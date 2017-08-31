@@ -1,0 +1,23 @@
+{
+  "name": "skycli",
+  "version": "0.1.0",
+  "description": "Command line interface to Skygear Portal",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SkygearIO/skycli.git"
+  },
+  "keywords": [
+    "cli",
+    "skygear"
+  ],
+  "author": "Oursky Limited",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/SkygearIO/skycli/issues"
+  },
+  "homepage": "https://skygear.io/"
+}
