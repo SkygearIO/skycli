@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "description": "Command line interface to Skygear Portal",
   "main": "index.js",
+  "bin": {
+    "skycli": "./bin/skycli"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -19,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/SkygearIO/skycli/issues"
   },
-  "homepage": "https://skygear.io/"
+  "homepage": "https://skygear.io/",
+  "dependencies": {
+    "yargs": "^8.0.2"
+  }
 }
