@@ -1,0 +1,13 @@
+{
+  "presets": [
+    "es2015",
+    "stage-2"
+  ],
+  "plugins": [
+    "add-module-exports",
+    ["transform-builtin-extend", {
+      "globals": ["Error", "Array"],
+      "approximate": true
+    }]
+  ]
+}
