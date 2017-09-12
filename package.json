@@ -28,6 +28,13 @@
   },
   "homepage": "https://skygear.io/",
   "dependencies": {
+    "chalk": "^2.1.0",
+    "find-up": "^2.1.0",
+    "inquirer": "^3.2.3",
+    "lodash": "^4.17.4",
+    "node-fetch": "^1.7.2",
+    "raven-js": "^3.17.0",
+    "untildify": "^3.0.2",
     "yargs": "^8.0.2"
   },
   "devDependencies": {
