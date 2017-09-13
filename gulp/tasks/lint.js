@@ -2,7 +2,7 @@ var gulp = require('gulp');
 var eslint = require('gulp-eslint');
 var excludeGitignore = require('gulp-exclude-gitignore');
 
-gulp.task('lint', ['build', 'test'], () => {
+gulp.task('lint', () => {
   return gulp.src(['src/**/*.js', 'test/**/*.js'])
     .pipe(excludeGitignore())
     .pipe(eslint())

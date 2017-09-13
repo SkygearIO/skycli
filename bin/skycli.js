@@ -1,5 +1,5 @@
 #!/usr/bin/env node
 'use strict';
 
-var program = require('../')
-program.argv
+var program = require('../');
+program.argv;

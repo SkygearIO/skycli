@@ -7,9 +7,11 @@
     "skycli": "./bin/skycli"
   },
   "scripts": {
-    "test": "gulp test",
+    "test": "gulp test && gulp lint",
+    "lint": "gulp lint",
     "prepare": "gulp build",
-    "start": "gulp watch"
+    "start": "gulp watch",
+    "skycli": "gulp build && ./bin/skycli.js"
   },
   "repository": {
     "type": "git",
@@ -26,6 +28,13 @@
   },
   "homepage": "https://skygear.io/",
   "dependencies": {
+    "chalk": "^2.1.0",
+    "find-up": "^2.1.0",
+    "inquirer": "^3.2.3",
+    "lodash": "^4.17.4",
+    "node-fetch": "^1.7.2",
+    "raven-js": "^3.17.0",
+    "untildify": "^3.0.2",
     "yargs": "^8.0.2"
   },
   "devDependencies": {
@@ -42,5 +51,18 @@
     "gulp-exclude-gitignore": "^1.2.0",
     "gulp-mocha": "^4.3.1",
     "require-dir": "^0.3.2"
+  },
+  "skycli": {
+    "controller": {
+      "env": {
+        "staging": {
+          "url": "https://deis.staging.skygeario.com/v2/"
+        },
+        "production": {
+          "url": "https://deis.skygeario.com/v2/"
+        }
+      }
+    },
+    "env": "production"
   }
 }

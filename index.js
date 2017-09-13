@@ -15,7 +15,31 @@
  */
 'use strict';
 
-module.exports = require('yargs')
+const config = require('./dist/config');
+
+const cli = require('yargs')
   .commandDir('dist/commands')
   .demandCommand()
-  .help()
+  .pkgConf('skycli')
+  .config(config.load())
+  .option('debug', {
+    type: 'boolean',
+    desc: 'Show debug logs'
+  })
+  .option('verbose', {
+    type: 'boolean',
+    desc: 'Show verbose logs'
+  })
+  .option('env', {
+    type: 'string',
+    desc: false // Controller environment, 'false' hide this option from help
+  })
+  .check((argv, options) => {
+    if (argv.debug) {
+      console.log('argv: ', argv);
+    }
+    return true;
+  }, true)
+  .help();
+
+module.exports = cli;
