@@ -22,6 +22,11 @@ const cli = require('yargs')
   .demandCommand()
   .pkgConf('skycli')
   .config(config.load())
+  .config(config.loadLocal())
+  .config({
+    project: config.loadProject()
+  })
+  .env('SKYCLI')
   .option('debug', {
     type: 'boolean',
     desc: 'Show debug logs'
