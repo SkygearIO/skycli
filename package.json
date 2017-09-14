@@ -53,16 +53,14 @@
     "require-dir": "^0.3.2"
   },
   "skycli": {
-    "controller": {
-      "env": {
-        "staging": {
-          "url": "https://deis.staging.skygeario.com/v2/"
-        },
-        "production": {
-          "url": "https://deis.skygeario.com/v2/"
-        }
+    "environments": {
+      "staging": {
+        "url": "https://deis.staging.skygeario.com/v2/"
+      },
+      "production": {
+        "url": "https://deis.skygeario.com/v2/"
       }
     },
-    "env": "production"
+    "environment": "production"
   }
 }
