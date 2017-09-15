@@ -54,7 +54,7 @@ const cli = require('yargs')
   })
   .option('environment', {
     type: 'string',
-    desc: false // Controller environment, 'false' hide this option from help
+    desc: config.developerMode && 'Set controller environment.'
   })
   .check(checkArguments)
   .help();

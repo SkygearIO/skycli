@@ -114,3 +114,5 @@ export function setProject(name, value) {
 export function unsetProject(name) {
   return unset(name, ProjectDomain);
 }
+
+export const developerMode = process.env.SKYCLI_DEVELOPER_MODE === '1';

@@ -96,7 +96,7 @@ export default {
   builder: {
     local: {
       type: 'boolean',
-      desc: false
+      desc: config.developerMode && 'Configure account for local directory.'
     }
   },
   handler: run
