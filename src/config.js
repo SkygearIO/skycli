@@ -13,57 +13,106 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import findUp from 'find-up';
 import _ from 'lodash';
 import fs from 'fs';
 import untildify from 'untildify';
+import path from 'path';
 
-const rcPathList = [
-  './.skyclirc',
-  './.skycli/skyclirc',
-  '~/.skyclirc',
-  '~/.skycli/skyclirc'
-];
+const currentConfigVersion = 1;
 
-function findConfigPath() {
-  let cwd = process.cwd();
-  return findUp.sync(rcPathList, { cwd });
+export const GlobalDomain = 'global';
+export const LocalDomain = 'local';
+export const ProjectDomain = 'project';
+
+const configPaths = {
+  global: '~/.skycli/skyclirc',
+  local: './.skycli/skyclirc',
+  project: './skygear.json'
+};
+
+function migrate(configObject) {
+  const migrated = _.assign({}, configObject);
+  if (typeof migrated.version === 'undefined') {
+    migrated.version = currentConfigVersion;
+  }
+
+  // If we have new config version in the future, migrate the config object
+  // from previous config version to the current one here.
+
+  return migrated;
 }
 
-export function load() {
-  let rcConfig = {};
-  let rcPath = findConfigPath();
+function absolutePath(domain = GlobalDomain) {
+  return path.resolve(untildify(configPaths[domain]));
+}
 
-  if (rcPath) {
-    rcConfig = JSON.parse(
-      fs.readFileSync(rcPath, 'utf-8')
+export function load(domain = GlobalDomain) {
+  let content = {};
+
+  const configPath = absolutePath(domain);
+  if (fs.existsSync(configPath)) {
+    content = JSON.parse(
+      fs.readFileSync(configPath, 'utf-8')
     );
   }
 
-  return rcConfig;
+  return migrate(content);
 }
 
-export function save(rcConfig) {
-  let content = JSON.stringify(rcConfig, null, 2);
-  let rcPath = findConfigPath();
-  if (!rcPath) {
-    rcPath = untildify(rcPathList[rcPathList.length - 1]);
-
-    // Make sure the directory exists
-    const configDir = untildify('~/.skycli/');
-    if (!fs.existsSync(configDir)) {
-      fs.mkdirSync(configDir);
-    }
+export function save(configObject, domain = GlobalDomain) {
+  const configPath = absolutePath(domain);
+  const configDirPath = path.dirname(configPath);
+  if (!fs.existsSync(configDirPath)) {
+    fs.mkdirSync(configDirPath);
   }
-  fs.writeFileSync(rcPath, content);
+
+  const content = JSON.stringify(configObject, null, 2);
+  fs.writeFileSync(configPath, content);
 }
 
-export function set(name, value) {
-  let rcConfig = load();
-  _.set(rcConfig, name, value);
-  save(rcConfig);
+export function set(name, value, domain = GlobalDomain) {
+  let configObject = load(domain);
+  let oldValue = _.get(configObject, name);
+  if (value !== oldValue) {
+    _.set(configObject, name, value);
+    save(configObject, domain);
+  }
 }
 
-export function unset(name) {
-  set(name, undefined);
+export function unset(name, domain = GlobalDomain) {
+  set(name, undefined, domain);
 }
+
+export function loadLocal() {
+  return load(LocalDomain);
+}
+
+export function saveLocal(configObject) {
+  return save(configObject, LocalDomain);
+}
+
+export function setLocal(name, value) {
+  return set(name, value, LocalDomain);
+}
+
+export function unsetLocal(name) {
+  return unset(name, LocalDomain);
+}
+
+export function loadProject() {
+  return load(ProjectDomain);
+}
+
+export function saveProject(configObject) {
+  return save(configObject, ProjectDomain);
+}
+
+export function setProject(name, value) {
+  return set(name, value, ProjectDomain);
+}
+
+export function unsetProject(name) {
+  return unset(name, ProjectDomain);
+}
+
+export const developerMode = process.env.SKYCLI_DEVELOPER_MODE === '1';

@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import _ from 'lodash';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 
-import { setControllerEnvironment, controller } from '../api';
+import { controller } from '../api';
 import * as config from '../config';
 
 const emailPrompt = {
@@ -46,9 +47,25 @@ const passwordPrompt = {
   }
 };
 
-function run(argv) {
-  setControllerEnvironment(argv);
+function saveAccount(email, token, environment, local = false) {
+  const accountKey = _.replace(`${environment}:${email}`, '.', '~');
 
+  const setFn = local ? config.setLocal : config.set;
+  setFn(
+    ['accounts', accountKey],
+    {
+      token,
+      environment,
+      email
+    }
+  );
+  setFn(
+    'account',
+    accountKey
+  );
+}
+
+function run(argv) {
   let email;
 
   inquirer.prompt([emailPrompt, passwordPrompt]).then((answers) => {
@@ -62,9 +79,8 @@ function run(argv) {
       console.log(chalk.red(payload.non_field_errors));
       return;
     }
-    config.set('auth.email', email);
-    config.set('auth.token', payload.token);
-    config.set('auth.env', argv.env);
+
+    saveAccount(email, payload.token, argv.environment, argv.local);
     console.log(chalk.green(`Logged in as ${email}.`));
   }, (error) => {
     console.log(chalk.red('Unable to complete the request.'));
@@ -77,5 +93,11 @@ function run(argv) {
 export default {
   command: 'login',
   desc: 'Log in to Skygear Portal',
+  builder: {
+    local: {
+      type: 'boolean',
+      desc: config.developerMode && 'Configure account for local directory.'
+    }
+  },
   handler: run
 };

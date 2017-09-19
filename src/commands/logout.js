@@ -18,16 +18,28 @@ import chalk from 'chalk';
 
 import * as config from '../config';
 
+function removeAccount(accountKey) {
+  config.unset(['accounts', accountKey]);
+  config.unsetLocal(['accounts', accountKey]);
+}
+
 function run(argv) {
+  const account = argv.currentAccount;
+  if (!account) {
+    console.log(chalk.red('Not logged in to accounts.'));
+    return;
+  }
+
   inquirer.prompt([{
     type: 'confirm',
     name: 'confirm',
-    message: `Log out as ${argv.email}?`
+    message: `Log out as ${account.email}?`
   }]).then((answers) => {
     if (!answers.confirm) {
       return;
     }
-    config.unset('auth');
+
+    removeAccount(argv.account);
     console.log(chalk.green('Successfully logged out.'));
   });
 }

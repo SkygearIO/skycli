@@ -16,12 +16,34 @@
 'use strict';
 
 const config = require('./dist/config');
+const configUtil = require('./dist/config-util');
+const setControllerEnvironment = require('./dist/api').setControllerEnvironment;
+
+function checkArguments(argv, options) {
+  // Populate some data from argv for convenience
+  argv.currentEnvironment = configUtil.currentEnvironment(argv);
+  argv.currentAccount = configUtil.currentAccount(argv);
+
+  // Configure controller environment
+  setControllerEnvironment(argv.currentEnvironment);
+
+  // Print argv for debug mode to facilitate debugging.
+  if (argv.debug) {
+    console.log('argv: ', argv);
+  }
+  return true;
+}
 
 const cli = require('yargs')
   .commandDir('dist/commands')
   .demandCommand()
   .pkgConf('skycli')
   .config(config.load())
+  .config(config.loadLocal())
+  .config({
+    project: config.loadProject()
+  })
+  .env('SKYCLI')
   .option('debug', {
     type: 'boolean',
     desc: 'Show debug logs'
@@ -30,16 +52,11 @@ const cli = require('yargs')
     type: 'boolean',
     desc: 'Show verbose logs'
   })
-  .option('env', {
+  .option('environment', {
     type: 'string',
-    desc: false // Controller environment, 'false' hide this option from help
+    desc: config.developerMode && 'Set controller environment.'
   })
-  .check((argv, options) => {
-    if (argv.debug) {
-      console.log('argv: ', argv);
-    }
-    return true;
-  }, true)
+  .check(checkArguments)
   .help();
 
 module.exports = cli;
