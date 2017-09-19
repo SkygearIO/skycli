@@ -30,6 +30,7 @@
   "dependencies": {
     "chalk": "^2.1.0",
     "find-up": "^2.1.0",
+    "fs-extra": "^4.0.2",
     "inquirer": "^3.2.3",
     "lodash": "^4.17.4",
     "node-fetch": "^1.7.2",
@@ -55,10 +56,12 @@
   "skycli": {
     "environments": {
       "staging": {
-        "url": "https://deis.staging.skygeario.com/v2/"
+        "url": "https://deis.staging.skygeario.com/v2/",
+        "portalURL": "https://portal-staging.skygear.io/"
       },
       "production": {
-        "url": "https://deis.skygeario.com/v2/"
+        "url": "https://deis.skygeario.com/v2/",
+        "portalURL": "https://portal.skygear.io/"
       }
     },
     "environment": "production"

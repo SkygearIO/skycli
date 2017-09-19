@@ -13,17 +13,144 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function call(argv) {
-  console.log('init called for dir', argv.dir);
+import inquirer from 'inquirer';
+import fs from 'fs-extra';
+import chalk from 'chalk';
+import path from 'path';
+import _ from 'lodash';
+
+import { controller } from '../api';
+import * as config from '../config';
+import * as template from '../template';
+
+function ensureLoggedIn(argv) {
+  if (!argv.currentAccount) {
+    return Promise.reject('Requires authentication, please run skycli login.');
+  }
+  return Promise.resolve();
 }
 
-module.exports = {
-  command: 'init [dir]',
-  desc: 'Create an empty repo',
-  builder: {
-    dir: {
-      default: '.'
+function confirmProjectDirectory(argv, projectDir) {
+  return inquirer.prompt([
+    {
+      type: 'confirm',
+      name: 'proceed',
+      message:
+        'You\'re about to initialze a Skygear Project in this ' +
+        `directory: ${projectDir}.\n` +
+        'Confirm?'
     }
+  ]);
+}
+
+function askProjectInfo(argv) {
+  const suggestedApp = path.basename(argv.dest);
+  const token = argv.currentAccount.token;
+  return inquirer.prompt([
+    {
+      type: 'list',
+      name: 'app',
+      message: 'Select an app to associate with the directory:',
+      when: () => {
+        console.log('Fetching the list of your apps...');
+        return true;
+      },
+      default: suggestedApp,
+      choices: () => {
+        return controller.apps(token)
+          .then((apps) => {
+            if (apps.length === 0) {
+              return Promise.reject(
+                'There are no apps in your account ' +
+                `${argv.currentAccount.email}. ` +
+                `Create an app at ${argv.currentEnvironment.portalURL}.`
+              );
+            }
+
+            return _.reduce(apps, (result, app) => {
+              result.push(app.id);
+              return result;
+            }, []);
+          });
+      }
+    },
+    {
+      type: 'confirm',
+      name: 'staticHosting',
+      message:
+        'Do you want to create your static hosting directory ' +
+        '(public)?'
+    },
+    {
+      type: 'list',
+      name: 'projectTemplate',
+      message: 'Select the Project Template:',
+      choices: [
+        {
+          name: 'JavaScript',
+          value: 'javascript'
+        },
+        {
+          name: 'Python',
+          value: 'python'
+        },
+        {
+          name: 'Empty',
+          value: 'empty'
+        }
+      ]
+    }
+  ]);
+}
+
+function run(argv) {
+  const projectDir = path.resolve(argv.dest);
+
+  return ensureLoggedIn(argv)
+    .then(() => {
+      return confirmProjectDirectory(argv, projectDir);
+    }).then((answers) => {
+      if (!answers.proceed) {
+        return Promise.reject();
+      }
+
+      return askProjectInfo(argv);
+    }).then((answers) => {
+      if (argv.debug) {
+        console.log('Got answers: ', answers);
+      }
+
+      // Ensure project directory exists and chdir to it.
+      fs.ensureDirSync(projectDir);
+      process.chdir(projectDir);
+
+      // Run templates.
+      template.cloudcode(answers.projectTemplate);
+      if (answers.staticHosting) {
+        const staticHostingDir = path.join(path.resolve('.'), 'public_html');
+        fs.ensureDirSync(staticHostingDir);
+        template.html(staticHostingDir);
+      }
+
+      // Write project config.
+      console.log('Writing configuration to skygear.json');
+      config.setProject('app', answers.app);
+
+      console.log('Initialization Completed!');
+    })
+    .catch((err) => {
+      if (err) {
+        console.log(chalk.red(err));
+      }
+      process.exit(1);
+    });
+}
+
+export default {
+  command: 'init [dest]',
+  desc: 'Initialize a Skygear project',
+  builder: (yargs) => {
+    return yargs.default('dest', 'skygear-project');
   },
-  handler: call
+  handler: run
 };
