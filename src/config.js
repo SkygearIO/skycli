@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import _ from 'lodash';
-import fs from 'fs';
+import fs from 'fs-extra';
 import untildify from 'untildify';
 import path from 'path';
 
@@ -42,15 +42,45 @@ function migrate(configObject) {
   return migrated;
 }
 
-function absolutePath(domain = GlobalDomain) {
-  return path.resolve(untildify(configPaths[domain]));
+function isGlobalConfigPath(configPath) {
+  const globalConfigPath = path.resolve(untildify(configPaths[GlobalDomain]));
+  return globalConfigPath === configPath;
+}
+
+function findConfig(domain, exists = true) {
+  const configPath = untildify(configPaths[domain]);
+  const absolute = path.isAbsolute(configPath);
+
+  var currentDir = process.cwd();
+  var fullPath = absolute ? configPath : path.resolve(currentDir, configPath);
+  if (!exists) {
+    return fullPath;
+  }
+
+  // If the config path is not already an absolute path, recursively
+  // find the config file until we find an existing one.
+  while (!absolute && currentDir !== path.dirname(currentDir)) {
+    fullPath = path.resolve(currentDir, configPath);
+    if (fs.existsSync(fullPath)) {
+      if (domain === LocalDomain && isGlobalConfigPath(fullPath)) {
+        // We are looking for local config, but we only find the global
+        // one, meaning local config doesn't exist.
+        return undefined;
+      }
+      return fullPath;
+    }
+    currentDir = path.dirname(currentDir);
+  }
+
+  fullPath = path.resolve(currentDir, configPath);
+  return fs.existsSync(fullPath) ? fullPath : undefined;
 }
 
 export function load(domain = GlobalDomain) {
   let content = {};
 
-  const configPath = absolutePath(domain);
-  if (fs.existsSync(configPath)) {
+  const configPath = findConfig(domain);
+  if (configPath) {
     content = JSON.parse(
       fs.readFileSync(configPath, 'utf-8')
     );
@@ -60,10 +90,10 @@ export function load(domain = GlobalDomain) {
 }
 
 export function save(configObject, domain = GlobalDomain) {
-  const configPath = absolutePath(domain);
-  const configDirPath = path.dirname(configPath);
-  if (!fs.existsSync(configDirPath)) {
-    fs.mkdirSync(configDirPath);
+  var configPath = findConfig(domain);
+  if (!configPath) {
+    configPath = findConfig(domain, false);
+    fs.ensureDirSync(path.dirname(configPath));
   }
 
   const content = JSON.stringify(configObject, null, 2);
