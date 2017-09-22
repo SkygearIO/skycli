@@ -37,7 +37,7 @@ function checkArguments(argv, options) {
 const cli = require('yargs')
   .commandDir('dist/commands')
   .demandCommand()
-  .pkgConf('skycli')
+  .pkgConf('skycli', __dirname)
   .config(config.load())
   .config(config.loadLocal())
   .config({
