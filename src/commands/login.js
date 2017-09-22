@@ -48,7 +48,7 @@ const passwordPrompt = {
 };
 
 function saveAccount(email, token, environment, local = false) {
-  const accountKey = _.replace(`${environment}:${email}`, '.', '~');
+  const accountKey = _.replace(`${environment}:${email}`, /\./g, '~');
 
   const setFn = local ? config.setLocal : config.set;
   setFn(
