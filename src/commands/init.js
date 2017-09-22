@@ -150,7 +150,7 @@ export default {
   command: 'init [dest]',
   desc: 'Initialize a Skygear project',
   builder: (yargs) => {
-    return yargs.default('dest', 'skygear-project');
+    return yargs.default('dest', '.');
   },
   handler: run
 };
