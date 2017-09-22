@@ -2,7 +2,9 @@ import Raven from 'raven-js';
 
 export function handleFailureResponse(response) {
   return response.json().then((error) => {
-    throw new Error(error);
+    throw error;
+  }, () => {
+    throw new Error(response.statusText);
   }).catch((err) => {
     Raven.captureException(err, {
       statusCode: response.status
