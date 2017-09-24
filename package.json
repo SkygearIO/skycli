@@ -4,7 +4,7 @@
   "description": "Command line interface to Skygear Portal",
   "main": "index.js",
   "bin": {
-    "skycli": "./bin/skycli"
+    "skycli": "./bin/skycli.js"
   },
   "scripts": {
     "test": "gulp test && gulp lint",
