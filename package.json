@@ -11,7 +11,9 @@
     "lint": "gulp lint",
     "prepare": "gulp build",
     "start": "gulp watch",
-    "skycli": "gulp build && ./bin/skycli.js"
+    "skycli": "gulp build && ./bin/skycli.js",
+    "build-bin": "gulp build && mkdir -p dist-bin && pkg --out-path dist-bin --targets node8-macos,node8-linux,node8-win .",
+    "clean": "rm -rf dist dist-bin"
   },
   "repository": {
     "type": "git",
@@ -51,7 +53,14 @@
     "gulp-eslint": "^4.0.0",
     "gulp-exclude-gitignore": "^1.2.0",
     "gulp-mocha": "^4.3.1",
+    "pkg": "^4.2.4",
     "require-dir": "^0.3.2"
+  },
+  "pkg": {
+    "assets": [
+      "dist/**/*",
+      "templates/**/*"
+    ]
   },
   "skycli": {
     "environments": {
