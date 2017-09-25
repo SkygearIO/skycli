@@ -3,5 +3,4 @@ dist
 dist-bin
 .skycli
 skygear.json
-skygear-project
 npm-debug.log
