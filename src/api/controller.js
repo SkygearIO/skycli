@@ -631,4 +631,39 @@ export function createBuildJob(semver, appName, token) {
     }
   });
 }
+
+export function createArtifactUpload(appName, token) {
+  return fetch(config.url + `apps/${appName}/artifacts/upload`, {
+    method: 'POST',
+    headers: {
+      ...defaultHeaders(token)
+    }
+  })
+  .then((response) => {
+    if (response.status === 200) {
+      return response.json();
+    } else {
+      return handleFailureResponse(response);
+    }
+  });
+}
+
+export function createArtifact(request, appName, token) {
+  return fetch(config.url + `apps/${appName}/artifacts`, {
+    method: 'POST',
+    headers: {
+      ...defaultHeaders(token)
+    },
+    body: JSON.stringify({
+      artifact_request: request
+    })
+  })
+  .then((response) => {
+    if (response.status === 200) {
+      return response.json();
+    } else {
+      return handleFailureResponse(response);
+    }
+  });
+}
 /* eslint-enable */
