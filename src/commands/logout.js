@@ -17,6 +17,7 @@ import inquirer from 'inquirer';
 import chalk from 'chalk';
 
 import * as config from '../config';
+import { createCommand } from '../util';
 
 function removeAccount(accountKey) {
   config.unset(['accounts', accountKey]);
@@ -30,7 +31,7 @@ function run(argv) {
     return;
   }
 
-  inquirer.prompt([{
+  return inquirer.prompt([{
     type: 'confirm',
     name: 'confirm',
     message: `Log out as ${account.email}?`
@@ -44,9 +45,8 @@ function run(argv) {
   });
 }
 
-export default {
+export default createCommand({
   command: 'logout',
   desc: 'Log out from Skygear Portal',
   handler: run
-};
-
+});

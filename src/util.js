@@ -13,15 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import pkg from '../../package.json';
-import { createCommand } from '../util';
+import _ from 'lodash';
+import chalk from 'chalk';
 
-function printVersion() {
-  console.log(pkg.version);
+export function createCommand(module) {
+  return _.assign(
+    {},
+    module,
+    {
+      handler: function (argv) {
+        return module.handler(argv)
+          .catch((err) => {
+            if (err) {
+              if (typeof err === 'object') {
+                err = JSON.stringify(err);
+              }
+              console.log(chalk.red(err));
+            }
+            process.exit(1);
+          });
+      },
+      execute: module.handler
+    }
+  );
 }
 
-module.exports = createCommand({
-  command: 'version',
-  desc: 'Print version',
-  handler: printVersion
-});
+export function executeCommand(module, argv) {
+  return module.execute(argv);
+}
