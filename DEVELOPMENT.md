@@ -27,6 +27,23 @@ $ npm start
 Alternatively, you can run `npm run skycli` to build source and then run
 `skycli`.
 
+## Options for development
+
+The command line interface has a developer mode that shows additional
+information when running `skycli help`. This can be achieved by running
+the program with `SKYCLI_DEVELOPER_MODE` environment variable set to `1`.
+
+```shell
+$ SKYCLI_DEVELOPER_MODE=1 skycli help
+```
+
+You can also run `skycli` with debug option to print debug information.
+
+```shell
+$ skycli --debug help
+$ SKYCLI_DEBUG=true skycli help  # Alternative usage
+```
+
 ## Publish
 
 Bump version number to next version:
