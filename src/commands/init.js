@@ -17,15 +17,18 @@ import inquirer from 'inquirer';
 import fs from 'fs-extra';
 import path from 'path';
 import _ from 'lodash';
+import chalk from 'chalk';
 
 import { controller } from '../api';
 import * as config from '../config';
 import { createCommand } from '../util';
 import * as template from '../template';
+import LoginCommand from './login';
 
 function ensureLoggedIn(argv) {
   if (!argv.currentAccount) {
-    return Promise.reject('Requires authentication, please run skycli login.');
+    console.log(chalk.yellow('Requires authentication, please run login.'));
+    return LoginCommand.execute(argv);
   }
   return Promise.resolve();
 }
