@@ -19,6 +19,7 @@ import archiver from 'archiver';
 import mktemp from 'mktemp';
 
 import { controller, asset } from '../api';
+import { createCommand } from '../util';
 
 function makeArchive(app) {
   // create a file to stream archive data to.
@@ -137,22 +138,16 @@ function run(argv) {
         console.log(chalk.red('Build failed.'));
       }
     })
-    .catch((err) => {
-      if (err) {
-        console.log(chalk.red(err));
-      }
-      process.exit(1);
-    })
     .then(() => {
       fs.unlinkSync(tarPath);
     });
 }
 
-export default {
+export default createCommand({
   command: 'deploy',
   desc: 'Deploy skygear project to cloud.',
   builder: (yargs) => {
     return yargs;
   },
   handler: run
-};
+});

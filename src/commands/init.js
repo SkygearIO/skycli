@@ -15,12 +15,12 @@
  */
 import inquirer from 'inquirer';
 import fs from 'fs-extra';
-import chalk from 'chalk';
 import path from 'path';
 import _ from 'lodash';
 
 import { controller } from '../api';
 import * as config from '../config';
+import { createCommand } from '../util';
 import * as template from '../template';
 
 function ensureLoggedIn(argv) {
@@ -137,20 +137,14 @@ function run(argv) {
       config.setProject('app', answers.app);
 
       console.log('Initialization Completed!');
-    })
-    .catch((err) => {
-      if (err) {
-        console.log(chalk.red(err));
-      }
-      process.exit(1);
     });
 }
 
-export default {
+export default createCommand({
   command: 'init [dest]',
   desc: 'Initialize a Skygear project',
   builder: (yargs) => {
     return yargs.default('dest', '.');
   },
   handler: run
-};
+});

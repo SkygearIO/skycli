@@ -19,6 +19,7 @@ import chalk from 'chalk';
 
 import { controller } from '../api';
 import * as config from '../config';
+import { createCommand } from '../util';
 
 const emailPrompt = {
   type: 'input',
@@ -68,7 +69,7 @@ function saveAccount(email, token, environment, local = false) {
 function run(argv) {
   let email;
 
-  inquirer.prompt([emailPrompt, passwordPrompt]).then((answers) => {
+  return inquirer.prompt([emailPrompt, passwordPrompt]).then((answers) => {
     email = answers.email;
     return controller.login(answers.email, answers.password);
   }).then((payload) => {
@@ -76,21 +77,20 @@ function run(argv) {
       console.log(payload);
     }
     if (payload.non_field_errors) {
-      console.log(chalk.red(payload.non_field_errors));
-      return;
+      return Promise.reject(payload.non_field_errors);
     }
 
     saveAccount(email, payload.token, argv.environment, argv.local);
     console.log(chalk.green(`Logged in as ${email}.`));
   }, (error) => {
-    console.log(chalk.red('Unable to complete the request.'));
     if (argv.debug) {
       console.error(error);
     }
+    return Promise.reject('Unable to complete the request.');
   });
 }
 
-export default {
+export default createCommand({
   command: 'login',
   desc: 'Log in to Skygear Portal',
   builder: {
@@ -100,4 +100,4 @@ export default {
     }
   },
   handler: run
-};
+});
