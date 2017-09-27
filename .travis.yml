@@ -16,3 +16,18 @@ install:
 
 script:
   - npm test
+
+before_deploy:
+  - npm run build-bin
+
+deploy:
+  - provider: releases
+    api-key: "$GITHUB_RELEASE_TOKEN"
+    file:
+      - "dist-bin/*"
+    skip_cleanup: true
+    file_glob: true
+    on:
+      repo: SkygearIO/skycli
+      tags: true
+      node_js: 8
