@@ -22,8 +22,9 @@ export function createCommand(module) {
     module,
     {
       handler: function (argv) {
-        return module.handler(argv)
-          .catch((err) => {
+        let p = module.handler(argv);
+        if (p && typeof p.catch === 'function') {
+          p.catch((err) => {
             if (err) {
               if (typeof err === 'object') {
                 err = JSON.stringify(err);
@@ -32,6 +33,7 @@ export function createCommand(module) {
             }
             process.exit(1);
           });
+        }
       },
       execute: module.handler
     }
