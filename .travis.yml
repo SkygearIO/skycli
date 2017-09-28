@@ -31,3 +31,8 @@ deploy:
       repo: SkygearIO/skycli
       tags: true
       node_js: 8
+
+notifications:
+  slack:
+    rooms:
+      secure: dGN9U9rXOHcR49DI0ciUMX+YjHmEr5HSPWxeFroExehQbOrlieSbR4zwt3WHBWFkneGq862A1YjHnjbFvrmSn+hDKQ0dCm3yxLY1YXwadlE/VZ8T2eL65Mh0x4jcoP7HYkK1l1rQX2ojW63nNlAcVjfo18InJfDXhi9wSg5pXdRzLXRvQ+OKu3JmsZxB6pZL1TOYpU4lcuThn/n6hg/5mKeUL1V9YuOJekMFp43n/LQD3s9fZhW75DIkGuGAqNKqKZ90tgyLoDM4xzJt0HGyYQWjx/k4vU0RWj+glhzBgLniwcNfYBfl6DA+hR/uyRR5Prtm8ImxW53hSczGxbj4abozn69wd0I7oQPNt4XqkrlWyT/x91deL+BR3I705Sl9BBCuEp8z3r5b/+jAt+jBl4v51qi4dwb+np1iHSJ4Sh7dn/ZTIbZVVgmqbeh1zrQMy85MDZYAatUGk1Oy22bxsMTdOvzASP4w10XPfmGxDpF/bxCvJDR4+x0REChCzVtigJ/4Nm+Bf3dFfVssthX2WeLAFltaIReMFD42SQqfm0oIPtD9GP+gS2jC7T2UvmousYbHeZgDYi9pxCfa71epzFYn8cJ370Dzy2trjoxIlRp6zT9+Vck8bUjRYjPTZwjPkZLUFUNLnHID2gdN+zunRvNozxsNRq+aUDb2hLIMi/0=
