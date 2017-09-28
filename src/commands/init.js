@@ -27,7 +27,7 @@ import LoginCommand from './login';
 
 function ensureLoggedIn(argv) {
   if (!argv.currentAccount) {
-    console.log(chalk.yellow('Requires authentication, please run login.'));
+    console.log(chalk.yellow('Requires authentication, please login.'));
     return LoginCommand.execute(argv);
   }
   return Promise.resolve();
