@@ -69,11 +69,11 @@
   "skycli": {
     "environments": {
       "staging": {
-        "url": "https://deis.staging.skygeario.com/v2/",
+        "url": "https://controller.staging.skygeario.com/v2/",
         "portalURL": "https://portal-staging.skygear.io/"
       },
       "production": {
-        "url": "https://deis.skygeario.com/v2/",
+        "url": "https://controller.skygeario.com/v2/",
         "portalURL": "https://portal.skygear.io/"
       }
     },
