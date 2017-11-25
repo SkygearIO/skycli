@@ -38,9 +38,9 @@
     "fs-extra": "^4.0.2",
     "inquirer": "^3.2.3",
     "lodash": "^4.17.4",
-    "mktemp": "^0.4.0",
     "node-fetch": "^1.7.2",
     "raven-js": "^3.17.0",
+    "tmp": "0.0.33",
     "untildify": "^3.0.2",
     "yargs": "^8.0.2"
   },
