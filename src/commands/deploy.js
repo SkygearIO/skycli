@@ -16,14 +16,20 @@
 import fs from 'fs-extra';
 import chalk from 'chalk';
 import archiver from 'archiver';
-import mktemp from 'mktemp';
+import tmp from 'tmp';
 
 import { controller, asset } from '../api';
 import { createCommand } from '../util';
 
 function makeArchive(app) {
   // create a file to stream archive data to.
-  var tarPath = mktemp.createFileSync(`/tmp/${app}-deploy-XXXXXXXXX.tar.gz`);
+  const {
+    name: tarPath
+  } = tmp.fileSync({
+    discardDescriptor: true,
+    prefix: `${app}-deploy-`,
+    postfix: '.tar.gz'
+  });
   var output = fs.createWriteStream(tarPath);
   var archive = archiver('tar', {
     gzip: true
