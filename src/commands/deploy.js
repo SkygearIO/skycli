@@ -16,6 +16,7 @@
 import fs from 'fs-extra';
 import chalk from 'chalk';
 import archiver from 'archiver';
+import globby from '@skygeario/globby';
 import tmp from 'tmp';
 
 import { controller, asset } from '../api';
@@ -58,13 +59,18 @@ function makeArchive(app) {
   // pipe archive data to the file
   archive.pipe(output);
 
-  archive.glob('**/*');
-
-  // finalize the archive (ie we are done appending files but streams have to finish yet)
-  return archive.finalize()
-    .then(() => {
-      return tarPath;
+  return globby('**', {
+    gitignore: true,
+    gitignoreName: '.skyignore'
+  }).then((paths) => {
+    paths.forEach((path) => {
+      archive.file(path);
     });
+    // finalize the archive (ie we are done appending files but streams have to finish yet)
+    return archive.finalize();
+  }).then(() => {
+    return tarPath;
+  });
 }
 
 function waitForBuildJob(appName, token) {
