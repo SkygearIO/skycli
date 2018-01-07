@@ -48,6 +48,35 @@ const passwordPrompt = {
   }
 };
 
+function askCredentials(argv) {
+  let prompts = [];
+  let credentials = {
+    email: argv.email,
+    password: argv.password
+  };
+
+  if (credentials.email) {
+    console.log(`Logging in as ${credentials.email}.`);
+  } else {
+    prompts.push(emailPrompt);
+  }
+
+  if (!credentials.password) {
+    prompts.push(passwordPrompt);
+  }
+
+  if (prompts.length === 0) {
+    return Promise.resolve(credentials);
+  }
+
+  return inquirer.prompt(prompts).then((answers) => {
+    return {
+      ...credentials,
+      ...answers
+    };
+  });
+}
+
 function saveAccount(email, token, environment, local = false) {
   const accountKey = _.replace(`${environment}:${email}`, /\./g, '~');
 
@@ -69,7 +98,7 @@ function saveAccount(email, token, environment, local = false) {
 function run(argv) {
   let email;
 
-  return inquirer.prompt([emailPrompt, passwordPrompt]).then((answers) => {
+  return askCredentials(argv).then((answers) => {
     email = answers.email;
     return controller.login(answers.email, answers.password);
   }).then((payload) => {
@@ -91,13 +120,24 @@ function run(argv) {
 }
 
 export default createCommand({
-  command: 'login',
+  command: 'login [email]',
   desc: 'Log in to Skygear Portal',
   builder: (yargs) => {
     return yargs
       .option('local', {
         type: 'boolean',
         desc: config.developerMode && 'Configure account for local directory.'
+      })
+      .option('email', {
+        alias: 'e',
+        type: 'string',
+        desc: 'Email address to login to Skygear Portal.'
+      })
+      .option('password', {
+        alias: 'p',
+        type: 'string',
+        desc: `Password to login to Skygear Portal.
+Suggestion: Use SKYCLI_PASSWORD to specify account password instead.`
       });
   },
   handler: run
