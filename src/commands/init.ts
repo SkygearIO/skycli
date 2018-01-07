@@ -145,7 +145,7 @@ function run(argv) {
 
 export default createCommand({
   command: 'init [dest]',
-  desc: 'Initialize a Skygear project',
+  describe: 'Initialize a Skygear project',
   builder: (yargs) => {
     return yargs.default('dest', '.');
   },

@@ -160,7 +160,7 @@ function run(argv) {
 
 export default createCommand({
   command: 'deploy',
-  desc: 'Deploy skygear project to cloud.',
+  describe: 'Deploy skygear project to cloud.',
   builder: (yargs) => {
     return yargs;
   },

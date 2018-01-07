@@ -47,6 +47,6 @@ function run(argv) {
 
 export default createCommand({
   command: 'logout',
-  desc: 'Log out from Skygear Portal',
+  describe: 'Log out from Skygear Portal',
   handler: run
 });

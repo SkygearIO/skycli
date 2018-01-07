@@ -96,7 +96,7 @@ function run(argv) {
 
 export default createCommand({
   command: 'logs',
-  desc: 'Print console log of the app.',
+  describe: 'Print console log of the app.',
   builder: (yargs) => {
     return yargs
       .option('tail', {

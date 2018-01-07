@@ -23,6 +23,6 @@ function printVersion() {
 
 module.exports = createCommand({
   command: 'version',
-  desc: 'Print version',
+  describe: 'Print version',
   handler: printVersion
 });

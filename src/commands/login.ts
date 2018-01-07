@@ -121,7 +121,7 @@ function run(argv) {
 
 export default createCommand({
   command: 'login [email]',
-  desc: 'Log in to Skygear Portal',
+  describe: 'Log in to Skygear Portal',
   builder: (yargs) => {
     return yargs
       .option('local', {
