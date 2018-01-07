@@ -17,14 +17,14 @@ import inquirer from 'inquirer';
 import chalk from 'chalk';
 
 import * as config from '../config';
-import { createCommand } from '../util';
+import { Arguments, createCommand } from '../util';
 
-function removeAccount(accountKey) {
+function removeAccount(accountKey: string) {
   config.unset(['accounts', accountKey]);
   config.unsetLocal(['accounts', accountKey]);
 }
 
-function run(argv) {
+function run(argv: Arguments) {
   const account = argv.currentAccount;
   if (!account) {
     console.log(chalk.red('Not logged in to accounts.'));

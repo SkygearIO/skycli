@@ -16,11 +16,11 @@
 import fs from 'fs-extra';
 import path from 'path';
 
-function fileCopyFilter(src) {
+function fileCopyFilter(src: string) {
   return path.basename(src) !== '.gitkeep';
 }
 
-export function cloudcode(name, dest = '.') {
+export function cloudcode(name: string, dest: string = '.') {
   const templateDir = path.resolve(
     path.join(__dirname, '..', 'templates', `cloudcode-${name}`)
   );
@@ -34,7 +34,7 @@ export function cloudcode(name, dest = '.') {
   });
 }
 
-export function html(dest = '.') {
+export function html(dest: string = '.') {
   const templateDir = path.resolve(
     path.join(__dirname, '..', 'templates', 'html')
   );

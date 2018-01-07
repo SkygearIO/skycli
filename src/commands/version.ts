@@ -19,6 +19,7 @@ var pkg = require('../../package.json');
 
 function printVersion() {
   console.log(pkg.version);
+  return Promise.resolve();
 }
 
 module.exports = createCommand({

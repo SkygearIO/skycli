@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { Arguments } from './util';
 
-export function currentAccount(argv) {
+export function currentAccount(argv: Arguments) {
   const accounts = argv.accounts || {};
   return accounts[argv.account] || undefined;
 }
 
-export function currentEnvironment(argv) {
+export function currentEnvironment(argv: Arguments) {
   const environments = argv.environments || {};
   const env = (currentAccount(argv) || {}).environment || argv.environment;
   return environments[env];

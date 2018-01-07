@@ -21,11 +21,11 @@ import chalk from 'chalk';
 
 import { controller } from '../api';
 import * as config from '../config';
-import { createCommand } from '../util';
+import { Arguments, createCommand } from '../util';
 import * as template from '../template';
 import LoginCommand from './login';
 
-function ensureLoggedIn(argv) {
+function ensureLoggedIn(argv: Arguments) {
   if (!argv.currentAccount) {
     console.log(chalk.yellow('Requires authentication, please login.'));
     return LoginCommand.execute(argv);
@@ -33,7 +33,7 @@ function ensureLoggedIn(argv) {
   return Promise.resolve();
 }
 
-function confirmProjectDirectory(argv, projectDir) {
+function confirmProjectDirectory(argv: Arguments, projectDir: string) {
   return inquirer.prompt([
     {
       type: 'confirm',
@@ -46,7 +46,7 @@ function confirmProjectDirectory(argv, projectDir) {
   ]);
 }
 
-function askProjectInfo(argv) {
+function askProjectInfo(argv: Arguments) {
   const suggestedApp = path.basename(argv.dest);
   const token = argv.currentAccount.token;
   return inquirer.prompt([
@@ -106,7 +106,7 @@ function askProjectInfo(argv) {
   ]);
 }
 
-function run(argv) {
+function run(argv: Arguments) {
   const projectDir = path.resolve(argv.dest);
 
   return ensureLoggedIn(argv)

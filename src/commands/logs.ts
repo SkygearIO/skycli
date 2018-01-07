@@ -17,16 +17,16 @@ import WebSocket from 'ws';
 import queryString from 'query-string';
 
 import { controller } from '../api';
-import { createCommand } from '../util';
+import { Arguments, createCommand } from '../util';
 
-function handleLogData(logData) {
+function handleLogData(logData): void {
   const {
     msg: message
   } = logData;
   console.log(message);
 }
 
-function makeLogStreamUrl(argv, logStreamResult) {
+function makeLogStreamUrl(argv: Arguments, logStreamResult): string {
   const {
     token,
     websocket_url: webSocketUrl
@@ -40,7 +40,7 @@ function makeLogStreamUrl(argv, logStreamResult) {
   return `${webSocketUrl}?${query}`;
 }
 
-function run(argv) {
+function run(argv: Arguments) {
   const appName = argv.project.app;
   const token = argv.currentAccount.token;
 
@@ -68,7 +68,7 @@ function run(argv) {
             console.log(`Received message: ${data}`);
           }
           try {
-            handleLogData(JSON.parse(data));
+            handleLogData(JSON.parse(data as string));
           } catch (e) {
             ws.close();
             reject(e);
@@ -100,7 +100,7 @@ export default createCommand({
   builder: (yargs) => {
     return yargs
       .option('tail', {
-        type: 'integer',
+        type: 'number',
         desc: 'Number of lines to print from the end of the log',
         default: 0
       });
