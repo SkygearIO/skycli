@@ -7,8 +7,9 @@
     "skycli": "./bin/skycli.js"
   },
   "scripts": {
-    "test": "gulp test && gulp lint",
+    "test": "gulp test && gulp lint && tsc",
     "lint": "gulp lint",
+    "tsc": "tsc",
     "prepare": "gulp build",
     "start": "gulp watch",
     "skycli": "gulp build && ./bin/skycli.js",
