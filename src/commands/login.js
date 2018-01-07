@@ -93,11 +93,12 @@ function run(argv) {
 export default createCommand({
   command: 'login',
   desc: 'Log in to Skygear Portal',
-  builder: {
-    local: {
-      type: 'boolean',
-      desc: config.developerMode && 'Configure account for local directory.'
-    }
+  builder: (yargs) => {
+    return yargs
+      .option('local', {
+        type: 'boolean',
+        desc: config.developerMode && 'Configure account for local directory.'
+      });
   },
   handler: run
 });
