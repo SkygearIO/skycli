@@ -1,7 +1,8 @@
 {
   "presets": [
-    "es2015",
-    "stage-2"
+    "@babel/es2015",
+    "@babel/stage-2",
+    "@babel/typescript"
   ],
   "plugins": [
     "add-module-exports",
