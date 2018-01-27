@@ -60,6 +60,7 @@ function makeArchive(app) {
   archive.pipe(output);
 
   return globby('**', {
+    dot: true,
     gitignore: true,
     gitignoreName: '.skyignore'
   }).then((paths) => {
