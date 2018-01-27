@@ -15,6 +15,7 @@
  */
 'use strict';
 
+require('babel-polyfill');
 const config = require('./dist/config');
 const configUtil = require('./dist/config-util');
 const setControllerEnvironment = require('./dist/api').setControllerEnvironment;

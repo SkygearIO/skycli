@@ -147,11 +147,13 @@ function run(argv) {
         console.log(chalk.green('Build completed successfully.'));
         success = true;
       } else {
-        console.log(chalk.red('Build failed.'));
+        return Promise.reject('Build failed.');
       }
     })
-    .then(() => {
-      fs.unlinkSync(tarPath);
+    .finally(() => {
+      if (tarPath) {
+        fs.unlinkSync(tarPath);
+      }
     });
 }
 
