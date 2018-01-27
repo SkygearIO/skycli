@@ -16,6 +16,7 @@ install:
 
 script:
   - npm test
+  - npm run tsc --noImplicitAny || true # treating it as warning for time being
 
 before_deploy:
   - npm run build-bin
