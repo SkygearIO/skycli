@@ -3,8 +3,14 @@
     "src/**/*.ts"
   ],
   "compilerOptions": {
-    "noImplicitAny": true,
-    "target": "es5"
+    "noImplicitAny": false,
+    "noEmit": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "es5",
+    "lib": [
+      "es2015",
+      "dom"
+    ]
   }
 }
 

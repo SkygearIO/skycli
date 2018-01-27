@@ -114,7 +114,7 @@ function run(argv) {
       return confirmProjectDirectory(argv, projectDir);
     }).then((answers) => {
       if (!answers.proceed) {
-        return Promise.reject();
+        return Promise.reject(undefined);
       }
 
       return askProjectInfo(argv);
