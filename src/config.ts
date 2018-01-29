@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import _ from 'lodash';
-import { PropertyPath, Dictionary } from 'lodash';
 import fs from 'fs-extra';
-import untildify from 'untildify';
+import _, { Dictionary, PropertyPath } from 'lodash';
 import path from 'path';
+import untildify from 'untildify';
 
 const currentConfigVersion = 1;
 
@@ -27,7 +26,7 @@ export enum ConfigDomain {
   ProjectDomain = 'project'
 }
 
-const configPaths: { [domain: string] : string } = {
+const configPaths: { [domain: string]: string } = {
   global: '~/.skycli/skyclirc',
   local: './.skycli/skyclirc',
   project: './skygear.json'
@@ -54,8 +53,8 @@ function findConfig(domain: ConfigDomain, exists: boolean = true) {
   const configPath = untildify(configPaths[domain]);
   const absolute = path.isAbsolute(configPath);
 
-  var currentDir = process.cwd();
-  var fullPath = absolute ? configPath : path.resolve(currentDir, configPath);
+  let currentDir = process.cwd();
+  let fullPath = absolute ? configPath : path.resolve(currentDir, configPath);
   if (!exists) {
     return fullPath;
   }
@@ -93,7 +92,7 @@ export function load(domain: ConfigDomain = ConfigDomain.GlobalDomain) {
 }
 
 export function save(configObject: Dictionary<any>, domain: ConfigDomain = ConfigDomain.GlobalDomain) {
-  var configPath = findConfig(domain);
+  let configPath = findConfig(domain);
   if (!configPath) {
     configPath = findConfig(domain, false);
     fs.ensureDirSync(path.dirname(configPath));
@@ -104,8 +103,8 @@ export function save(configObject: Dictionary<any>, domain: ConfigDomain = Confi
 }
 
 export function set(name: PropertyPath, value: any, domain: ConfigDomain = ConfigDomain.GlobalDomain) {
-  let configObject = load(domain);
-  let oldValue = _.get(configObject, name);
+  const configObject = load(domain);
+  const oldValue = _.get(configObject, name);
   if (value !== oldValue) {
     _.set(configObject, name, value);
     save(configObject, domain);

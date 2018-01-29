@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import fs from 'fs-extra';
-import chalk from 'chalk';
-import archiver from 'archiver';
 import globby from '@skygeario/globby';
+import archiver from 'archiver';
+import chalk from 'chalk';
+import fs from 'fs-extra';
 import tmp from 'tmp';
 
-import { controller, asset } from '../api';
+import { asset, controller } from '../api';
 import { Arguments, createCommand } from '../util';
 
 function makeArchive(app: string) {
@@ -31,8 +31,8 @@ function makeArchive(app: string) {
     prefix: `${app}-deploy-`,
     postfix: '.tar.gz'
   });
-  var output = fs.createWriteStream(tarPath);
-  var archive = archiver('tar', {
+  const output = fs.createWriteStream(tarPath);
+  const archive = archiver('tar', {
     gzip: true
   });
 
@@ -82,7 +82,7 @@ function waitForBuildJob(appName: string, token: string) {
   });
 }
 
-function waitForBuildJobImpl(appName: string, token: string, resolve, reject) {
+function waitForBuildJobImpl(appName: string, token: string, resolve: any, reject: any) {
   controller.appStatus(appName, token)
     .then((result) => {
       const buildJobStatus = result.lastBuildJobStatus.status;
@@ -100,9 +100,9 @@ function waitForBuildJobImpl(appName: string, token: string, resolve, reject) {
 }
 
 function run(argv: Arguments) {
-  var tarPath: string;
-  var artifactRequest;
-  var success: boolean;
+  let tarPath: string;
+  let artifactRequest;
+  let success: boolean;
   const appName = argv.project.app;
 
   console.log('Creating an archive of your cloud code...');

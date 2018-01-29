@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import _ from 'lodash';
-import inquirer from 'inquirer';
 import chalk from 'chalk';
+import inquirer from 'inquirer';
+import _ from 'lodash';
 
 import { controller } from '../api';
 import * as config from '../config';
@@ -49,8 +49,8 @@ const passwordPrompt: inquirer.Question = {
 };
 
 function askCredentials(argv: Arguments) {
-  let prompts = [];
-  let credentials = {
+  const prompts = [];
+  const credentials = {
     email: argv.email,
     password: argv.password
   };

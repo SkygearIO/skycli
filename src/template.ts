@@ -25,7 +25,7 @@ export function cloudcode(name: string, dest: string = '.') {
     path.join(__dirname, '..', 'templates', `cloudcode-${name}`)
   );
   if (!fs.pathExistsSync(templateDir)) {
-    throw `Template directory ${templateDir} not found.`;
+    throw new Error(`Template directory ${templateDir} not found.`);
   }
 
   const destDir = path.resolve(dest);

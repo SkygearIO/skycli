@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import inquirer from 'inquirer';
-import fs from 'fs-extra';
-import path from 'path';
-import _ from 'lodash';
 import chalk from 'chalk';
+import fs from 'fs-extra';
+import inquirer from 'inquirer';
+import _ from 'lodash';
+import path from 'path';
 
 import { controller } from '../api';
 import * as config from '../config';
-import { Arguments, createCommand } from '../util';
 import * as template from '../template';
+import { Arguments, createCommand } from '../util';
 import LoginCommand from './login';
 
 function ensureLoggedIn(argv: Arguments) {

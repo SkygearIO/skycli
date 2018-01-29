@@ -15,7 +15,7 @@
  */
 import { createCommand } from '../util';
 
-var pkg = require('../../package.json');
+const pkg = require('../../package.json');
 
 function printVersion() {
   console.log(pkg.version);

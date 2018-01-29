@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import WebSocket from 'ws';
 import queryString from 'query-string';
+import WebSocket from 'ws';
 
 import { controller } from '../api';
 import { Arguments, createCommand } from '../util';
 
-function handleLogData(logData): void {
+function handleLogData(logData: any): void {
   const {
     msg: message
   } = logData;
   console.log(message);
 }
 
-function makeLogStreamUrl(argv: Arguments, logStreamResult): string {
+function makeLogStreamUrl(argv: Arguments, logStreamResult: any): string {
   const {
     token,
     websocket_url: webSocketUrl
