@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import inquirer from 'inquirer';
-import fs from 'fs-extra';
-import path from 'path';
-import _ from 'lodash';
 import chalk from 'chalk';
+import fs from 'fs-extra';
+import inquirer from 'inquirer';
+import _ from 'lodash';
+import path from 'path';
 
 import { controller } from '../api';
 import * as config from '../config';
-import { createCommand } from '../util';
 import * as template from '../template';
+import { Arguments, createCommand } from '../util';
 import LoginCommand from './login';
 
-function ensureLoggedIn(argv) {
+function ensureLoggedIn(argv: Arguments) {
   if (!argv.currentAccount) {
     console.log(chalk.yellow('Requires authentication, please login.'));
     return LoginCommand.execute(argv);
@@ -33,7 +33,7 @@ function ensureLoggedIn(argv) {
   return Promise.resolve();
 }
 
-function confirmProjectDirectory(argv, projectDir) {
+function confirmProjectDirectory(argv: Arguments, projectDir: string) {
   return inquirer.prompt([
     {
       type: 'confirm',
@@ -46,7 +46,7 @@ function confirmProjectDirectory(argv, projectDir) {
   ]);
 }
 
-function askProjectInfo(argv) {
+function askProjectInfo(argv: Arguments) {
   const suggestedApp = path.basename(argv.dest);
   const token = argv.currentAccount.token;
   return inquirer.prompt([
@@ -106,7 +106,7 @@ function askProjectInfo(argv) {
   ]);
 }
 
-function run(argv) {
+function run(argv: Arguments) {
   const projectDir = path.resolve(argv.dest);
 
   return ensureLoggedIn(argv)
@@ -114,7 +114,7 @@ function run(argv) {
       return confirmProjectDirectory(argv, projectDir);
     }).then((answers) => {
       if (!answers.proceed) {
-        return Promise.reject();
+        return Promise.reject(undefined);
       }
 
       return askProjectInfo(argv);
@@ -145,7 +145,7 @@ function run(argv) {
 
 export default createCommand({
   command: 'init [dest]',
-  desc: 'Initialize a Skygear project',
+  describe: 'Initialize a Skygear project',
   builder: (yargs) => {
     return yargs.default('dest', '.');
   },

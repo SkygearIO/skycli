@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import _ from 'lodash';
-import inquirer from 'inquirer';
 import chalk from 'chalk';
+import inquirer from 'inquirer';
+import _ from 'lodash';
 
 import { controller } from '../api';
 import * as config from '../config';
-import { createCommand } from '../util';
+import { Arguments, createCommand } from '../util';
 
-const emailPrompt = {
+const emailPrompt: inquirer.Question = {
   type: 'input',
   name: 'email',
   message: 'Email:',
@@ -36,7 +36,7 @@ const emailPrompt = {
   }
 };
 
-const passwordPrompt = {
+const passwordPrompt: inquirer.Question = {
   type: 'password',
   name: 'password',
   message: 'Password:',
@@ -48,9 +48,9 @@ const passwordPrompt = {
   }
 };
 
-function askCredentials(argv) {
-  let prompts = [];
-  let credentials = {
+function askCredentials(argv: Arguments) {
+  const prompts = [];
+  const credentials = {
     email: argv.email,
     password: argv.password
   };
@@ -77,7 +77,7 @@ function askCredentials(argv) {
   });
 }
 
-function saveAccount(email, token, environment, local = false) {
+function saveAccount(email: string, token: string, environment: string, local: boolean = false) {
   const accountKey = _.replace(`${environment}:${email}`, /\./g, '~');
 
   const setFn = local ? config.setLocal : config.set;
@@ -95,8 +95,8 @@ function saveAccount(email, token, environment, local = false) {
   );
 }
 
-function run(argv) {
-  let email;
+function run(argv: Arguments) {
+  let email: string;
 
   return askCredentials(argv).then((answers) => {
     email = answers.email;
@@ -121,7 +121,7 @@ function run(argv) {
 
 export default createCommand({
   command: 'login [email]',
-  desc: 'Log in to Skygear Portal',
+  describe: 'Log in to Skygear Portal',
   builder: (yargs) => {
     return yargs
       .option('local', {

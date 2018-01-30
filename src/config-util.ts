@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import pkg from '../../package.json';
-import { createCommand } from '../util';
+import { Arguments } from './util';
 
-function printVersion() {
-  console.log(pkg.version);
+export function currentAccount(argv: Arguments) {
+  const accounts = argv.accounts || {};
+  return accounts[argv.account] || undefined;
 }
 
-module.exports = createCommand({
-  command: 'version',
-  desc: 'Print version',
-  handler: printVersion
-});
+export function currentEnvironment(argv: Arguments) {
+  const environments = argv.environments || {};
+  const env = (currentAccount(argv) || {}).environment || argv.environment;
+  return environments[env];
+}

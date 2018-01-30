@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import fs from 'fs-extra';
-import chalk from 'chalk';
-import archiver from 'archiver';
 import globby from '@skygeario/globby';
+import archiver from 'archiver';
+import chalk from 'chalk';
+import fs from 'fs-extra';
 import tmp from 'tmp';
 
-import { controller, asset } from '../api';
-import { createCommand } from '../util';
+import { asset, controller } from '../api';
+import { Arguments, createCommand } from '../util';
 
-function makeArchive(app) {
+function makeArchive(app: string) {
   // create a file to stream archive data to.
   const {
     name: tarPath
@@ -31,8 +31,8 @@ function makeArchive(app) {
     prefix: `${app}-deploy-`,
     postfix: '.tar.gz'
   });
-  var output = fs.createWriteStream(tarPath);
-  var archive = archiver('tar', {
+  const output = fs.createWriteStream(tarPath);
+  const archive = archiver('tar', {
     gzip: true
   });
 
@@ -63,9 +63,11 @@ function makeArchive(app) {
     dot: true,
     gitignore: true,
     gitignoreName: '.skyignore'
-  }).then((paths) => {
+  }).then((paths: [string]) => {
     paths.forEach((path) => {
-      archive.file(path);
+      archive.file(path, {
+        name: path
+      });
     });
     // finalize the archive (ie we are done appending files but streams have to finish yet)
     return archive.finalize();
@@ -74,13 +76,13 @@ function makeArchive(app) {
   });
 }
 
-function waitForBuildJob(appName, token) {
+function waitForBuildJob(appName: string, token: string) {
   return new Promise((resolve, reject) => {
     waitForBuildJobImpl(appName, token, resolve, reject);
   });
 }
 
-function waitForBuildJobImpl(appName, token, resolve, reject) {
+function waitForBuildJobImpl(appName: string, token: string, resolve: any, reject: any) {
   controller.appStatus(appName, token)
     .then((result) => {
       const buildJobStatus = result.lastBuildJobStatus.status;
@@ -97,10 +99,10 @@ function waitForBuildJobImpl(appName, token, resolve, reject) {
     });
 }
 
-function run(argv) {
-  var tarPath;
-  var artifactRequest;
-  var success;
+function run(argv: Arguments) {
+  let tarPath: string;
+  let artifactRequest;
+  let success: boolean;
   const appName = argv.project.app;
 
   console.log('Creating an archive of your cloud code...');
@@ -142,7 +144,7 @@ function run(argv) {
       console.log('Downloading build log...');
       return asset.download(logUrl);
     })
-    .then((buildLog) => {
+    .then((buildLog: string) => {
       console.log(buildLog);
       if (success) {
         console.log(chalk.green('Build completed successfully.'));
@@ -160,7 +162,7 @@ function run(argv) {
 
 export default createCommand({
   command: 'deploy',
-  desc: 'Deploy skygear project to cloud.',
+  describe: 'Deploy skygear project to cloud.',
   builder: (yargs) => {
     return yargs;
   },

@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import inquirer from 'inquirer';
 import chalk from 'chalk';
+import inquirer from 'inquirer';
 
 import * as config from '../config';
-import { createCommand } from '../util';
+import { Arguments, createCommand } from '../util';
 
-function removeAccount(accountKey) {
+function removeAccount(accountKey: string) {
   config.unset(['accounts', accountKey]);
   config.unsetLocal(['accounts', accountKey]);
 }
 
-function run(argv) {
+function run(argv: Arguments) {
   const account = argv.currentAccount;
   if (!account) {
     console.log(chalk.red('Not logged in to accounts.'));
@@ -47,6 +47,6 @@ function run(argv) {
 
 export default createCommand({
   command: 'logout',
-  desc: 'Log out from Skygear Portal',
+  describe: 'Log out from Skygear Portal',
   handler: run
 });

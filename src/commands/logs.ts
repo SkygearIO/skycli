@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import WebSocket from 'ws';
 import queryString from 'query-string';
+import WebSocket from 'ws';
 
 import { controller } from '../api';
-import { createCommand } from '../util';
+import { Arguments, createCommand } from '../util';
 
-function handleLogData(logData) {
+function handleLogData(logData: any): void {
   const {
     msg: message
   } = logData;
   console.log(message);
 }
 
-function makeLogStreamUrl(argv, logStreamResult) {
+function makeLogStreamUrl(argv: Arguments, logStreamResult: any): string {
   const {
     token,
     websocket_url: webSocketUrl
@@ -40,7 +40,7 @@ function makeLogStreamUrl(argv, logStreamResult) {
   return `${webSocketUrl}?${query}`;
 }
 
-function run(argv) {
+function run(argv: Arguments) {
   const appName = argv.project.app;
   const token = argv.currentAccount.token;
 
@@ -68,7 +68,7 @@ function run(argv) {
             console.log(`Received message: ${data}`);
           }
           try {
-            handleLogData(JSON.parse(data));
+            handleLogData(JSON.parse(data as string));
           } catch (e) {
             ws.close();
             reject(e);
@@ -96,11 +96,11 @@ function run(argv) {
 
 export default createCommand({
   command: 'logs',
-  desc: 'Print console log of the app.',
+  describe: 'Print console log of the app.',
   builder: (yargs) => {
     return yargs
       .option('tail', {
-        type: 'integer',
+        type: 'number',
         desc: 'Number of lines to print from the end of the log',
         default: 0
       });

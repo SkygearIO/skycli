@@ -13,18 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import _ from 'lodash';
 import chalk from 'chalk';
+import _ from 'lodash';
+import {
+  Arguments as YargsArguments,
+  CommandModule as YargsCommandModule
+} from 'yargs';
 
-export function createCommand(module) {
+export interface Arguments extends YargsArguments {
+  debug: boolean;
+  verbose: boolean;
+  environment: string;
+}
+
+export interface CommandModule extends YargsCommandModule {
+  execute?(argv: Arguments): Promise<void>;
+  handler(argv: Arguments): Promise<void>;
+}
+
+export function createCommand(module: CommandModule) {
   return _.assign(
     {},
     module,
     {
-      handler: function (argv) {
-        let p = module.handler(argv);
+      handler: (argv: Arguments) => {
+        const p = module.handler(argv);
         if (p && typeof p.catch === 'function') {
-          p.catch((err) => {
+          p.catch((err: Error | string) => {
             if (err) {
               if (typeof err === 'object') {
                 err = JSON.stringify(err);
@@ -40,6 +55,6 @@ export function createCommand(module) {
   );
 }
 
-export function executeCommand(module, argv) {
+export function executeCommand(module: CommandModule, argv: Arguments) {
   return module.execute(argv);
 }
