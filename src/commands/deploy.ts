@@ -22,7 +22,7 @@ import tmp from 'tmp';
 import { asset, controller } from '../api';
 import { Arguments, createCommand } from '../util';
 
-function makeArchive(app: string) {
+function makeArchive(app: string, includeDotfiles: boolean) {
   // create a file to stream archive data to.
   const { name: tarPath } = tmp.fileSync({
     discardDescriptor: true,
@@ -58,7 +58,7 @@ function makeArchive(app: string) {
   archive.pipe(output);
 
   return globby('**', {
-    dot: true,
+    dot: includeDotfiles,
     gitignore: true,
     gitignoreName: '.skyignore'
   })
@@ -114,7 +114,7 @@ function run(argv: Arguments) {
 
   console.log('Creating an archive of your cloud code...');
   const token = argv.currentAccount.token;
-  return makeArchive(appName)
+  return makeArchive(appName, argv.includeDotfiles)
     .then((result) => {
       tarPath = result;
       if (argv.debug) {
@@ -168,7 +168,11 @@ export default createCommand({
   command: 'deploy',
   describe: 'Deploy skygear project to cloud.',
   builder: (yargs) => {
-    return yargs;
+    return yargs.option('include-dotfiles', {
+      type: 'boolean',
+      desc: 'Include dots files during deploy',
+      default: false
+    });
   },
   handler: run
 });
