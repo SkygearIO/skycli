@@ -42,20 +42,20 @@ const cli = require('yargs')
   .config(config.load())
   .config(config.loadLocal())
   .config({
-    project: config.loadProject()
+    project: config.loadProject(),
   })
   .env('SKYCLI')
   .option('debug', {
     type: 'boolean',
-    desc: 'Show debug logs'
+    desc: 'Show debug logs',
   })
   .option('verbose', {
     type: 'boolean',
-    desc: 'Show verbose logs'
+    desc: 'Show verbose logs',
   })
   .option('environment', {
     type: 'string',
-    desc: config.developerMode && 'Set controller environment.'
+    desc: config.developerMode && 'Set controller environment.',
   })
   .check(checkArguments)
   .help();

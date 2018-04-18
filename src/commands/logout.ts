@@ -31,18 +31,22 @@ function run(argv: Arguments) {
     return;
   }
 
-  return inquirer.prompt([{
-    type: 'confirm',
-    name: 'confirm',
-    message: `Log out as ${account.email}?`
-  }]).then((answers) => {
-    if (!answers.confirm) {
-      return;
-    }
+  return inquirer
+    .prompt([
+      {
+        type: 'confirm',
+        name: 'confirm',
+        message: `Log out as ${account.email}?`
+      }
+    ])
+    .then((answers) => {
+      if (!answers.confirm) {
+        return;
+      }
 
-    removeAccount(argv.account);
-    console.log(chalk.green('Successfully logged out.'));
-  });
+      removeAccount(argv.account);
+      console.log(chalk.green('Successfully logged out.'));
+    });
 }
 
 export default createCommand({

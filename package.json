@@ -11,10 +11,12 @@
     "lint": "gulp lint",
     "tslint": "tslint",
     "tsc": "tsc",
+    "prettier": "prettier --write 'src/**/*.ts'",
     "prepare": "gulp build",
     "start": "gulp watch",
     "skycli": "gulp build && ./bin/skycli.js",
-    "build-bin": "gulp build && mkdir -p dist-bin && pkg --out-path dist-bin --targets node8-macos,node8-linux,node8-win .",
+    "build-bin":
+      "gulp build && mkdir -p dist-bin && pkg --out-path dist-bin --targets node8-macos,node8-linux,node8-win .",
     "clean": "rm -rf dist dist-bin",
     "postpublish": "./scripts/brew-publish.sh"
   },
@@ -22,10 +24,7 @@
     "type": "git",
     "url": "git+https://github.com/SkygearIO/skycli.git"
   },
-  "keywords": [
-    "cli",
-    "skygear"
-  ],
+  "keywords": ["cli", "skygear"],
   "author": "Oursky Limited",
   "license": "Apache-2.0",
   "bugs": {
@@ -78,15 +77,13 @@
     "gulp-mocha": "^4.3.1",
     "gulp-tslint": "^8.1.2",
     "pkg": "^4.2.4",
+    "prettier": "^1.12.1",
     "require-dir": "^0.3.2",
     "tslint": "^5.9.1",
     "typescript": "^2.6.2"
   },
   "pkg": {
-    "assets": [
-      "dist/**/*",
-      "templates/**/*"
-    ]
+    "assets": ["dist/**/*", "templates/**/*"]
   },
   "skycli": {
     "environments": {

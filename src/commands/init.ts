@@ -39,7 +39,7 @@ function confirmProjectDirectory(argv: Arguments, projectDir: string) {
       type: 'confirm',
       name: 'proceed',
       message:
-        'You\'re about to initialze a Skygear Project in this ' +
+        "You're about to initialze a Skygear Project in this " +
         `directory: ${projectDir}.\n` +
         'Confirm?'
     }
@@ -60,29 +60,31 @@ function askProjectInfo(argv: Arguments) {
       },
       default: suggestedApp,
       choices: () => {
-        return controller.apps(token)
-          .then((apps) => {
-            if (apps.length === 0) {
-              return Promise.reject(
-                'There are no apps in your account ' +
+        return controller.apps(token).then((apps) => {
+          if (apps.length === 0) {
+            return Promise.reject(
+              'There are no apps in your account ' +
                 `${argv.currentAccount.email}. ` +
                 `Create an app at ${argv.currentEnvironment.portalURL}.`
-              );
-            }
+            );
+          }
 
-            return _.reduce(apps, (result, app) => {
+          return _.reduce(
+            apps,
+            (result, app) => {
               result.push(app.id);
               return result;
-            }, []);
-          });
+            },
+            []
+          );
+        });
       }
     },
     {
       type: 'confirm',
       name: 'staticHosting',
       message:
-        'Do you want to create your static hosting directory ' +
-        '(public)?'
+        'Do you want to create your static hosting directory ' + '(public)?'
     },
     {
       type: 'list',
@@ -112,13 +114,15 @@ function run(argv: Arguments) {
   return ensureLoggedIn(argv)
     .then(() => {
       return confirmProjectDirectory(argv, projectDir);
-    }).then((answers) => {
+    })
+    .then((answers) => {
       if (!answers.proceed) {
         return Promise.reject(undefined);
       }
 
       return askProjectInfo(argv);
-    }).then((answers) => {
+    })
+    .then((answers) => {
       if (argv.debug) {
         console.log('Got answers: ', answers);
       }

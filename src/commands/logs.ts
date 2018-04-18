@@ -20,17 +20,12 @@ import { controller } from '../api';
 import { Arguments, createCommand } from '../util';
 
 function handleLogData(logData: any): void {
-  const {
-    msg: message
-  } = logData;
+  const { msg: message } = logData;
   console.log(message);
 }
 
 function makeLogStreamUrl(argv: Arguments, logStreamResult: any): string {
-  const {
-    token,
-    websocket_url: webSocketUrl
-  } = logStreamResult;
+  const { token, websocket_url: webSocketUrl } = logStreamResult;
 
   const query = queryString.stringify({
     token,
@@ -44,66 +39,64 @@ function run(argv: Arguments) {
   const appName = argv.project.app;
   const token = argv.currentAccount.token;
 
-  return controller.appLogStream(appName, token)
-    .then((result) => {
-      const logUrl = makeLogStreamUrl(argv, result);
-      if (argv.debug) {
-        console.log(`Connecting to ${logUrl}.`);
-      }
+  return controller.appLogStream(appName, token).then((result) => {
+    const logUrl = makeLogStreamUrl(argv, result);
+    if (argv.debug) {
+      console.log(`Connecting to ${logUrl}.`);
+    }
 
-      return new Promise((resolve, reject) => {
-        const ws = new WebSocket(logUrl);
+    return new Promise((resolve, reject) => {
+      const ws = new WebSocket(logUrl);
 
-        ws.on('open', () => {
-          // Print message when connection opens.
-          if (argv.debug) {
-            console.log(`Connection opened to ${logUrl}.`);
-          }
-          console.log(`Streaming log for ${appName}...`);
-        });
+      ws.on('open', () => {
+        // Print message when connection opens.
+        if (argv.debug) {
+          console.log(`Connection opened to ${logUrl}.`);
+        }
+        console.log(`Streaming log for ${appName}...`);
+      });
 
-        ws.on('message', (data) => {
-          // Handle received message which contains log data in stringified JSON.
-          if (argv.debug) {
-            console.log(`Received message: ${data}`);
-          }
-          try {
-            handleLogData(JSON.parse(data as string));
-          } catch (e) {
-            ws.close();
-            reject(e);
-          }
-        });
+      ws.on('message', (data) => {
+        // Handle received message which contains log data in stringified JSON.
+        if (argv.debug) {
+          console.log(`Received message: ${data}`);
+        }
+        try {
+          handleLogData(JSON.parse(data as string));
+        } catch (e) {
+          ws.close();
+          reject(e);
+        }
+      });
 
-        ws.on('close', () => {
-          // Resolve promise when the connection is closed.
-          if (argv.debug) {
-            console.log(`Connection closed from ${logUrl}.`);
-          }
-          resolve();
-        });
+      ws.on('close', () => {
+        // Resolve promise when the connection is closed.
+        if (argv.debug) {
+          console.log(`Connection closed from ${logUrl}.`);
+        }
+        resolve();
+      });
 
-        ws.on('error', (err) => {
-          // Handle error and reject the promise.
-          if (argv.debug) {
-            console.log(`Error occurred with ${logUrl}: ${err}`);
-          }
-          reject(err);
-        });
+      ws.on('error', (err) => {
+        // Handle error and reject the promise.
+        if (argv.debug) {
+          console.log(`Error occurred with ${logUrl}: ${err}`);
+        }
+        reject(err);
       });
     });
+  });
 }
 
 export default createCommand({
   command: 'logs',
   describe: 'Print console log of the app.',
   builder: (yargs) => {
-    return yargs
-      .option('tail', {
-        type: 'number',
-        desc: 'Number of lines to print from the end of the log',
-        default: 0
-      });
+    return yargs.option('tail', {
+      type: 'number',
+      desc: 'Number of lines to print from the end of the log',
+      default: 0
+    });
   },
   handler: run
 });

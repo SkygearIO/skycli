@@ -77,46 +77,50 @@ function askCredentials(argv: Arguments) {
   });
 }
 
-function saveAccount(email: string, token: string, environment: string, local: boolean = false) {
+function saveAccount(
+  email: string,
+  token: string,
+  environment: string,
+  local: boolean = false
+) {
   const accountKey = _.replace(`${environment}:${email}`, /\./g, '~');
 
   const setFn = local ? config.setLocal : config.set;
-  setFn(
-    ['accounts', accountKey],
-    {
-      token,
-      environment,
-      email
-    }
-  );
-  setFn(
-    'account',
-    accountKey
-  );
+  setFn(['accounts', accountKey], {
+    token,
+    environment,
+    email
+  });
+  setFn('account', accountKey);
 }
 
 function run(argv: Arguments) {
   let email: string;
 
-  return askCredentials(argv).then((answers) => {
-    email = answers.email;
-    return controller.login(answers.email, answers.password);
-  }).then((payload) => {
-    if (argv.debug) {
-      console.log(payload);
-    }
-    if (payload.non_field_errors) {
-      return Promise.reject(payload.non_field_errors);
-    }
+  return askCredentials(argv)
+    .then((answers) => {
+      email = answers.email;
+      return controller.login(answers.email, answers.password);
+    })
+    .then(
+      (payload) => {
+        if (argv.debug) {
+          console.log(payload);
+        }
+        if (payload.non_field_errors) {
+          return Promise.reject(payload.non_field_errors);
+        }
 
-    saveAccount(email, payload.token, argv.environment, argv.local);
-    console.log(chalk.green(`Logged in as ${email}.`));
-  }, (error) => {
-    if (argv.debug) {
-      console.error(error);
-    }
-    return Promise.reject('Unable to complete the request.');
-  });
+        saveAccount(email, payload.token, argv.environment, argv.local);
+        console.log(chalk.green(`Logged in as ${email}.`));
+      },
+      (error) => {
+        if (argv.debug) {
+          console.error(error);
+        }
+        return Promise.reject('Unable to complete the request.');
+      }
+    );
 }
 
 export default createCommand({

@@ -24,9 +24,7 @@ import { Arguments, createCommand } from '../util';
 
 function makeArchive(app: string) {
   // create a file to stream archive data to.
-  const {
-    name: tarPath
-  } = tmp.fileSync({
+  const { name: tarPath } = tmp.fileSync({
     discardDescriptor: true,
     prefix: `${app}-deploy-`,
     postfix: '.tar.gz'
@@ -63,17 +61,19 @@ function makeArchive(app: string) {
     dot: true,
     gitignore: true,
     gitignoreName: '.skyignore'
-  }).then((paths: [string]) => {
-    paths.forEach((path) => {
-      archive.file(path, {
-        name: path
+  })
+    .then((paths: [string]) => {
+      paths.forEach((path) => {
+        archive.file(path, {
+          name: path
+        });
       });
+      // finalize the archive (ie we are done appending files but streams have to finish yet)
+      return archive.finalize();
+    })
+    .then(() => {
+      return tarPath;
     });
-    // finalize the archive (ie we are done appending files but streams have to finish yet)
-    return archive.finalize();
-  }).then(() => {
-    return tarPath;
-  });
 }
 
 function waitForBuildJob(appName: string, token: string) {
@@ -82,9 +82,14 @@ function waitForBuildJob(appName: string, token: string) {
   });
 }
 
-function waitForBuildJobImpl(appName: string, token: string, resolve: any, reject: any) {
-  controller.appStatus(appName, token)
-    .then((result) => {
+function waitForBuildJobImpl(
+  appName: string,
+  token: string,
+  resolve: any,
+  reject: any
+) {
+  controller.appStatus(appName, token).then(
+    (result) => {
       const buildJobStatus = result.lastBuildJobStatus.status;
       if (buildJobStatus === 'success' || buildJobStatus === 'failed') {
         resolve(result.lastBuildJobStatus);
@@ -94,9 +99,11 @@ function waitForBuildJobImpl(appName: string, token: string, resolve: any, rejec
       setTimeout(() => {
         waitForBuildJobImpl(appName, token, resolve, reject);
       }, 5000);
-    }, (err) => {
+    },
+    (err) => {
       reject(err);
-    });
+    }
+  );
 }
 
 function run(argv: Arguments) {
@@ -134,10 +141,7 @@ function run(argv: Arguments) {
       return waitForBuildJob(appName, token);
     })
     .then((result) => {
-      const {
-        status,
-        log_url: logUrl
-      } = result;
+      const { status, log_url: logUrl } = result;
 
       success = status === 'success';
 

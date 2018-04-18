@@ -45,7 +45,9 @@ function migrate(configObject: Dictionary<any>) {
 }
 
 function isGlobalConfigPath(configPath: string) {
-  const globalConfigPath = path.resolve(untildify(configPaths[ConfigDomain.GlobalDomain]));
+  const globalConfigPath = path.resolve(
+    untildify(configPaths[ConfigDomain.GlobalDomain])
+  );
   return globalConfigPath === configPath;
 }
 
@@ -83,15 +85,16 @@ export function load(domain: ConfigDomain = ConfigDomain.GlobalDomain) {
 
   const configPath = findConfig(domain);
   if (configPath) {
-    content = JSON.parse(
-      fs.readFileSync(configPath, 'utf-8')
-    );
+    content = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
   }
 
   return migrate(content);
 }
 
-export function save(configObject: Dictionary<any>, domain: ConfigDomain = ConfigDomain.GlobalDomain) {
+export function save(
+  configObject: Dictionary<any>,
+  domain: ConfigDomain = ConfigDomain.GlobalDomain
+) {
   let configPath = findConfig(domain);
   if (!configPath) {
     configPath = findConfig(domain, false);
@@ -102,7 +105,11 @@ export function save(configObject: Dictionary<any>, domain: ConfigDomain = Confi
   fs.writeFileSync(configPath, content);
 }
 
-export function set(name: PropertyPath, value: any, domain: ConfigDomain = ConfigDomain.GlobalDomain) {
+export function set(
+  name: PropertyPath,
+  value: any,
+  domain: ConfigDomain = ConfigDomain.GlobalDomain
+) {
   const configObject = load(domain);
   const oldValue = _.get(configObject, name);
   if (value !== oldValue) {
@@ -111,7 +118,10 @@ export function set(name: PropertyPath, value: any, domain: ConfigDomain = Confi
   }
 }
 
-export function unset(name: PropertyPath, domain: ConfigDomain = ConfigDomain.GlobalDomain) {
+export function unset(
+  name: PropertyPath,
+  domain: ConfigDomain = ConfigDomain.GlobalDomain
+) {
   set(name, undefined, domain);
 }
 

@@ -32,27 +32,23 @@ export interface CommandModule extends YargsCommandModule {
 }
 
 export function createCommand(module: CommandModule) {
-  return _.assign(
-    {},
-    module,
-    {
-      handler: (argv: Arguments) => {
-        const p = module.handler(argv);
-        if (p && typeof p.catch === 'function') {
-          p.catch((err: Error | string) => {
-            if (err) {
-              if (typeof err === 'object') {
-                err = JSON.stringify(err);
-              }
-              console.log(chalk.red(err));
+  return _.assign({}, module, {
+    handler: (argv: Arguments) => {
+      const p = module.handler(argv);
+      if (p && typeof p.catch === 'function') {
+        p.catch((err: Error | string) => {
+          if (err) {
+            if (typeof err === 'object') {
+              err = JSON.stringify(err);
             }
-            process.exit(1);
-          });
-        }
-      },
-      execute: module.handler
-    }
-  );
+            console.log(chalk.red(err));
+          }
+          process.exit(1);
+        });
+      }
+    },
+    execute: module.handler
+  });
 }
 
 export function executeCommand(module: CommandModule, argv: Arguments) {
