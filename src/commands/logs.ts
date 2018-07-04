@@ -13,15 +13,72 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import queryString from 'query-string';
+import chalk from 'chalk';
+import queryString, { parse } from 'query-string';
 import WebSocket from 'ws';
 
 import { controller } from '../api';
 import { Arguments, createCommand } from '../util';
 
-function handleLogData(logData: any): void {
-  const { msg: message } = logData;
-  console.log(message);
+type LogColorizer = (...text: string[]) => (string | string[]);
+
+function parseLogStream(line: string): any {
+  const logData = JSON.parse(line);
+  if (logData.structured !== undefined) {
+    return logData;
+  }
+
+  // FIXME: remove the following when structured log is supported in piper
+  const { msg } = logData;
+
+  try {
+    const parsed = JSON.parse(msg);
+    return {
+      ...logData,
+      ...parsed,
+      structured: true
+    };
+  } catch (e) {
+    return {
+      ...logData,
+      structured: false
+    };
+  }
+}
+
+function handleLogData(argv: Arguments, logData: any): void {
+  const filtered = {
+    ...logData,
+    pod: undefined,
+    structured: undefined
+  };
+
+  const logColorizer: LogColorizer = ((level) => {
+    if (level === 'debug') {
+      return chalk.gray;
+    }
+
+    if (level === 'warning') {
+      return chalk.yellow;
+    }
+
+    if (level === 'error') {
+      return chalk.red;
+    }
+
+    if (level === 'critical') {
+      return chalk.greenBright.bgRed;
+    }
+
+    return (...args: string[]) => args;
+  })(filtered.level);
+
+  if (!argv.detail) {
+    console.log(logColorizer(filtered.msg));
+    return;
+  }
+
+  console.log(logColorizer(JSON.stringify(filtered, null, 2)));
 }
 
 function makeLogStreamUrl(argv: Arguments, logStreamResult: any): string {
@@ -47,6 +104,7 @@ function run(argv: Arguments) {
 
     return new Promise((resolve, reject) => {
       const ws = new WebSocket(logUrl);
+      const logHandleFunc = handleLogData.bind(this, argv);
 
       ws.on('open', () => {
         // Print message when connection opens.
@@ -62,7 +120,7 @@ function run(argv: Arguments) {
           console.log(`Received message: ${data}`);
         }
         try {
-          handleLogData(JSON.parse(data as string));
+          logHandleFunc(parseLogStream(data as string));
         } catch (e) {
           ws.close();
           reject(e);
@@ -92,11 +150,17 @@ export default createCommand({
   command: 'logs',
   describe: 'Print console log of the app.',
   builder: (yargs) => {
-    return yargs.option('tail', {
-      type: 'number',
-      desc: 'Number of lines to print from the end of the log',
-      default: 0
-    });
+    return yargs
+      .option('tail', {
+        type: 'number',
+        desc: 'Number of lines to print from the end of the log',
+        default: 0
+      })
+      .option('detail', {
+        type: 'boolean',
+        desc: 'Show log in a detailed format',
+        default: false
+      });
   },
   handler: run
 });
