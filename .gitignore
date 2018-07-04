@@ -4,3 +4,4 @@ dist-bin
 .skycli
 skygear.json
 npm-debug.log
+docker-compose.override.yml
