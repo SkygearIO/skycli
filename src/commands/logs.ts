@@ -53,7 +53,13 @@ function handleLogData(argv: Arguments, logData: any): void {
     structured: undefined
   };
 
-  const logColorizer: LogColorizer = ((level) => {
+  const logColorizer: LogColorizer = ((level, options) => {
+    const logNoColorizer: LogColorizer = (...args: string[]) => args;
+
+    if (options['no-color']) {
+      return logNoColorizer;
+    }
+
     if (level === 'debug') {
       return chalk.gray;
     }
@@ -70,8 +76,8 @@ function handleLogData(argv: Arguments, logData: any): void {
       return chalk.greenBright.bgRed;
     }
 
-    return (...args: string[]) => args;
-  })(filtered.level);
+    return logNoColorizer;
+  })(filtered.level, argv);
 
   if (!argv.detail) {
     console.log(logColorizer(filtered.msg));
