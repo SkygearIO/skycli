@@ -13,16 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import chalk from 'chalk';
+
 import queryString, { parse } from 'query-string';
-import sqlFormatter from 'sql-formatter';
 import WebSocket from 'ws';
+
+import {
+  defaultLogColorizer,
+  noColorLogColorizer
+} from './logging/coloring';
+
+import {
+  jsonLogger,
+  keyvalueLogger,
+  Logger,
+  simpleLogger
+} from './logging/logger';
 
 import { controller } from '../api';
 import { Arguments, createCommand } from '../util';
-
-type Logger = (logData: any) => string;
-type LogColorizer = (...text: string[]) => (string | string[]);
 
 function parseLogStream(line: string): any {
   const logData = JSON.parse(line);
@@ -48,75 +56,14 @@ function parseLogStream(line: string): any {
   }
 }
 
-const keyvalueLogger: Logger = (logData) => {
-  const logLine = Object.keys(logData)
-    .map((eachKey) => ({key: eachKey, value: logData[eachKey]}))
-    .map(({key, value}) => `${key}=${JSON.stringify(value)}`)
-    .join(' ');
-  const detailsLog = (({ sql, error }) => {
-    if (sql) {
-      // Remove the redundant spaces after '$'
-      return sqlFormatter.format(sql).replace(/\$\s+/g, '$');
-    }
-
-    if (error) {
-      return error;
-    }
-
-    return;
-  })(logData);
-
-  return detailsLog ? `\n${logLine}\n${detailsLog}\n` : `\n${logLine}\n`;
-};
-
-const simpleLogger: Logger = (logData) => {
-  if (!logData.time) {
-    return `                     | ${logData.msg}`;
-  }
-
-  return `${logData.time} | ${logData.msg}`;
-};
-
-const jsonLogger: Logger = (logData) => {
-  return JSON.stringify(logData, null, 2);
-};
-
-function handleLogData(argv: Arguments, logger: Logger, logData: any): void {
+function handleLogData(logger: Logger, logData: any): void {
   const filtered = {
     ...logData,
     pod: undefined,
     structured: undefined
   };
 
-  const logColorizer: LogColorizer = ((level, options) => {
-    const logNoColorizer: LogColorizer = (...args: string[]) => (
-      args.length > 1 ? args : args[0]
-    );
-
-    if (options['no-color']) {
-      return logNoColorizer;
-    }
-
-    if (level === 'debug') {
-      return chalk.gray;
-    }
-
-    if (level === 'warning') {
-      return chalk.yellow;
-    }
-
-    if (level === 'error') {
-      return chalk.red;
-    }
-
-    if (level === 'critical') {
-      return chalk.greenBright.bgRed;
-    }
-
-    return logNoColorizer;
-  })(filtered.level, argv);
-
-  console.log(logColorizer(logger(filtered)));
+  console.log(logger(filtered));
 }
 
 function makeLogStreamUrl(argv: Arguments, logStreamResult: any): string {
@@ -143,7 +90,15 @@ function run(argv: Arguments) {
     return new Promise((resolve, reject) => {
       const ws = new WebSocket(logUrl);
 
-      const colorizedLogger = ((format: string) => {
+      const logColorizer = ((options) => {
+        if (options['no-color']) {
+          return noColorLogColorizer;
+        }
+
+        return defaultLogColorizer;
+      })(argv);
+
+      const colorizedLogger = (({ format }) => {
         if (format === 'simple') {
           return simpleLogger;
         }
@@ -153,9 +108,12 @@ function run(argv: Arguments) {
         }
 
         return keyvalueLogger;
-      })(argv.format as string);
+      })(argv);
 
-      const logHandleFunc = handleLogData.bind(null, argv, colorizedLogger);
+      const logHandleFunc = handleLogData.bind(
+        null,
+        colorizedLogger.bind(null, logColorizer) as Logger
+      );
 
       ws.on('open', () => {
         // Print message when connection opens.
