@@ -23,17 +23,17 @@ import {
 } from './logging/coloring';
 
 import {
-  jsonLogger,
-  keyvalueLogger,
-  Logger,
-  simpleLogger
-} from './logging/logger';
+  jsonLogFormatter,
+  keyValueLogFormatter,
+  LogFormatter,
+  simpleLogFormatter
+} from './logging/formatting';
 
 import { controller } from '../api';
 import { Arguments, createCommand } from '../util';
 
-function parseLogStream(line: string): any {
-  const logData = JSON.parse(line);
+function parseLogStream(line: string): { [_: string]: any } {
+  const logData = JSON.parse(line) as {[_: string]: any};
   if (logData.structured !== undefined) {
     return logData;
   }
@@ -56,14 +56,17 @@ function parseLogStream(line: string): any {
   }
 }
 
-function handleLogData(logger: Logger, logData: any): void {
+function handleLogData(
+  logFormatter: LogFormatter,
+  logData?: {[_: string]: any} | null,
+): void {
   const filtered = {
     ...logData,
     pod: undefined,
     structured: undefined
   };
 
-  console.log(logger(filtered));
+  console.log(logFormatter(filtered));
 }
 
 function makeLogStreamUrl(argv: Arguments, logStreamResult: any): string {
@@ -98,21 +101,21 @@ function run(argv: Arguments) {
         return defaultLogColorizer;
       })(argv);
 
-      const colorizedLogger = (({ format }) => {
+      const colorizedLogFormatter = (({ format }) => {
         if (format === 'simple') {
-          return simpleLogger;
+          return simpleLogFormatter;
         }
 
         if (format === 'json') {
-          return jsonLogger;
+          return jsonLogFormatter;
         }
 
-        return keyvalueLogger;
+        return keyValueLogFormatter;
       })(argv);
 
       const logHandleFunc = handleLogData.bind(
         null,
-        colorizedLogger.bind(null, logColorizer) as Logger
+        colorizedLogFormatter.bind(null, logColorizer) as LogFormatter
       );
 
       ws.on('open', () => {
@@ -172,8 +175,8 @@ export default createCommand({
       .option('format', {
         type: 'string',
         desc: 'Show log in specific format',
-        choices: ['keyvalue', 'simple', 'json'],
-        default: 'keyvalue'
+        choices: ['key-value', 'simple', 'json'],
+        default: 'key-value'
       });
   },
   handler: run
