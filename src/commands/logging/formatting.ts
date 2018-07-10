@@ -14,9 +14,14 @@
  * limitations under the License.
  */
 
+import moment from 'moment';
 import sqlFormatter from 'sql-formatter';
 
 import { LogColorizer } from './coloring';
+
+const DATETIME_FORAMT = 'YYYY-MM-DD hh:mm:ssZZ';
+const EMPTY_DATETIME_PADDING
+  = moment().format(DATETIME_FORAMT).replace(/./g, ' ');
 
 export type LogFormatter = (logData?: {[_: string]: any} | null) => string;
 
@@ -54,10 +59,17 @@ export const keyValueLogFormatter: ColorizedLogFormatter
 export const simpleLogFormatter: ColorizedLogFormatter
   = (logColorizer, logData) => {
     if (!logData.time) {
-      return logColorizer(logData, `                     | ${logData.msg}`);
+      return logColorizer(
+        logData,
+        `${EMPTY_DATETIME_PADDING} | ${logData.msg}`,
+      );
     }
 
-    return logColorizer(logData, `${logData.time} | ${logData.msg}`);
+    const formattedDatetime = moment(logData).format(DATETIME_FORAMT);
+    return logColorizer(
+      logData,
+      `${formattedDatetime} | ${logData.msg}`,
+    );
   };
 
 export const jsonLogFormatter: ColorizedLogFormatter
