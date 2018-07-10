@@ -30,7 +30,14 @@ export type ColorizedLogFormatter =
 
 export const keyValueLogFormatter: ColorizedLogFormatter
   = (logColorizer, logData) => {
-    const logLine = Object.keys(logData)
+    const { time, msg, ...logExtraData } = logData;
+    const logDataKeys = [
+      time && 'time',
+      msg && 'msg',
+      ...Object.keys(logExtraData)
+    ];
+
+    const logLine = logDataKeys
       .map((eachKey) => ({key: eachKey, value: logData[eachKey]}))
       .filter((eachKeyValue) => eachKeyValue.value !== undefined)
       .map(({key, value}) => `${key}=${JSON.stringify(value)}`)
