@@ -1,3 +1,4 @@
 var gulp = require('gulp');
+require('./lint');
 
-gulp.task('default', ['lint']);
+gulp.task('default', gulp.series('lint'));
