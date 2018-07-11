@@ -1,8 +1,9 @@
 var gulp = require('gulp');
+require('./build');
 
-gulp.task('watch', ['build'], () => {
+gulp.task('watch', gulp.series('build', () => {
   return gulp.watch([
     'src/**/*.js',
     'src/**/*.ts'
   ], ['build']);
-});
+}));

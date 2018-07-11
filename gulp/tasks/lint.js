@@ -8,14 +8,14 @@ gulp.task('eslint', () => {
     .pipe(excludeGitignore())
     .pipe(eslint())
     .pipe(eslint.format())
-    .pipe(eslint.failAfterError())
+    .pipe(eslint.failAfterError());
 });
 
 gulp.task('tslint', () => {
   return gulp.src(['src/**/*.ts', 'test/**/*.ts'])
     .pipe(excludeGitignore())
     .pipe(tslint())
-    .pipe(tslint.report())
+    .pipe(tslint.report());
 });
 
-gulp.task('lint', ['eslint', 'tslint']);
+gulp.task('lint', gulp.series('eslint', 'tslint'));
