@@ -15,8 +15,7 @@
     "prepare": "gulp build",
     "start": "gulp watch",
     "skycli": "gulp build && ./bin/skycli.js",
-    "build-bin":
-      "gulp build && mkdir -p dist-bin && pkg --out-path dist-bin --targets node8-macos,node8-linux,node8-win .",
+    "build-bin": "gulp build && mkdir -p dist-bin && pkg --out-path dist-bin --targets node8-macos,node8-linux,node8-win .",
     "clean": "rm -rf dist dist-bin",
     "postpublish": "./scripts/brew-publish.sh"
   },
@@ -24,7 +23,10 @@
     "type": "git",
     "url": "git+https://github.com/SkygearIO/skycli.git"
   },
-  "keywords": ["cli", "skygear"],
+  "keywords": [
+    "cli",
+    "skygear"
+  ],
   "author": "Oursky Limited",
   "license": "Apache-2.0",
   "bugs": {
@@ -41,9 +43,11 @@
     "fs-extra": "^4.0.2",
     "inquirer": "^3.2.3",
     "lodash": "^4.17.4",
+    "moment": "^2.22.2",
     "node-fetch": "^1.7.2",
     "query-string": "^5.0.1",
     "raven-js": "^3.17.0",
+    "sql-formatter": "^2.3.1",
     "tmp": "0.0.33",
     "untildify": "^3.0.2",
     "ws": "^4.0.0",
@@ -83,7 +87,10 @@
     "typescript": "^2.6.2"
   },
   "pkg": {
-    "assets": ["dist/**/*", "templates/**/*"]
+    "assets": [
+      "dist/**/*",
+      "templates/**/*"
+    ]
   },
   "skycli": {
     "environments": {
