@@ -1,7 +1,9 @@
 {
   "presets": [
-    "@babel/es2015",
-    "@babel/stage-2",
+    "@babel/env",
+    ["@babel/stage-2", {
+      "decoratorsLegacy": true
+    }],
     "@babel/typescript"
   ],
   "plugins": [
