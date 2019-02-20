@@ -18,15 +18,11 @@
 require('babel-polyfill');
 const config = require('./dist/config');
 const configUtil = require('./dist/config-util');
-const setControllerEnvironment = require('./dist/api').setControllerEnvironment;
 
 function checkArguments(argv, options) {
   // Populate some data from argv for convenience
   argv.currentEnvironment = configUtil.currentEnvironment(argv);
   argv.currentAccount = configUtil.currentAccount(argv);
-
-  // Configure controller environment
-  setControllerEnvironment(argv.currentEnvironment);
 
   // Print argv for debug mode to facilitate debugging.
   if (argv.debug) {
