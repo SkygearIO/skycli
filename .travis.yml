@@ -18,8 +18,8 @@ install:
 
 script:
   - npm test
-  - npm run tsc --noImplicitAny || true # treating it as warning for time being
-  - npm run tslint -- -c tslint.ideal.json 'src/**/*.ts' 'test/**/*.ts' || true # treating it as warning for time being
+  - npm run tsc --noImplicitAny
+  - npm run tslint -- -c tslint.ideal.json 'src/**/*.ts' 'test/**/*.ts'
 
 before_deploy:
   - npm run build-bin

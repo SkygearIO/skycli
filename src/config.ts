@@ -32,6 +32,7 @@ const configPaths: { [domain: string]: string } = {
   project: './skygear.json'
 };
 
+// tslint:disable-next-line:no-any
 function migrate(configObject: Dictionary<any>) {
   const migrated = _.assign({}, configObject);
   if (typeof migrated.version === 'undefined') {
@@ -92,6 +93,7 @@ export function load(domain: ConfigDomain = ConfigDomain.GlobalDomain) {
 }
 
 export function save(
+  // tslint:disable-next-line:no-any
   configObject: Dictionary<any>,
   domain: ConfigDomain = ConfigDomain.GlobalDomain
 ) {
@@ -107,6 +109,7 @@ export function save(
 
 export function set(
   name: PropertyPath,
+  // tslint:disable-next-line:no-any
   value: any,
   domain: ConfigDomain = ConfigDomain.GlobalDomain
 ) {
@@ -129,10 +132,12 @@ export function loadLocal() {
   return load(ConfigDomain.LocalDomain);
 }
 
+// tslint:disable-next-line:no-any
 export function saveLocal(configObject: Dictionary<any>) {
   return save(configObject, ConfigDomain.LocalDomain);
 }
 
+// tslint:disable-next-line:no-any
 export function setLocal(name: PropertyPath, value: any) {
   return set(name, value, ConfigDomain.LocalDomain);
 }
@@ -145,10 +150,12 @@ export function loadProject() {
   return load(ConfigDomain.ProjectDomain);
 }
 
+// tslint:disable-next-line:no-any
 export function saveProject(configObject: Dictionary<any>) {
   return save(configObject, ConfigDomain.ProjectDomain);
 }
 
+// tslint:disable-next-line:no-any
 export function setProject(name: PropertyPath, value: any) {
   return set(name, value, ConfigDomain.ProjectDomain);
 }

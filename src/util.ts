@@ -33,6 +33,7 @@ export interface CommandModule extends YargsCommandModule {
 
 export function createCommand(module: CommandModule) {
   return _.assign({}, module, {
+    execute: module.handler,
     handler: (argv: Arguments) => {
       const p = module.handler(argv);
       if (p && typeof p.catch === 'function') {
@@ -46,8 +47,7 @@ export function createCommand(module: CommandModule) {
           process.exit(1);
         });
       }
-    },
-    execute: module.handler
+    }
   });
 }
 
