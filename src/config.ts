@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import * as os from 'os';
 import fs from 'fs-extra';
 import _, { Dictionary, PropertyPath } from 'lodash';
 import path from 'path';
@@ -22,14 +23,12 @@ const currentConfigVersion = 1;
 
 export enum ConfigDomain {
   GlobalDomain = 'global',
-  LocalDomain = 'local',
   ProjectDomain = 'project'
 }
 
 const configPaths: { [domain: string]: string } = {
-  global: '~/.skycli/skyclirc',
-  local: './.skycli/skyclirc',
-  project: './skygear.json'
+  global: `${process.env.XDG_CONFIG_HOME || os.homedir() + '/.config'}/skycli/config`,
+  project: './skygear.yaml'
 };
 
 // tslint:disable-next-line:no-any
@@ -43,13 +42,6 @@ function migrate(configObject: Dictionary<any>) {
   // from previous config version to the current one here.
 
   return migrated;
-}
-
-function isGlobalConfigPath(configPath: string) {
-  const globalConfigPath = path.resolve(
-    untildify(configPaths[ConfigDomain.GlobalDomain])
-  );
-  return globalConfigPath === configPath;
 }
 
 function findConfig(domain: ConfigDomain, exists: boolean = true) {
@@ -67,11 +59,6 @@ function findConfig(domain: ConfigDomain, exists: boolean = true) {
   while (!absolute && currentDir !== path.dirname(currentDir)) {
     fullPath = path.resolve(currentDir, configPath);
     if (fs.existsSync(fullPath)) {
-      if (domain === ConfigDomain.LocalDomain && isGlobalConfigPath(fullPath)) {
-        // We are looking for local config, but we only find the global
-        // one, meaning local config doesn't exist.
-        return undefined;
-      }
       return fullPath;
     }
     currentDir = path.dirname(currentDir);
@@ -128,22 +115,8 @@ export function unset(
   set(name, undefined, domain);
 }
 
-export function loadLocal() {
-  return load(ConfigDomain.LocalDomain);
-}
-
-// tslint:disable-next-line:no-any
-export function saveLocal(configObject: Dictionary<any>) {
-  return save(configObject, ConfigDomain.LocalDomain);
-}
-
-// tslint:disable-next-line:no-any
-export function setLocal(name: PropertyPath, value: any) {
-  return set(name, value, ConfigDomain.LocalDomain);
-}
-
-export function unsetLocal(name: PropertyPath) {
-  return unset(name, ConfigDomain.LocalDomain);
+export function loadGlobal() {
+  return load(ConfigDomain.GlobalDomain);
 }
 
 export function loadProject() {

@@ -35,8 +35,7 @@ const cli = require('yargs')
   .commandDir('dist/commands')
   .demandCommand()
   .pkgConf('skycli', __dirname)
-  .config(config.load())
-  .config(config.loadLocal())
+  .config(config.loadGlobal())
   .config({
     project: config.loadProject(),
   })
