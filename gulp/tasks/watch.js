@@ -5,5 +5,5 @@ gulp.task('watch', gulp.series('build', () => {
   return gulp.watch([
     'src/**/*.js',
     'src/**/*.ts'
-  ], ['build']);
+  ], gulp.series('build'));
 }));
