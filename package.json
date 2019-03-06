@@ -83,17 +83,5 @@
       "templates/**/*"
     ]
   },
-  "skycli": {
-    "environments": {
-      "staging": {
-        "url": "https://controller.staging.skygeario.com/v2/",
-        "portalURL": "https://portal-staging.skygear.io/"
-      },
-      "production": {
-        "url": "https://controller.skygeario.com/v2/",
-        "portalURL": "https://portal.skygear.io/"
-      }
-    },
-    "environment": "production"
-  }
+  "skycli": {}
 }
