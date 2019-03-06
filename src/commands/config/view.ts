@@ -1,8 +1,6 @@
-import _ from 'lodash';
-
 import Table, { VerticalTable } from 'cli-table3';
-import { ClusterConfig } from '../types';
-import { Arguments, createCommand } from '../util';
+import { ClusterConfig } from '../../types';
+import { Arguments, createCommand } from '../../util';
 
 function createVerticalTableRow(key: string, value: string): Table.VerticalTableRow {
   return { [key] : value };
@@ -26,7 +24,7 @@ function run(argv: Arguments) {
 }
 
 export default createCommand({
-  command: 'config view',
+  command: 'view',
   describe: 'Show skycli configuration',
   handler: run
 });
