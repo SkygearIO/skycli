@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 import url from 'url';
 
-import { ClusterConfig, createClusterConfig } from '../types/clusterConfig';
+import { ClusterConfig, createClusterConfig } from '../types';
 import { handleFailureResponse } from './error';
 
 function defaultHeaders(token?: string) {
