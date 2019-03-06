@@ -20,6 +20,8 @@ import * as os from 'os';
 import path from 'path';
 import untildify from 'untildify';
 
+import { GlobalConfig } from './types';
+
 const currentConfigVersion = 1;
 
 export enum ConfigDomain {
@@ -77,7 +79,7 @@ export function load(domain: ConfigDomain = ConfigDomain.GlobalDomain) {
     content = yaml.safeLoad(fs.readFileSync(configPath, 'utf-8'));
   }
 
-  return migrate(content);
+  return content;
 }
 
 export function save(
@@ -110,11 +112,15 @@ export function set(
 }
 
 export function loadGlobal() {
-  return load(ConfigDomain.GlobalDomain);
+  const globalConfig = load(ConfigDomain.GlobalDomain) as GlobalConfig;
+  // TODO: load current user
+  return {
+    cluster: globalConfig.cluster && globalConfig.cluster[globalConfig.currentContext]
+  };
 }
 
 export function loadProject() {
-  return load(ConfigDomain.ProjectDomain);
+  return migrate(load(ConfigDomain.ProjectDomain));
 }
 
 export const developerMode = process.env.SKYCLI_DEVELOPER_MODE === '1';

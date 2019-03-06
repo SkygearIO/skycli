@@ -1,0 +1,32 @@
+import _ from 'lodash';
+
+import Table, { VerticalTable } from 'cli-table3';
+import { ClusterConfig } from '../types';
+import { Arguments, createCommand } from '../util';
+
+function createVerticalTableRow(key: string, value: string): Table.VerticalTableRow {
+  return { [key] : value };
+}
+
+function run(argv: Arguments) {
+  const cluster = (argv.cluster || {}) as ClusterConfig;
+  const table = new Table({
+    head: ['Property', 'Value']
+  }) as VerticalTable;
+
+  table.push(
+    createVerticalTableRow('Cluster Type', cluster.env),
+    createVerticalTableRow('Cluster Endpoint', cluster.endpoint),
+    // TODO: show current user
+    createVerticalTableRow('Account', ''),
+  );
+
+  console.log(table.toString());
+  return Promise.resolve();
+}
+
+export default createCommand({
+  command: 'config view',
+  describe: 'Show skycli configuration',
+  handler: run
+});
