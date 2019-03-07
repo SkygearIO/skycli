@@ -4,6 +4,7 @@
   ],
   "compilerOptions": {
     "noImplicitAny": false,
+    "resolveJsonModule": true,
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
     "target": "es5",
