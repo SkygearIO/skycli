@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as os from 'os';
 import fs from 'fs-extra';
 import _, { Dictionary, PropertyPath } from 'lodash';
+import * as os from 'os';
 import path from 'path';
 import untildify from 'untildify';
 
