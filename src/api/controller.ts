@@ -12,8 +12,8 @@ function defaultHeaders(token?: string) {
   };
 }
 
-export function getConfig(endpoint: string): Promise<ClusterConfig> {
-  return fetch(url.resolve(endpoint, '/config'), {
+export function getConfig(endpoint: string, apiKey: string): Promise<ClusterConfig> {
+  return fetch(url.resolve(endpoint, '/_controller/config'), {
     headers: {
       ...defaultHeaders()
     },
