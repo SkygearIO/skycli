@@ -111,16 +111,16 @@ export function set(
   }
 }
 
-export function loadGlobal() {
+export function loadConfig() {
   const globalConfig = load(ConfigDomain.GlobalDomain) as GlobalConfig;
+  const appConfig = migrate(load(ConfigDomain.ProjectDomain));
   // TODO: load current user
   return {
-    cluster: globalConfig.cluster && globalConfig.cluster[globalConfig.currentContext]
+    config: {
+      app: appConfig,
+      cluster: globalConfig.cluster && globalConfig.cluster[globalConfig.currentContext]
+    }
   };
-}
-
-export function loadProject() {
-  return migrate(load(ConfigDomain.ProjectDomain));
 }
 
 export const developerMode = process.env.SKYCLI_DEVELOPER_MODE === '1';

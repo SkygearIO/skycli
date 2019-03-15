@@ -9,8 +9,8 @@ interface ConfigContext {
 
 function createConfigContext(): ConfigContext {
     return {
-        cluster:  defaultContext,
-        user:  defaultContext
+        cluster: defaultContext,
+        user: defaultContext
     };
 }
 
