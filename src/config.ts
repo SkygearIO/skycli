@@ -20,7 +20,7 @@ import * as os from 'os';
 import path from 'path';
 import untildify from 'untildify';
 
-import { GlobalConfig } from './types';
+import { createGlobalConfig, GlobalConfig } from './types';
 
 const currentConfigVersion = 1;
 
@@ -112,14 +112,21 @@ export function set(
 }
 
 export function loadConfig() {
-  const globalConfig = load(ConfigDomain.GlobalDomain) as GlobalConfig;
+  let globalConfig = load(ConfigDomain.GlobalDomain) as GlobalConfig;
+  if (!Object.keys(globalConfig).length) {
+    globalConfig = createGlobalConfig();
+  }
+
   const appConfig = migrate(load(ConfigDomain.ProjectDomain));
   // TODO: load current user
   return {
+    appConfig,
     config: {
       app: appConfig,
-      cluster: globalConfig.cluster && globalConfig.cluster[globalConfig.currentContext]
-    }
+      cluster: globalConfig.cluster && globalConfig.cluster[globalConfig.currentContext],
+      user: globalConfig.user && globalConfig.user[globalConfig.currentContext],
+    },
+    globalConfig
   };
 }
 

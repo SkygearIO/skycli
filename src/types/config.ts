@@ -1,6 +1,8 @@
 import { ClusterConfig } from './clusterConfig';
+import { User } from './user';
 
 export interface Config {
     cluster: ClusterConfig;
-    // todo: user and app config
+    user: User;
+    // todo: app config
 }

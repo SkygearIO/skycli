@@ -2,7 +2,9 @@ import chalk from 'chalk';
 import inquirer from 'inquirer';
 
 import { controller } from '../../api';
+import * as config from '../../config';
 import { Arguments, createCommand } from '../../util';
+import { updateGlobalConfigUser } from './util';
 
 const emailPrompt: inquirer.Question = {
   message: 'Email:',
@@ -63,11 +65,11 @@ function run(argv: Arguments) {
       return controller.signupWithEmail(argv.config, answers.email, answers.password);
     })
     .then((payload) => {
-      console.log(payload);
       if (argv.debug) {
         console.log(payload);
       }
-      const email = payload.meta.email;
+      const newGlobalConfig = updateGlobalConfigUser(argv.globalConfig, payload);
+      config.save(newGlobalConfig, config.ConfigDomain.GlobalDomain);
       console.log(chalk`Sign up as {green ${email}}.`);
     }).catch ((error) => {
       if (argv.debug) {
@@ -75,7 +77,6 @@ function run(argv: Arguments) {
       }
       return Promise.reject('Unable to complete the request.');
     });
-    
 }
 
 export default createCommand({

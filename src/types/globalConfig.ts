@@ -1,4 +1,5 @@
 import { ClusterConfig } from './clusterConfig';
+import { User } from './user';
 
 const defaultContext = 'default';
 
@@ -14,6 +15,7 @@ function createConfigContext(): ConfigContext {
     };
 }
 
+interface UserMap { [s: string]: User; }
 interface ClusterConfigMap { [s: string]: ClusterConfig; }
 interface ContextMap { [s: string]: ConfigContext; }
 
@@ -21,16 +23,16 @@ export interface GlobalConfig {
     cluster: ClusterConfigMap;
     context: ContextMap;
     currentContext: string;
+    user: UserMap;
 }
 
-export function createGlobalConfig(clusterConfig: ClusterConfig): GlobalConfig {
+export function createGlobalConfig(): GlobalConfig {
     return {
-        cluster: {
-            [defaultContext]: clusterConfig
-        },
+        cluster: {},
         context: {
             [defaultContext]: createConfigContext()
         },
-        currentContext: defaultContext
+        currentContext: defaultContext,
+        user: {}
     };
 }

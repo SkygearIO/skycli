@@ -74,7 +74,10 @@ function run(argv: Arguments) {
     }).then((payload) => {
       payload.endpoint = endpoint;
       payload.apiKey = apiKey;
-      const newGlobalConfig = createGlobalConfig(payload);
+      const newGlobalConfig = createGlobalConfig();
+      const currentContextKey = newGlobalConfig.currentContext;
+      const currentClusterKey = newGlobalConfig.context[currentContextKey].cluster;
+      newGlobalConfig.cluster[currentClusterKey] = payload;
       config.save(newGlobalConfig, config.ConfigDomain.GlobalDomain);
       console.log(chalk`Running Skygear cluster at {green ${endpoint}}.`);
     }).catch ((error) => {
