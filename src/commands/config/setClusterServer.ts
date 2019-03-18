@@ -1,11 +1,10 @@
 import chalk from 'chalk';
 import inquirer from 'inquirer';
-import _ from 'lodash';
 
-import { controller } from '../api';
-import * as config from '../config';
-import { createGlobalConfig } from '../types';
-import { Arguments, createCommand } from '../util';
+import { controller } from '../../api';
+import * as config from '../../config';
+import { createGlobalConfig } from '../../types';
+import { Arguments, createCommand } from '../../util';
 
 const urlPrompt: inquirer.Question = {
   message: 'Cluster endpoint:',
@@ -67,7 +66,7 @@ export default createCommand({
         type: 'string'
       });
   },
-  command: 'config set-cluster-server [endpoint]',
+  command: 'set-cluster-server [endpoint]',
   describe: 'Setup cluster endpoint url',
   handler: run
 });

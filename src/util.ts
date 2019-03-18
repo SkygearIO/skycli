@@ -54,3 +54,18 @@ export function createCommand(module: CommandModule) {
 export function executeCommand(module: CommandModule, argv: Arguments) {
   return module.execute(argv);
 }
+
+export function getCommandGroupHelpMessage(command: string, subCommands: CommandModule[]) {
+  const cmdsText = subCommands.map((cmd) => {
+    if (typeof cmd.command === 'string') {
+      return cmd.command.split(' ');
+    }
+  }).map((cmd) =>
+    cmd[0]
+  ).join(' | ');
+  return `Usage: skycli config [action]
+  action maybe           ${cmdsText}
+
+For detailed information on this command and its flags, run:
+  skycli ${command} help`;
+}
