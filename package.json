@@ -39,6 +39,7 @@
     "form-data": "^2.3.3",
     "fs-extra": "^4.0.3",
     "inquirer": "^3.3.0",
+    "js-yaml": "^3.12.2",
     "lodash": "^4.17.11",
     "node-fetch": "^1.7.3",
     "untildify": "^3.0.3",
@@ -83,17 +84,5 @@
       "templates/**/*"
     ]
   },
-  "skycli": {
-    "environments": {
-      "staging": {
-        "url": "https://controller.staging.skygeario.com/v2/",
-        "portalURL": "https://portal-staging.skygear.io/"
-      },
-      "production": {
-        "url": "https://controller.skygeario.com/v2/",
-        "portalURL": "https://portal.skygear.io/"
-      }
-    },
-    "environment": "production"
-  }
+  "skycli": {}
 }

@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import fs from 'fs-extra';
+import * as yaml from 'js-yaml';
 import _, { Dictionary, PropertyPath } from 'lodash';
 import * as os from 'os';
 import path from 'path';
@@ -73,7 +74,7 @@ export function load(domain: ConfigDomain = ConfigDomain.GlobalDomain) {
 
   const configPath = findConfig(domain);
   if (configPath) {
-    content = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    content = yaml.safeLoad(fs.readFileSync(configPath, 'utf-8'));
   }
 
   return migrate(content);
@@ -90,7 +91,7 @@ export function save(
     fs.ensureDirSync(path.dirname(configPath));
   }
 
-  const content = JSON.stringify(configObject, null, 2);
+  const content = yaml.safeDump(configObject);
   fs.writeFileSync(configPath, content);
 }
 
@@ -108,33 +109,12 @@ export function set(
   }
 }
 
-export function unset(
-  name: PropertyPath,
-  domain: ConfigDomain = ConfigDomain.GlobalDomain
-) {
-  set(name, undefined, domain);
-}
-
 export function loadGlobal() {
   return load(ConfigDomain.GlobalDomain);
 }
 
 export function loadProject() {
   return load(ConfigDomain.ProjectDomain);
-}
-
-// tslint:disable-next-line:no-any
-export function saveProject(configObject: Dictionary<any>) {
-  return save(configObject, ConfigDomain.ProjectDomain);
-}
-
-// tslint:disable-next-line:no-any
-export function setProject(name: PropertyPath, value: any) {
-  return set(name, value, ConfigDomain.ProjectDomain);
-}
-
-export function unsetProject(name: PropertyPath) {
-  return unset(name, ConfigDomain.ProjectDomain);
 }
 
 export const developerMode = process.env.SKYCLI_DEVELOPER_MODE === '1';
