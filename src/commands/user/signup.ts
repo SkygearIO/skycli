@@ -76,7 +76,7 @@ function run(argv: Arguments) {
       if (argv.debug) {
         console.error(error);
       }
-      return Promise.reject('Unable to complete the request.');
+      return Promise.reject(`${error}`);
     });
 }
 
