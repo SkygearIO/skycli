@@ -1,9 +1,9 @@
 export interface User {
     userID: string;
     accessToken: string;
-    meta: Meta;
+    metadata: Metadata;
 }
-export interface Meta {
+export interface Metadata {
     email: string;
 }
 
@@ -11,14 +11,13 @@ export interface Meta {
 export function userFromJSON(input: any): User {
     return {
         accessToken: input.access_token,
-        // FIXME: update profile to meta after auth gear update
-        meta: metaFromJSON(input.profile),
+        metadata: metaFromJSON(input.metadata),
         userID: input.user_id
     };
 }
 
 // tslint:disable-next-line:no-any
-export function metaFromJSON(input: any): Meta {
+export function metaFromJSON(input: any): Metadata {
     return {
         email: input.email
     };
