@@ -4,6 +4,7 @@ import inquirer from 'inquirer';
 import { controller } from '../../api';
 import * as config from '../../config';
 import { Arguments, createCommand } from '../../util';
+import requireClusterConfig from '../middleware/requireClusterConfig';
 import { updateGlobalConfigUser } from './util';
 
 const emailPrompt: inquirer.Question = {
@@ -80,6 +81,10 @@ function run(argv: Arguments) {
 }
 
 export default createCommand({
+  builder: (yargs) => {
+    return yargs
+      .middleware(requireClusterConfig);
+  },
   command: 'signup',
   describe: 'Sign up skygear cluster user',
   handler: run
