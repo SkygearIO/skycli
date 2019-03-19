@@ -45,10 +45,6 @@ const cli = require('yargs')
     type: 'boolean',
     desc: 'Show verbose logs',
   })
-  .option('environment', {
-    type: 'string',
-    desc: config.developerMode && 'Set controller environment.',
-  })
   .check(checkArguments)
   .help();
 
