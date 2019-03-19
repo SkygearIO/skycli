@@ -15,6 +15,7 @@ function run(argv: Arguments) {
   table.push(
     createVerticalTableRow('Cluster Type', cluster.env),
     createVerticalTableRow('Cluster Endpoint', cluster.endpoint),
+    createVerticalTableRow('Cluster API Key', cluster.apiKey),
     // TODO: show current user
     createVerticalTableRow('Account', ''),
   );
