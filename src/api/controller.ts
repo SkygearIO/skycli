@@ -23,3 +23,16 @@ export async function signupWithEmail(
     return userFromJSON(payload.result);
   });
 }
+
+export async function loginWithEmail(
+  context: CLIContext, email: string, password: string
+): Promise<User> {
+  return callAPI(context, '/_auth/login', 'POST', {
+    auth_data: {
+      email
+    },
+    password
+  }).then((payload) => {
+    return userFromJSON(payload.result);
+  });
+}
