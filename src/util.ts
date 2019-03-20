@@ -19,11 +19,15 @@ import {
   Arguments as YargsArguments,
   CommandModule as YargsCommandModule
 } from 'yargs';
+import { GlobalConfig } from './types';
+import { CLIContext } from './types/cliContext';
 
 export interface Arguments extends YargsArguments {
   debug: boolean;
   verbose: boolean;
   environment: string;
+  context: CLIContext;
+  globalConfig: GlobalConfig;
 }
 
 export interface CommandModule extends YargsCommandModule {

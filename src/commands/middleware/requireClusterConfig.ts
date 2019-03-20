@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import { Arguments } from '../../util';
 
 export default function requireClusterConfig(argv: Arguments) {
-    if (argv.config.cluster && argv.config.cluster.endpoint) {
+    if (argv.context.cluster && argv.context.cluster.endpoint) {
         return;
     }
 

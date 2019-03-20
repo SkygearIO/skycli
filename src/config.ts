@@ -118,14 +118,8 @@ export function loadConfig() {
   }
 
   const appConfig = migrate(load(ConfigDomain.ProjectDomain));
-  // TODO: load current user
   return {
     appConfig,
-    config: {
-      app: appConfig,
-      cluster: globalConfig.cluster && globalConfig.cluster[globalConfig.currentContext],
-      user: globalConfig.user && globalConfig.user[globalConfig.currentContext],
-    },
     globalConfig
   };
 }

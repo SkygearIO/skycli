@@ -37,8 +37,8 @@ const passwordPrompt: inquirer.Question = {
 function askCredentials(argv: Arguments) {
   const prompts = [];
   const credentials = {
-    email: argv.email,
-    password: argv.password
+    email: argv.email as string,
+    password: argv.password as string
   };
 
   if (credentials.email) {
@@ -63,7 +63,7 @@ function run(argv: Arguments) {
   return askCredentials(argv)
     .then((answers) => {
       email = answers.email;
-      return controller.signupWithEmail(argv.config, answers.email, answers.password);
+      return controller.signupWithEmail(argv.context, answers.email, answers.password);
     })
     .then((payload) => {
       if (argv.debug) {
