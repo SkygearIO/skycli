@@ -4,10 +4,18 @@ export interface ClusterConfig {
     apiKey: string;
 }
 
+export function createClusterConfig(endpoint: string, apiKey: string): ClusterConfig {
+    return {
+        apiKey,
+        endpoint,
+        env: null,
+    };
+}
+
 // tslint:disable-next-line:no-any
-export function createClusterConfig(input: any): ClusterConfig {
+export function clusterConfigFromJSON(input: any): ClusterConfig {
     if (!input || !input.env) {
-        throw Error('Invalid cluster config.');
+        throw Error(`Invalid cluster config: ${input}`);
     }
     return {
         apiKey: input.apiKey,
