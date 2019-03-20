@@ -32,9 +32,10 @@ const urlPrompt: inquirer.Question = {
 
 function askClusterServer(argv: Arguments) {
   const prompts = [];
+  const clusterConfig = argv.config.cluster;
   const server = {
-    apiKey: argv['api-key'] || (argv.cluster && argv.cluster.apiKey),
-    endpoint: argv.endpoint || (argv.cluster && argv.cluster.endpoint),
+    apiKey: argv['api-key'] || (clusterConfig && clusterConfig.apiKey),
+    endpoint: argv.endpoint || (clusterConfig && clusterConfig.endpoint),
   };
 
   if (server.endpoint) {
@@ -73,7 +74,10 @@ function run(argv: Arguments) {
     }).then((payload) => {
       payload.endpoint = endpoint;
       payload.apiKey = apiKey;
-      const newGlobalConfig = createGlobalConfig(payload);
+      const newGlobalConfig = createGlobalConfig();
+      const currentContextKey = newGlobalConfig.currentContext;
+      const currentClusterKey = newGlobalConfig.context[currentContextKey].cluster;
+      newGlobalConfig.cluster[currentClusterKey] = payload;
       config.save(newGlobalConfig, config.ConfigDomain.GlobalDomain);
       console.log(chalk`Running Skygear cluster at {green ${endpoint}}.`);
     }).catch ((error) => {

@@ -20,7 +20,7 @@ import * as os from 'os';
 import path from 'path';
 import untildify from 'untildify';
 
-import { GlobalConfig } from './types';
+import { createGlobalConfig, GlobalConfig } from './types';
 
 const currentConfigVersion = 1;
 
@@ -111,16 +111,23 @@ export function set(
   }
 }
 
-export function loadGlobal() {
-  const globalConfig = load(ConfigDomain.GlobalDomain) as GlobalConfig;
+export function loadConfig() {
+  let globalConfig = load(ConfigDomain.GlobalDomain) as GlobalConfig;
+  if (!Object.keys(globalConfig).length) {
+    globalConfig = createGlobalConfig();
+  }
+
+  const appConfig = migrate(load(ConfigDomain.ProjectDomain));
   // TODO: load current user
   return {
-    cluster: globalConfig.cluster && globalConfig.cluster[globalConfig.currentContext]
+    appConfig,
+    config: {
+      app: appConfig,
+      cluster: globalConfig.cluster && globalConfig.cluster[globalConfig.currentContext],
+      user: globalConfig.user && globalConfig.user[globalConfig.currentContext],
+    },
+    globalConfig
   };
-}
-
-export function loadProject() {
-  return migrate(load(ConfigDomain.ProjectDomain));
 }
 
 export const developerMode = process.env.SKYCLI_DEVELOPER_MODE === '1';
