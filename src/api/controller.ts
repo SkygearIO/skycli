@@ -36,3 +36,7 @@ export async function loginWithEmail(
     return userFromJSON(payload.result);
   });
 }
+
+export async function logout(context: CLIContext): Promise<void> {
+  return callAPI(context, '/_auth/logout', 'POST');
+}

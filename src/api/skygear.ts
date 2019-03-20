@@ -3,11 +3,12 @@ import url from 'url';
 
 import { CLIContext } from '../types/cliContext';
 
-function defaultHeaders(context?: CLIContext) {
+function defaultHeaders(context: CLIContext) {
   return {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
-    'X-Skygear-API-Key': (context && context.cluster.apiKey) || ''
+    'X-Skygear-API-Key': (context.cluster && context.cluster.apiKey) || '',
+    'X-Skygear-Access-Token': (context.user && context.user.accessToken) || ''
   };
 }
 

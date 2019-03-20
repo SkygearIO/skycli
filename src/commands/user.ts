@@ -1,8 +1,9 @@
 import { Arguments, createCommand, getCommandGroupHelpMessage } from '../util';
 import userLogin from './user/login';
+import userLogout from './user/logout';
 import userSignup from './user/signup';
 
-const subCommands = [userSignup, userLogin];
+const subCommands = [userSignup, userLogin, userLogout];
 
 function run(argv: Arguments) {
   console.log(getCommandGroupHelpMessage('user', subCommands));
