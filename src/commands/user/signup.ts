@@ -4,6 +4,7 @@ import inquirer from 'inquirer';
 import { controller } from '../../api';
 import * as config from '../../config';
 import { Arguments, createCommand } from '../../util';
+import requireClusterConfig from '../middleware/requireClusterConfig';
 import { updateGlobalConfigUser } from './util';
 
 const emailPrompt: inquirer.Question = {
@@ -36,8 +37,8 @@ const passwordPrompt: inquirer.Question = {
 function askCredentials(argv: Arguments) {
   const prompts = [];
   const credentials = {
-    email: argv.email,
-    password: argv.password
+    email: argv.email as string,
+    password: argv.password as string
   };
 
   if (credentials.email) {
@@ -62,7 +63,7 @@ function run(argv: Arguments) {
   return askCredentials(argv)
     .then((answers) => {
       email = answers.email;
-      return controller.signupWithEmail(argv.config, answers.email, answers.password);
+      return controller.signupWithEmail(argv.context, answers.email, answers.password);
     })
     .then((payload) => {
       if (argv.debug) {
@@ -75,11 +76,15 @@ function run(argv: Arguments) {
       if (argv.debug) {
         console.error(error);
       }
-      return Promise.reject('Unable to complete the request.');
+      return Promise.reject(`${error}`);
     });
 }
 
 export default createCommand({
+  builder: (yargs) => {
+    return yargs
+      .middleware(requireClusterConfig);
+  },
   command: 'signup',
   describe: 'Sign up skygear cluster user',
   handler: run

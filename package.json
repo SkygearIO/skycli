@@ -44,7 +44,7 @@
     "lodash": "^4.17.11",
     "node-fetch": "^1.7.3",
     "untildify": "^3.0.3",
-    "yargs": "^8.0.2"
+    "yargs": "^13.2.2"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.41",
@@ -58,7 +58,7 @@
     "@types/node": "^9.6.42",
     "@types/query-string": "^5.1.0",
     "@types/untildify": "^3.0.0",
-    "@types/yargs": "^10.0.2",
+    "@types/yargs": "^12.0.10",
     "babel-eslint": "^9.0.0",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-transform-builtin-extend": "^1.1.2",

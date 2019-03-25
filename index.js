@@ -17,12 +17,11 @@
 
 require('@babel/polyfill');
 const config = require('./dist/config');
-const configUtil = require('./dist/config-util');
+const configUtil = require('./dist/configUtil');
 
 function checkArguments(argv, options) {
   // Populate some data from argv for convenience
-  argv.currentEnvironment = configUtil.currentEnvironment(argv);
-  argv.currentAccount = configUtil.currentAccount(argv);
+  argv.context = configUtil.currentCLIContext(argv);
 
   // Print argv for debug mode to facilitate debugging.
   if (argv.debug) {
@@ -44,10 +43,6 @@ const cli = require('yargs')
   .option('verbose', {
     type: 'boolean',
     desc: 'Show verbose logs',
-  })
-  .option('environment', {
-    type: 'string',
-    desc: config.developerMode && 'Set controller environment.',
   })
   .check(checkArguments)
   .help();

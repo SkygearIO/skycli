@@ -13,15 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { GlobalConfig } from './types';
+import { CLIContext } from './types/cliContext';
 import { Arguments } from './util';
 
-export function currentAccount(argv: Arguments) {
-  const accounts = argv.accounts || {};
-  return accounts[argv.account] || undefined;
-}
+export function currentCLIContext(argv: Arguments): CLIContext {
+  const globalConfig = argv.globalConfig as GlobalConfig;
+  const currentContextKey = globalConfig.currentContext;
 
-export function currentEnvironment(argv: Arguments) {
-  const environments = argv.environments || {};
-  const env = (currentAccount(argv) || {}).environment || argv.environment;
-  return environments[env];
+  // TODO: load current app
+  return {
+    cluster: globalConfig.cluster && globalConfig.cluster[currentContextKey],
+    user: globalConfig.user && globalConfig.user[currentContextKey],
+  };
 }

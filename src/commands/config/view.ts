@@ -7,7 +7,7 @@ function createVerticalTableRow(key: string, value: string): Table.VerticalTable
 }
 
 function run(argv: Arguments) {
-  const cluster = (argv.config.cluster || {}) as ClusterConfig;
+  const cluster = (argv.context.cluster || {}) as ClusterConfig;
   const table = new Table({
     head: ['Property', 'Value']
   }) as VerticalTable;

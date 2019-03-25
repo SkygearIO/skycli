@@ -4,10 +4,10 @@ import url from 'url';
 import { ClusterConfig, createClusterConfig } from '../types/clusterConfig';
 import { User, userFromJSON } from '../types/user';
 
-import { Config } from '../types/config';
+import { CLIContext } from '../types/cliContext';
 import { handleFailureResponse } from './error';
 
-function defaultHeaders(config?: Config) {
+function defaultHeaders(config?: CLIContext) {
   return {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
@@ -33,7 +33,7 @@ export async function getConfig(endpoint: string, apiKey: string): Promise<Clust
 }
 
 export async function signupWithEmail(
-  config: Config, email: string, password: string
+  config: CLIContext, email: string, password: string
 ): Promise<User> {
   return fetch(url.resolve(config.cluster.endpoint, '/_auth/signup'), {
     body: JSON.stringify({
