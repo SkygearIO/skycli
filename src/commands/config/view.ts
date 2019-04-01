@@ -1,5 +1,6 @@
 import Table, { VerticalTable } from 'cli-table3';
 import { ClusterConfig } from '../../types';
+import { User } from '../../types/user';
 import { Arguments, createCommand } from '../../util';
 
 function createVerticalTableRow(key: string, value: string): Table.VerticalTableRow {
@@ -8,6 +9,7 @@ function createVerticalTableRow(key: string, value: string): Table.VerticalTable
 
 function run(argv: Arguments) {
   const cluster = (argv.context.cluster || {}) as ClusterConfig;
+  const user = (argv.context.user || {}) as User;
   const table = new Table({
     head: ['Property', 'Value']
   }) as VerticalTable;
@@ -16,8 +18,7 @@ function run(argv: Arguments) {
     createVerticalTableRow('Cluster Type', cluster.env),
     createVerticalTableRow('Cluster Endpoint', cluster.endpoint),
     createVerticalTableRow('Cluster API Key', cluster.apiKey),
-    // TODO: show current user
-    createVerticalTableRow('Account', ''),
+    createVerticalTableRow('Account', user.metadata && user.metadata.email),
   );
 
   console.log(table.toString());

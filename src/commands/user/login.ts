@@ -12,7 +12,7 @@ function run(argv: Arguments) {
   return askCredentials(argv)
     .then((answers) => {
       email = answers.email;
-      return controller.signupWithEmail(argv.context, answers.email, answers.password);
+      return controller.loginWithEmail(argv.context, answers.email, answers.password);
     })
     .then((payload) => {
       if (argv.debug) {
@@ -20,7 +20,7 @@ function run(argv: Arguments) {
       }
       const newGlobalConfig = updateGlobalConfigUser(argv.globalConfig, payload);
       config.save(newGlobalConfig, config.ConfigDomain.GlobalDomain);
-      console.log(chalk`Sign up as {green ${email}}.`);
+      console.log(chalk`Login as {green ${email}}.`);
     }).catch ((error) => {
       if (argv.debug) {
         console.error(error);
@@ -34,11 +34,11 @@ export default createCommand({
     return yargs
       .middleware(requireClusterConfig)
       .option('email', {
-        desc: 'Sign up as email',
+        desc: 'Login as email',
         type: 'string'
       });
   },
-  command: 'signup',
-  describe: 'Sign up Skygear cluster user',
+  command: 'login',
+  describe: 'Login Skygear cluster user',
   handler: run
 });

@@ -6,3 +6,10 @@ export interface CLIContext {
     user: User;
     // todo: app config
 }
+
+export function createEmptyCLIContext(): CLIContext {
+    return {
+        cluster: null,
+        user: null,
+    };
+}

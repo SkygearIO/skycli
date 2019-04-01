@@ -1,58 +1,42 @@
-import fetch from 'node-fetch';
-import url from 'url';
-
-import { ClusterConfig, createClusterConfig } from '../types/clusterConfig';
+import { CLIContext, createEmptyCLIContext } from '../types/cliContext';
+import { ClusterConfig, clusterConfigFromJSON, createClusterConfig } from '../types/clusterConfig';
 import { User, userFromJSON } from '../types/user';
-
-import { CLIContext } from '../types/cliContext';
-import { handleFailureResponse } from './error';
-
-function defaultHeaders(config?: CLIContext) {
-  return {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json',
-    'X-Skygear-API-Key': (config && config.cluster.apiKey) || ''
-  };
-}
+import { callAPI } from './skygear';
 
 export async function getConfig(endpoint: string, apiKey: string): Promise<ClusterConfig> {
-  return fetch(url.resolve(endpoint, '/_controller/config'), {
-    headers: {
-      ...defaultHeaders()
-    },
-    method: 'GET'
-  }).then((response) => {
-    if (response.status === 200) {
-      return response.json();
-    } else {
-      return handleFailureResponse(response);
-    }
-  }).then((payload) => {
-    return createClusterConfig(payload.result);
+  const context = createEmptyCLIContext();
+  context.cluster = createClusterConfig(endpoint, apiKey);
+  return callAPI(context, '/_controller/config', 'GET').then((payload) => {
+    return clusterConfigFromJSON(payload.result);
   });
 }
 
 export async function signupWithEmail(
-  config: CLIContext, email: string, password: string
+  context: CLIContext, email: string, password: string
 ): Promise<User> {
-  return fetch(url.resolve(config.cluster.endpoint, '/_auth/signup'), {
-    body: JSON.stringify({
-      auth_data: {
-        email
-      },
-      password
-    }),
-    headers: {
-      ...defaultHeaders(config)
+  return callAPI(context, '/_auth/signup', 'POST', {
+    auth_data: {
+      email
     },
-    method: 'POST'
-  }).then((response) => {
-    if (response.status === 200) {
-      return response.json();
-    } else {
-      return handleFailureResponse(response);
-    }
+    password
   }).then((payload) => {
     return userFromJSON(payload.result);
   });
+}
+
+export async function loginWithEmail(
+  context: CLIContext, email: string, password: string
+): Promise<User> {
+  return callAPI(context, '/_auth/login', 'POST', {
+    auth_data: {
+      email
+    },
+    password
+  }).then((payload) => {
+    return userFromJSON(payload.result);
+  });
+}
+
+export async function logout(context: CLIContext): Promise<void> {
+  return callAPI(context, '/_auth/logout', 'POST');
 }
