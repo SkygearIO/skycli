@@ -3,6 +3,7 @@ import inquirer from 'inquirer';
 
 import { controller } from '../../api';
 import { Arguments, createCommand } from '../../util';
+import requireUser from '../middleware/requireUser';
 
 const appNamePrompt: inquirer.Question = {
   message: 'What is your app name?',
@@ -66,7 +67,7 @@ function run(argv: Arguments) {
 
 export default createCommand({
   builder: (yargs) => {
-    return yargs.option('app', {
+    return yargs.middleware(requireUser).option('app', {
       desc: 'Application name',
       type: 'string'
     });

@@ -6,6 +6,7 @@ import tar from 'tar';
 
 import { controller } from '../../api';
 import { Arguments, createCommand } from '../../util';
+import requireUser from '../middleware/requireUser';
 
 function selectApp(argv: Arguments) {
   if (argv.app) {
@@ -120,10 +121,13 @@ function run(argv: Arguments) {
 
 export default createCommand({
   builder: (yargs) => {
-    return yargs.default('dest', '.').option('app', {
-      desc: 'Application name',
-      type: 'string'
-    });
+    return yargs
+      .middleware(requireUser)
+      .default('dest', '.')
+      .option('app', {
+        desc: 'Application name',
+        type: 'string'
+      });
   },
   command: 'scaffold [dest]',
   describe: 'Scaffold skygear application',
