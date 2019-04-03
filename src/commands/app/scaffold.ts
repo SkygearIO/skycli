@@ -76,6 +76,12 @@ function run(argv: Arguments) {
       if (!answers.proceed) {
         return Promise.reject('cancelled');
       }
+
+      // ensure project folder exists
+      if (!fs.existsSync(projectDir)) {
+        fs.mkdirSync(projectDir);
+      }
+
       return selectApp(argv);
     })
     .then((answers) => {
