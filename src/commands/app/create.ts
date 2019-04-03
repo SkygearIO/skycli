@@ -2,8 +2,6 @@ import chalk from 'chalk';
 import inquirer from 'inquirer';
 
 import { controller } from '../../api';
-import * as config from '../../config';
-import { createGlobalConfig } from '../../types';
 import { Arguments, createCommand } from '../../util';
 
 const appNamePrompt: inquirer.Question = {
