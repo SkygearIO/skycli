@@ -1,5 +1,4 @@
-import { CLIContext } from '../types/cliContext';
-import { User, userFromJSON } from '../types/user';
+import { CLIContext, User, userFromJSON } from '../types';
 import { callAPI } from './skygear';
 
 export async function signupWithEmail(

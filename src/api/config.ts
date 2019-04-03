@@ -1,5 +1,9 @@
-import { createEmptyCLIContext } from '../types/cliContext';
-import { ClusterConfig, clusterConfigFromJSON, createClusterConfig } from '../types/clusterConfig';
+import {
+  ClusterConfig,
+  clusterConfigFromJSON,
+  createClusterConfig,
+  createEmptyCLIContext
+} from '../types';
 import { callAPI } from './skygear';
 
 export async function getConfig(endpoint: string, apiKey: string): Promise<ClusterConfig> {

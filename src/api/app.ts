@@ -1,5 +1,4 @@
-import { CLIContext } from '../types/cliContext';
-import { TenantConfig, tenantConfigFromJSON } from '../types/tenantConfig';
+import { CLIContext, TenantConfig, tenantConfigFromJSON } from '../types';
 import { callAPI } from './skygear';
 
 export async function createApp(context: CLIContext, appName: string): Promise<{

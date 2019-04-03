@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { GlobalConfig } from './types';
-import { CLIContext } from './types/cliContext';
+import { CLIContext, GlobalConfig } from './types';
 import { Arguments } from './util';
 
 export function currentCLIContext(argv: Arguments): CLIContext {

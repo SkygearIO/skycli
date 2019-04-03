@@ -1,6 +1,5 @@
 import Table, { VerticalTable } from 'cli-table3';
-import { ClusterConfig } from '../../types';
-import { User } from '../../types/user';
+import { ClusterConfig, User } from '../../types';
 import { Arguments, createCommand } from '../../util';
 
 function createVerticalTableRow(key: string, value: string): Table.VerticalTableRow {
