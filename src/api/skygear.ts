@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 import url from 'url';
 
-import { CLIContext } from '../types/cliContext';
+import { CLIContext } from '../types';
 
 function defaultHeaders(context: CLIContext) {
   return {

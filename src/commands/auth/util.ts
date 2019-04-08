@@ -1,8 +1,7 @@
 import chalk from 'chalk';
 import inquirer from 'inquirer';
 
-import { GlobalConfig } from '../../types/globalConfig';
-import { User } from '../../types/user';
+import { GlobalConfig, User } from '../../types';
 import { Arguments } from '../../util';
 
 export function updateGlobalConfigUser(config: GlobalConfig, user: User): GlobalConfig {
