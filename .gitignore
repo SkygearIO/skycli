@@ -5,3 +5,7 @@ dist-bin
 skygear.json
 npm-debug.log
 docker-compose.override.yml
+
+# Ignore everything in example folder except the demo folder
+example/*
+!example/demo/

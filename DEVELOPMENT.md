@@ -27,6 +27,15 @@ $ npm start
 Alternatively, you can run `npm run skycli` to build source and then run
 `skycli`.
 
+There is an example config file in `example/demo` which can be used for
+development. You may also scaffold apps in `example`, they are ignored in git.
+
+```shell
+$ cd example/demo
+# e.g. deploy cloud code
+$ skycli app deploy
+```
+
 ## Options for development
 
 The command line interface has a developer mode that shows additional
