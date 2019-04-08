@@ -1,1 +1,4 @@
 app: demo
+cloudCode:
+  hello:
+    type: http-handler
