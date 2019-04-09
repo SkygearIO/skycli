@@ -6,6 +6,8 @@ import path from 'path';
 import tar from 'tar';
 import { isArray } from 'util';
 
+import { controller } from '../../api';
+import { CLIContext } from '../../types';
 import { Checksum } from '../../types/artifact';
 import { CloudCodeConfig } from '../../types/cloudCodeConfig';
 import { Arguments, createCommand } from '../../util';
@@ -62,11 +64,18 @@ async function archiveCloudCode(name: string, cloudCode: CloudCodeConfig): Promi
   return checksum;
 }
 
+async function uploadArchive(context: CLIContext, name: string, cloudCode: CloudCodeConfig, checksum: Checksum) {
+  console.log(chalk`Uploading archive`);
+  const result = await controller.createArtifactUpload(context, checksum);
+  console.log(result);
+}
+
 async function run(argv: Arguments) {
   console.log(chalk`Deploy cloud code to app: {green ${argv.context.app}}`);
   const cloudCodeMap = argv.appConfig.cloudCode || {};
   for (const name of Object.keys(cloudCodeMap)) {
-    await archiveCloudCode(name, cloudCodeMap[name]);
+    const checksum = await archiveCloudCode(name, cloudCodeMap[name]);
+    await uploadArchive(argv.context, name, cloudCodeMap[name], checksum);
   }
 }
 
