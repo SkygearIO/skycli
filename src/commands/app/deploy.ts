@@ -7,6 +7,7 @@ import tar from 'tar';
 import { isArray } from 'util';
 
 import { Checksum } from '../../types/artifact';
+import { CloudCodeConfig } from '../../types/cloudCodeConfig';
 import { Arguments, createCommand } from '../../util';
 import requireUser from '../middleware/requireUser';
 
@@ -51,21 +52,22 @@ function getChecksum(): Promise<Checksum> {
   });
 }
 
-function run(argv: Arguments) {
+async function archiveCloudCode(name: string, cloudCode: CloudCodeConfig): Promise<Checksum> {
+  console.log(chalk`Deploying cloud code: {green ${name}}`);
+  await archiveSrc(cloudCode.src);
+  console.log('Archive created');
+  const checksum = await getChecksum();
+  console.log(`Archive checksum md5: ${checksum.md5}`);
+  console.log(`Archive checksum sha256: ${checksum.sha256}`);
+  return checksum;
+}
+
+async function run(argv: Arguments) {
   console.log(chalk`Deploy cloud code to app: {green ${argv.context.app}}`);
   const cloudCodeMap = argv.appConfig.cloudCode || {};
-  Object.keys(cloudCodeMap).map((cloudCodeName) => {
-    console.log(chalk`Deploying cloud code: {green ${cloudCodeName}}`);
-    const cloudCode = cloudCodeMap[cloudCodeName];
-    archiveSrc(cloudCode.src).then(() => {
-      console.log('Archive created');
-      return getChecksum();
-    }).then((checksum: Checksum) => {
-      console.log(`Archive checksum md5: ${checksum.md5}`);
-      console.log(`Archive checksum sha256: ${checksum.sha256}`);
-    });
-  });
-  return Promise.resolve();
+  for (const name of Object.keys(cloudCodeMap)) {
+    await archiveCloudCode(name, cloudCodeMap[name]);
+  }
 }
 
 export default createCommand({
