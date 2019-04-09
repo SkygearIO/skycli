@@ -17,7 +17,9 @@ function archivePath() {
 function archiveSrc(srcPath: string | string[]) {
   const opt = {
     file: archivePath(),
-    gzip: true
+    gzip: true,
+    // set portable to true, so the archive is the same for same content
+    portable: true
   };
   return tar.c(opt, isArray(srcPath) ? srcPath : [srcPath]);
 }
