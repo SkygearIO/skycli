@@ -83,8 +83,12 @@ async function run(argv: Arguments) {
   console.log(chalk`Deploy cloud code to app: {green ${argv.context.app}}`);
   const cloudCodeMap = argv.appConfig.cloudCode || {};
   for (const name of Object.keys(cloudCodeMap)) {
-    const checksum = await archiveCloudCode(name, cloudCodeMap[name]);
-    await createArtifact(argv.context, checksum);
+    try {
+      const checksum = await archiveCloudCode(name, cloudCodeMap[name]);
+      await createArtifact(argv.context, checksum);
+    } catch (error) {
+      console.error(`Failed deploy cloud code ${name}:`, error);
+    }
   }
 }
 
