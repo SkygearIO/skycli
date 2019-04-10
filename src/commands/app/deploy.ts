@@ -68,12 +68,15 @@ async function archiveCloudCode(name: string, cloudCode: CloudCodeConfig): Promi
   return checksum;
 }
 
-async function uploadArchive(context: CLIContext, checksum: Checksum) {
+async function createArtifact(context: CLIContext, checksum: Checksum) {
   console.log(chalk`Uploading archive`);
   const result = await controller.createArtifactUpload(context, checksum);
   const stream = createArchiveReadStream();
   await controller.uploadArtifact(result.uploadRequest, checksum.md5, stream);
   console.log(chalk`Archive uploaded`);
+  const artifactID = await controller.createArtifact(context, result.artifactRequest);
+  console.log(chalk`Artifact created`);
+  return artifactID;
 }
 
 async function run(argv: Arguments) {
@@ -81,7 +84,7 @@ async function run(argv: Arguments) {
   const cloudCodeMap = argv.appConfig.cloudCode || {};
   for (const name of Object.keys(cloudCodeMap)) {
     const checksum = await archiveCloudCode(name, cloudCodeMap[name]);
-    await uploadArchive(argv.context, checksum);
+    await createArtifact(argv.context, checksum);
   }
 }
 

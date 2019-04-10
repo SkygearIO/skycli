@@ -52,3 +52,16 @@ export async function uploadArtifact(
     }
   });
 }
+
+// createArtifact returns artifact id if success
+export async function createArtifact(
+  context: CLIContext,
+  artifactRequest: string,
+): Promise<string> {
+  return callAPI(context, '/_controller/artifact', 'POST', {
+    app_name: context.app,
+    artifact_request: artifactRequest,
+  }).then((payload) => {
+    return payload.result.artifact.id;
+  });
+}
