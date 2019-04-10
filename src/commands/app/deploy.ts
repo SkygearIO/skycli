@@ -17,6 +17,10 @@ function archivePath() {
   return path.join(os.tmpdir(), 'skygear-src.tgz');
 }
 
+function createArchiveReadStream() {
+  return fs.createReadStream(archivePath());
+}
+
 function archiveSrc(srcPath: string | string[]) {
   const opt = {
     file: archivePath(),
@@ -32,7 +36,7 @@ function getChecksum(): Promise<Checksum> {
   const sha256 = crypto.createHash('sha256');
   return new Promise((resolve, reject) => {
     try {
-      const stream = fs.createReadStream(archivePath());
+      const stream = createArchiveReadStream();
       stream.on('data', (data) => {
         md5.update(data, 'utf8');
         sha256.update(data, 'utf8');
@@ -64,10 +68,12 @@ async function archiveCloudCode(name: string, cloudCode: CloudCodeConfig): Promi
   return checksum;
 }
 
-async function uploadArchive(context: CLIContext, name: string, cloudCode: CloudCodeConfig, checksum: Checksum) {
+async function uploadArchive(context: CLIContext, checksum: Checksum) {
   console.log(chalk`Uploading archive`);
   const result = await controller.createArtifactUpload(context, checksum);
-  console.log(result);
+  const stream = createArchiveReadStream();
+  await controller.uploadArtifact(result.uploadRequest, checksum.md5, stream);
+  console.log(chalk`Archive uploaded`);
 }
 
 async function run(argv: Arguments) {
@@ -75,7 +81,7 @@ async function run(argv: Arguments) {
   const cloudCodeMap = argv.appConfig.cloudCode || {};
   for (const name of Object.keys(cloudCodeMap)) {
     const checksum = await archiveCloudCode(name, cloudCodeMap[name]);
-    await uploadArchive(argv.context, name, cloudCodeMap[name], checksum);
+    await uploadArchive(argv.context, checksum);
   }
 }
 
