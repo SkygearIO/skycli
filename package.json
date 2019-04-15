@@ -12,6 +12,7 @@
     "tslint": "tslint",
     "tsc": "tsc",
     "prettier": "prettier --write 'src/**/*.ts'",
+    "prettier-check": "prettier --check 'src/**/*.ts'",
     "prepare": "gulp build",
     "start": "gulp watch",
     "skycli": "gulp build && ./bin/skycli.js",

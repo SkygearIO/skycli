@@ -20,6 +20,7 @@ script:
   - npm test
   - npm run tsc --noImplicitAny
   - npm run tslint -- -c tslint.ideal.json 'src/**/*.ts' 'test/**/*.ts'
+  - npm run prettier-check
 
 before_deploy:
   - npm run build-bin
