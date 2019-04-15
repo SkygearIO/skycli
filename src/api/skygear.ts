@@ -26,12 +26,13 @@ async function handleFailureResponse(response: Response) {
   throw new Error(message || `Fail to parse error: ${JSON.stringify(payload)}`);
 }
 
-// tslint:disable-next-line:no-any
 export function callAPI(
   context: CLIContext,
   path: string,
   method: string,
+  // tslint:disable-next-line:no-any
   data?: any
+  // tslint:disable-next-line:no-any
 ): Promise<any> {
   return fetch(url.resolve(context.cluster.endpoint, path), {
     body: data && JSON.stringify(data),
