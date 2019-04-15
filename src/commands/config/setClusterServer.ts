@@ -34,12 +34,16 @@ function askClusterServer(argv: Arguments) {
   const prompts = [];
   const clusterConfig = argv.context.cluster;
   const server = {
-    apiKey: argv['api-key'] as string || (clusterConfig && clusterConfig.apiKey),
-    endpoint: argv.endpoint as string || (clusterConfig && clusterConfig.endpoint),
+    apiKey:
+      (argv['api-key'] as string) || (clusterConfig && clusterConfig.apiKey),
+    endpoint:
+      (argv.endpoint as string) || (clusterConfig && clusterConfig.endpoint)
   };
 
   if (server.endpoint) {
-    console.log(chalk`Setup cluster server endpoint as {green ${server.endpoint}}.`);
+    console.log(
+      chalk`Setup cluster server endpoint as {green ${server.endpoint}}.`
+    );
   } else {
     prompts.push(urlPrompt);
   }
@@ -71,16 +75,19 @@ function run(argv: Arguments) {
       endpoint = answers.endpoint;
       apiKey = answers.apiKey;
       return controller.getConfig(endpoint, apiKey);
-    }).then((payload) => {
+    })
+    .then((payload) => {
       payload.endpoint = endpoint;
       payload.apiKey = apiKey;
       const newGlobalConfig = createGlobalConfig();
       const currentContextKey = newGlobalConfig.currentContext;
-      const currentClusterKey = newGlobalConfig.context[currentContextKey].cluster;
+      const currentClusterKey =
+        newGlobalConfig.context[currentContextKey].cluster;
       newGlobalConfig.cluster[currentClusterKey] = payload;
       config.save(newGlobalConfig, config.ConfigDomain.GlobalDomain);
       console.log(chalk`Running Skygear cluster at {green ${endpoint}}.`);
-    }).catch ((error) => {
+    })
+    .catch((error) => {
       return Promise.reject('Fail to fetch cluster config. ' + error);
     });
 }

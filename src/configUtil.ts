@@ -23,6 +23,6 @@ export function currentCLIContext(argv: Arguments): CLIContext {
   // TODO: load current app
   return {
     cluster: globalConfig.cluster && globalConfig.cluster[currentContextKey],
-    user: globalConfig.user && globalConfig.user[currentContextKey],
+    user: globalConfig.user && globalConfig.user[currentContextKey]
   };
 }

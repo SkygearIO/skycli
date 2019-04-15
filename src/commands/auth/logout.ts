@@ -33,7 +33,8 @@ function run(argv: Arguments) {
       config.save(newGlobalConfig, config.ConfigDomain.GlobalDomain);
 
       console.log(chalk.green('Successfully logged out.'));
-    }).catch ((error) => {
+    })
+    .catch((error) => {
       if (argv.debug) {
         console.error(error);
       }

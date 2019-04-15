@@ -2,7 +2,9 @@ import { CLIContext, User, userFromJSON } from '../types';
 import { callAPI } from './skygear';
 
 export async function signupWithEmail(
-  context: CLIContext, email: string, password: string
+  context: CLIContext,
+  email: string,
+  password: string
 ): Promise<User> {
   return callAPI(context, '/_auth/signup', 'POST', {
     auth_data: {
@@ -15,7 +17,9 @@ export async function signupWithEmail(
 }
 
 export async function loginWithEmail(
-  context: CLIContext, email: string, password: string
+  context: CLIContext,
+  email: string,
+  password: string
 ): Promise<User> {
   return callAPI(context, '/_auth/login', 'POST', {
     auth_data: {
