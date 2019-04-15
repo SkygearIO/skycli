@@ -1,9 +1,12 @@
 import { CLIContext, TenantConfig, tenantConfigFromJSON } from '../types';
 import { callAPI } from './skygear';
 
-export async function createApp(context: CLIContext, appName: string): Promise<{
-  config: TenantConfig,
-  endpoint: string,
+export async function createApp(
+  context: CLIContext,
+  appName: string
+): Promise<{
+  config: TenantConfig;
+  endpoint: string;
 }> {
   return callAPI(context, '/_controller/app', 'POST', {
     name: appName

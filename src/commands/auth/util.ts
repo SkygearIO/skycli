@@ -4,13 +4,16 @@ import inquirer from 'inquirer';
 import { GlobalConfig, User } from '../../types';
 import { Arguments } from '../../util';
 
-export function updateGlobalConfigUser(config: GlobalConfig, user: User): GlobalConfig {
-    const newConfig = {...config};
-    const currentContextKey = newConfig.currentContext;
-    const currentUserKey = newConfig.context[currentContextKey].user;
-    newConfig.user = newConfig.user || {};
-    newConfig.user[currentUserKey] = user;
-    return newConfig;
+export function updateGlobalConfigUser(
+  config: GlobalConfig,
+  user: User
+): GlobalConfig {
+  const newConfig = { ...config };
+  const currentContextKey = newConfig.currentContext;
+  const currentUserKey = newConfig.context[currentContextKey].user;
+  newConfig.user = newConfig.user || {};
+  newConfig.user[currentUserKey] = user;
+  return newConfig;
 }
 
 const emailPrompt: inquirer.Question = {
@@ -19,10 +22,10 @@ const emailPrompt: inquirer.Question = {
   type: 'input',
   validate: (input) => {
     if (input.trim() === '') {
-    return 'Email is required.';
+      return 'Email is required.';
     }
     if (input.indexOf('@') === -1) {
-    return 'Email is not valid (must contains @).';
+      return 'Email is not valid (must contains @).';
     }
     return true;
   }
@@ -34,7 +37,7 @@ const passwordPrompt: inquirer.Question = {
   type: 'password',
   validate: (input) => {
     if (input === '') {
-    return 'Password is required.';
+      return 'Password is required.';
     }
     return true;
   }

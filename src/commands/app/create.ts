@@ -32,7 +32,7 @@ function ask(argv: Arguments) {
   }
 
   if (prompts.length === 0) {
-    return Promise.resolve({appName});
+    return Promise.resolve({ appName });
   }
 
   return inquirer.prompt(prompts).then((answers) => {
@@ -50,23 +50,28 @@ function run(argv: Arguments) {
       appName = answers.app;
       console.log('Creating app...');
       return controller.createApp(argv.context, appName);
-    }).then((payload) => {
+    })
+    .then((payload) => {
       console.log(chalk`Your API endpoint: {green ${payload.endpoint}}.`);
-      console.log(chalk`Your Client API Key: {green ${payload.config.apiKey}}.`);
-      console.log(chalk`Your Master API Key: {green ${payload.config.masterKey}}.`);
+      console.log(
+        chalk`Your Client API Key: {green ${payload.config.apiKey}}.`
+      );
+      console.log(
+        chalk`Your Master API Key: {green ${payload.config.masterKey}}.`
+      );
       console.log('Created app successfully!');
-    }).catch ((error) => {
+    })
+    .catch((error) => {
       return Promise.reject('Fail to create application. ' + error);
     });
 }
 
 export default createCommand({
   builder: (yargs) => {
-    return yargs
-      .option('app', {
-        desc: 'Application name',
-        type: 'string'
-      });
+    return yargs.option('app', {
+      desc: 'Application name',
+      type: 'string'
+    });
   },
   command: 'create',
   describe: 'Create skygear application',

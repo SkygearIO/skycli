@@ -5,7 +5,7 @@ import { CLIContext } from '../types';
 
 function defaultHeaders(context: CLIContext) {
   return {
-    'Accept': 'application/json',
+    Accept: 'application/json',
     'Content-Type': 'application/json',
     'X-Skygear-API-Key': (context.cluster && context.cluster.apiKey) || '',
     'X-Skygear-Access-Token': (context.user && context.user.accessToken) || ''
@@ -13,18 +13,27 @@ function defaultHeaders(context: CLIContext) {
 }
 
 async function handleFailureResponse(response: Response) {
-  const payload = await response.json().then((p) => {
-    return p;
-  }).catch((error) => {
-    throw new Error(response.statusText);
-  });
+  const payload = await response
+    .json()
+    .then((p) => {
+      return p;
+    })
+    .catch((error) => {
+      throw new Error(response.statusText);
+    });
 
   const message = payload.error && payload.error.message;
   throw new Error(message || `Fail to parse error: ${JSON.stringify(payload)}`);
 }
 
-// tslint:disable-next-line:no-any
-export function callAPI(context: CLIContext, path: string, method: string, data?: any): Promise<any> {
+export function callAPI(
+  context: CLIContext,
+  path: string,
+  method: string,
+  // tslint:disable-next-line:no-any
+  data?: any
+  // tslint:disable-next-line:no-any
+): Promise<any> {
   return fetch(url.resolve(context.cluster.endpoint, path), {
     body: data && JSON.stringify(data),
     headers: defaultHeaders(context),

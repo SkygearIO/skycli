@@ -30,7 +30,8 @@ export enum ConfigDomain {
 }
 
 const configPaths: { [domain: string]: string } = {
-  global: `${process.env.XDG_CONFIG_HOME || os.homedir() + '/.config'}/skycli/config`,
+  global: `${process.env.XDG_CONFIG_HOME ||
+    os.homedir() + '/.config'}/skycli/config`,
   project: './skygear.yaml'
 };
 

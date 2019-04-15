@@ -12,6 +12,7 @@
     "tslint": "tslint",
     "tsc": "tsc",
     "prettier": "prettier --write 'src/**/*.ts'",
+    "prettier-check": "prettier --check 'src/**/*.ts'",
     "prepare": "gulp build",
     "start": "gulp watch",
     "skycli": "gulp build && ./bin/skycli.js",
@@ -74,6 +75,7 @@
     "prettier": "^1.16.4",
     "require-dir": "^0.3.2",
     "tslint": "^5.12.1",
+    "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.3.1"
   },
   "resolutions": {
