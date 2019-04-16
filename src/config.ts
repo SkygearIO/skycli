@@ -20,7 +20,7 @@ import * as os from 'os';
 import path from 'path';
 import untildify from 'untildify';
 
-import { createGlobalConfig, GlobalConfig } from './types';
+import { AppConfig, createGlobalConfig, GlobalConfig } from './types';
 
 const currentConfigVersion = 1;
 
@@ -118,7 +118,7 @@ export function loadConfig() {
     globalConfig = createGlobalConfig();
   }
 
-  const appConfig = migrate(load(ConfigDomain.ProjectDomain));
+  const appConfig = migrate(load(ConfigDomain.ProjectDomain)) as AppConfig;
   return {
     appConfig,
     globalConfig

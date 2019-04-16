@@ -2,9 +2,9 @@ import chalk from 'chalk';
 import inquirer from 'inquirer';
 
 import { controller } from '../../api';
-import * as config from '../../config';
-import { createGlobalConfig } from '../../types';
 import { Arguments, createCommand } from '../../util';
+import requireUser from '../middleware/requireUser';
+import AppScaffoldCommand from './scaffold';
 
 const appNamePrompt: inquirer.Question = {
   message: 'What is your app name?',
@@ -42,6 +42,19 @@ function ask(argv: Arguments) {
   });
 }
 
+function confirmScaffoldApp() {
+  return inquirer.prompt([
+    {
+      message:
+        'Do you want to setup the project folder now? ' +
+        'Or you can do it later by `skycli app scaffold` command.\n' +
+        'Setup now?',
+      name: 'scaffoldNow',
+      type: 'confirm'
+    }
+  ]);
+}
+
 function run(argv: Arguments) {
   let appName: string;
 
@@ -59,7 +72,23 @@ function run(argv: Arguments) {
       console.log(
         chalk`Your Master API Key: {green ${payload.config.masterKey}}.`
       );
-      console.log('Created app successfully!');
+      console.log('Created app successfully! \n');
+
+      return confirmScaffoldApp();
+    })
+    .then((answers) => {
+      if (!answers.scaffoldNow) {
+        console.log(
+          chalk`\nTo setup later, please run:\n    skycli app scaffold`
+        );
+        return;
+      }
+
+      return AppScaffoldCommand.execute({
+        ...argv,
+        app: appName,
+        dest: '.'
+      });
     })
     .catch((error) => {
       return Promise.reject('Fail to create application. ' + error);
@@ -68,7 +97,7 @@ function run(argv: Arguments) {
 
 export default createCommand({
   builder: (yargs) => {
-    return yargs.option('app', {
+    return yargs.middleware(requireUser).option('app', {
       desc: 'Application name',
       type: 'string'
     });

@@ -1,4 +1,10 @@
-import { CLIContext, TenantConfig, tenantConfigFromJSON } from '../types';
+import {
+  App,
+  appFromJSON,
+  CLIContext,
+  TenantConfig,
+  tenantConfigFromJSON
+} from '../types';
 import { callAPI } from './skygear';
 
 export async function createApp(
@@ -16,5 +22,12 @@ export async function createApp(
       config: tenantConfigFromJSON(result.tenant_config),
       endpoint: result.endpoint
     };
+  });
+}
+
+export async function getApps(context: CLIContext): Promise<App[]> {
+  return callAPI(context, '/_controller/apps', 'GET').then((payload) => {
+    const result = payload.result.apps;
+    return result.map(appFromJSON);
   });
 }

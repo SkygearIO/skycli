@@ -1,7 +1,8 @@
 import { Arguments, createCommand, getCommandGroupHelpMessage } from '../util';
 import appCreate from './app/create';
+import appScaffold from './app/scaffold';
 
-const subCommands = [appCreate];
+const subCommands = [appCreate, appScaffold];
 
 function run(argv: Arguments) {
   console.log(getCommandGroupHelpMessage('app', subCommands));
