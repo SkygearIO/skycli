@@ -85,7 +85,9 @@ async function run(argv: Arguments) {
   for (const name of Object.keys(cloudCodeMap)) {
     try {
       const checksum = await archiveCloudCode(name, cloudCodeMap[name]);
-      await createArtifact(argv.context, checksum);
+      const artifactID = await createArtifact(argv.context, checksum);
+      await controller.createCloudCode(argv.context, name, cloudCodeMap[name], artifactID);
+      console.log(chalk`Cloud code created`);
     } catch (error) {
       console.error(`Failed deploy cloud code ${name}:`, error);
     }
