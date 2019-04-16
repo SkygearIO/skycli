@@ -1,3 +1,4 @@
+import globby from '@skygeario/globby';
 import chalk from 'chalk';
 import crypto from 'crypto';
 import fs from 'fs';
@@ -21,14 +22,26 @@ function createArchiveReadStream() {
 }
 
 function archiveSrc(srcPath: string) {
-  const opt = {
-    cwd: srcPath,
-    file: archivePath(),
-    gzip: true,
-    // set portable to true, so the archive is the same for same content
-    portable: true
-  };
-  return tar.c(opt, ['.']);
+  return globby(srcPath, {
+    dot: true,
+    gitignore: true,
+    gitignoreName: '.skyignore'
+  })
+    .then((paths: string[]) => {
+      // globby returns path relative to the current dir
+      // transform the path relative to srcPath for archive
+      return paths.map((p) => path.relative(srcPath, p));
+    })
+    .then((paths: string[]) => {
+      const opt = {
+        cwd: srcPath,
+        file: archivePath(),
+        gzip: true,
+        // set portable to true, so the archive is the same for same content
+        portable: true
+      };
+      return tar.c(opt, paths);
+    });
 }
 
 function getChecksum(): Promise<Checksum> {
