@@ -11,3 +11,18 @@ export async function getSecrets(context: CLIContext): Promise<Secret[]> {
     return result ? result.map(secretFromJSON) : [];
   });
 }
+
+export async function createSecret(
+  context: CLIContext,
+  secretName: string,
+  secretValue: string
+): Promise<Secret> {
+  return callAPI(context, `/_controller/secret`, 'POST', {
+    app_name: context.app,
+    secret_name: secretName,
+    secret_value: secretValue
+  }).then((payload) => {
+    const result = payload.result.secret;
+    return result ? secretFromJSON(result) : null;
+  });
+}
