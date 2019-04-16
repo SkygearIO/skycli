@@ -3,7 +3,7 @@ export interface CloudCodeConfig {
   path: string;
   env: string;
   entry: string;
-  src: string | string[];
+  src: string;
 }
 
 export function createCloudCodeRequestPayloadFromConfig(

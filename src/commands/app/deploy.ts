@@ -4,7 +4,6 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import tar from 'tar';
-import { isArray } from 'util';
 
 import { controller } from '../../api';
 import { CLIContext } from '../../types';
@@ -21,14 +20,15 @@ function createArchiveReadStream() {
   return fs.createReadStream(archivePath());
 }
 
-function archiveSrc(srcPath: string | string[]) {
+function archiveSrc(srcPath: string) {
   const opt = {
     file: archivePath(),
     gzip: true,
     // set portable to true, so the archive is the same for same content
-    portable: true
+    portable: true,
+    cwd: srcPath
   };
-  return tar.c(opt, isArray(srcPath) ? srcPath : [srcPath]);
+  return tar.c(opt, ['.']);
 }
 
 function getChecksum(): Promise<Checksum> {
