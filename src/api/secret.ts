@@ -26,3 +26,15 @@ export async function createSecret(
     return result ? secretFromJSON(result) : null;
   });
 }
+
+export async function renameSecret(
+  context: CLIContext,
+  oldSecretName: string,
+  newSecretName: string
+): Promise<void> {
+  return callAPI(context, `/_controller/secret/rename`, 'POST', {
+    app_name: context.app,
+    new_secret_name: newSecretName,
+    old_secret_name: oldSecretName
+  });
+}

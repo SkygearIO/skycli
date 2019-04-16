@@ -1,8 +1,9 @@
 import { Arguments, createCommand, getCommandGroupHelpMessage } from '../util';
 import secretCreate from './secret/create';
 import secretList from './secret/list';
+import secretRename from './secret/rename';
 
-const subCommands = [secretList, secretCreate];
+const subCommands = [secretList, secretCreate, secretRename];
 
 function run(argv: Arguments) {
   console.log(getCommandGroupHelpMessage('secret', subCommands));
