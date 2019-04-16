@@ -1,3 +1,4 @@
+import secret from '../commands/secret';
 import { CLIContext, Secret, secretFromJSON } from '../types';
 import { callAPI } from './skygear';
 
@@ -37,4 +38,15 @@ export async function renameSecret(
     new_secret_name: newSecretName,
     old_secret_name: oldSecretName
   });
+}
+
+export async function deleteSecret(
+  context: CLIContext,
+  secretName: string
+): Promise<void> {
+  return callAPI(
+    context,
+    `/_controller/secret?app_name=${context.app}&secret_name=${secretName}`,
+    'DELETE'
+  );
 }
