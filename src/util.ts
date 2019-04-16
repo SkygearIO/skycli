@@ -70,7 +70,7 @@ export function getCommandGroupHelpMessage(
     })
     .map((cmd) => cmd[0])
     .join(' | ');
-  return `Usage: skycli config [action]
+  return `Usage: skycli ${command} [action]
   action maybe           ${cmdsText}
 
 For detailed information on this command and its flags, run:
