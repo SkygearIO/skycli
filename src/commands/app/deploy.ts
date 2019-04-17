@@ -99,31 +99,44 @@ async function createArtifact(context: CLIContext, checksum: Checksum) {
 }
 
 async function run(argv: Arguments) {
-  console.log(chalk`Deploy cloud code to app: {green ${argv.context.app}}`);
+  const name = argv.name as string;
+  // TODO: support deploying all cloud code at once
+  // skygear-controller need an api to support batch deploy
+  if (name == null || name === '') {
+    console.error(chalk`Need name of cloud code, use --name`);
+    return;
+  }
+
   const cloudCodeMap = argv.appConfig.cloudCode || {};
-  for (const name of Object.keys(cloudCodeMap)) {
-    try {
-      const checksum = await archiveCloudCode(name, cloudCodeMap[name]);
-      const artifactID = await createArtifact(argv.context, checksum);
-      await controller.createCloudCode(
-        argv.context,
-        name,
-        cloudCodeMap[name],
-        artifactID
-      );
-      console.log(chalk`Cloud code created`);
-    } catch (error) {
-      console.error(`Failed deploy cloud code ${name}:`, error);
-    }
+  const cloudCode = cloudCodeMap[name];
+  if (cloudCode == null) {
+    console.error(chalk`Cloud code {red ${name}} not found`);
+    return;
+  }
+
+  console.log(chalk`Deploy cloud code to app: {green ${argv.context.app}}`);
+  try {
+    const checksum = await archiveCloudCode(name, cloudCode);
+    const artifactID = await createArtifact(argv.context, checksum);
+    await controller.createCloudCode(argv.context, name, cloudCode, artifactID);
+    console.log(chalk`Cloud code deployed`);
+  } catch (error) {
+    console.error(`Failed deploy cloud code ${name}:`, error);
   }
 }
 
 export default createCommand({
   builder: (yargs) => {
-    return yargs.middleware(requireUser).option('app', {
-      desc: 'Application name',
-      type: 'string'
-    });
+    return yargs
+      .middleware(requireUser)
+      .option('app', {
+        desc: 'Application name',
+        type: 'string'
+      })
+      .option('name', {
+        desc: 'Cloud code name',
+        type: 'string'
+      });
   },
   command: 'deploy',
   describe: 'Deploy skygear cloud code',
