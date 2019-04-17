@@ -45,7 +45,7 @@ function getChecksum(): Promise<Checksum> {
       stream.on('end', () => {
         resolve({
           md5: md5.digest('base64'),
-          sha256: sha256.digest('base64'),
+          sha256: sha256.digest('base64')
         });
       });
 
@@ -58,7 +58,10 @@ function getChecksum(): Promise<Checksum> {
   });
 }
 
-async function archiveCloudCode(name: string, cloudCode: CloudCodeConfig): Promise<Checksum> {
+async function archiveCloudCode(
+  name: string,
+  cloudCode: CloudCodeConfig
+): Promise<Checksum> {
   console.log(chalk`Deploying cloud code: {green ${name}}`);
   await archiveSrc(cloudCode.src);
   console.log('Archive created');
@@ -74,7 +77,10 @@ async function createArtifact(context: CLIContext, checksum: Checksum) {
   const stream = createArchiveReadStream();
   await controller.uploadArtifact(result.uploadRequest, checksum.md5, stream);
   console.log(chalk`Archive uploaded`);
-  const artifactID = await controller.createArtifact(context, result.artifactRequest);
+  const artifactID = await controller.createArtifact(
+    context,
+    result.artifactRequest
+  );
   console.log(chalk`Artifact created`);
   return artifactID;
 }
@@ -86,7 +92,12 @@ async function run(argv: Arguments) {
     try {
       const checksum = await archiveCloudCode(name, cloudCodeMap[name]);
       const artifactID = await createArtifact(argv.context, checksum);
-      await controller.createCloudCode(argv.context, name, cloudCodeMap[name], artifactID);
+      await controller.createCloudCode(
+        argv.context,
+        name,
+        cloudCodeMap[name],
+        artifactID
+      );
       console.log(chalk`Cloud code created`);
     } catch (error) {
       console.error(`Failed deploy cloud code ${name}:`, error);

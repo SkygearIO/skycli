@@ -9,20 +9,22 @@ export interface CreateArtifactUploadResponse {
 }
 
 export interface PresignedRequest {
-  method:  string;
-  url:     string;
-  fields:  {[name: string]: string};
+  method: string;
+  url: string;
+  fields: { [name: string]: string };
   headers: string[];
 }
 
-export function createArtifactUploadResponseFromJSON(input: any): CreateArtifactUploadResponse {
+export function createArtifactUploadResponseFromJSON(
+  input: any
+): CreateArtifactUploadResponse {
   return {
     uploadRequest: {
       method: input.upload_request.method,
       url: input.upload_request.url,
       fields: input.upload_request.fields,
-      headers: input.upload_request.headers,
+      headers: input.upload_request.headers
     },
-    artifactRequest: input.artifact_request,
+    artifactRequest: input.artifact_request
   };
 }

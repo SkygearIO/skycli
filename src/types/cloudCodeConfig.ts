@@ -9,14 +9,14 @@ export interface CloudCodeConfig {
 export function createCloudCodeRequestPayloadFromConfig(
   name: string,
   cloudCode: CloudCodeConfig,
-  artifactID: string,
+  artifactID: string
 ) {
   let triggerType: string;
   let triggerConfig: any;
   if (cloudCode.type === 'http-handler') {
     triggerType = 'http';
     triggerConfig = {
-      src_path: cloudCode.path,
+      src_path: cloudCode.path
     };
   }
 
@@ -28,6 +28,6 @@ export function createCloudCodeRequestPayloadFromConfig(
     config: {},
     artifact_id: artifactID,
     environment: cloudCode.env,
-    entry_point: cloudCode.entry,
+    entry_point: cloudCode.entry
   };
 }
