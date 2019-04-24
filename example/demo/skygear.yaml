@@ -3,6 +3,7 @@ cloudCode:
   hello:
     type: http-handler
     path: /hello
-    env: node
-    entry: js/hello
+    env: nodejs
+    # entry relative to src path
+    entry: hello
     src: js
