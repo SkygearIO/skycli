@@ -16,15 +16,16 @@ export interface PresignedRequest {
 }
 
 export function createArtifactUploadResponseFromJSON(
+  // tslint:disable-next-line: no-any
   input: any
 ): CreateArtifactUploadResponse {
   return {
+    artifactRequest: input.artifact_request,
     uploadRequest: {
-      method: input.upload_request.method,
-      url: input.upload_request.url,
       fields: input.upload_request.fields,
-      headers: input.upload_request.headers
-    },
-    artifactRequest: input.artifact_request
+      headers: input.upload_request.headers,
+      method: input.upload_request.method,
+      url: input.upload_request.url
+    }
   };
 }

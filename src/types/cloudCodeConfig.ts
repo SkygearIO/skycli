@@ -11,8 +11,12 @@ export function createCloudCodeRequestPayloadFromConfig(
   cloudCode: CloudCodeConfig,
   artifactID: string
 ) {
+  interface HTTPTriggerConfigPayload {
+    src_path: string;
+  }
+
   let triggerType: string;
-  let triggerConfig: any;
+  let triggerConfig: HTTPTriggerConfigPayload | undefined;
   if (cloudCode.type === 'http-handler') {
     triggerType = 'http';
     triggerConfig = {
@@ -21,13 +25,13 @@ export function createCloudCodeRequestPayloadFromConfig(
   }
 
   return {
-    name,
-    type: cloudCode.type,
-    trigger_type: triggerType,
-    trigger_config: triggerConfig,
-    config: {},
     artifact_id: artifactID,
+    config: {},
+    entry_point: cloudCode.entry,
     environment: cloudCode.env,
-    entry_point: cloudCode.entry
+    name,
+    trigger_config: triggerConfig,
+    trigger_type: triggerType,
+    type: cloudCode.type
   };
 }

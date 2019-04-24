@@ -22,11 +22,11 @@ function createArchiveReadStream() {
 
 function archiveSrc(srcPath: string) {
   const opt = {
+    cwd: srcPath,
     file: archivePath(),
     gzip: true,
     // set portable to true, so the archive is the same for same content
-    portable: true,
-    cwd: srcPath
+    portable: true
   };
   return tar.c(opt, ['.']);
 }

@@ -28,10 +28,10 @@ export async function uploadArtifact(
   stream: ReadStream
 ): Promise<undefined> {
   const opt: RequestInit = {
-    method: req.method,
     headers: req.headers
       .map((header) => header.split(':'))
-      .reduce((acc, curr) => ({ ...acc, [curr[0]]: curr[1] }), {})
+      .reduce((acc, curr) => ({ ...acc, [curr[0]]: curr[1] }), {}),
+    method: req.method
   };
 
   opt.headers['Content-MD5'] = checksumMD5;
@@ -41,6 +41,7 @@ export async function uploadArtifact(
     // stream from fs.createReadStream should work.
     //
     // But the type definition does not match, so force type cast here.
+    // tslint:disable-next-line: no-any
     opt.body = stream as any;
   } else {
     throw new Error(
