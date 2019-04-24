@@ -1,4 +1,5 @@
 app: demo
+
 cloudCode:
   hello:
     type: http-handler
@@ -6,4 +7,13 @@ cloudCode:
     env: nodejs
     # entry relative to src path
     entry: hello
+    src: js
+  after_signup:
+    type: http-handler
+    hook:
+      event: after_signup
+      async: true
+      timeout: 65
+    env: nodejs
+    entry: after_signup
     src: js
