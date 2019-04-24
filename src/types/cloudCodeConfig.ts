@@ -1,6 +1,35 @@
+import { isArray } from 'util';
+
+type CloudCodeHook = CloudCodeHookConfig | CloudCodeHookConfig[];
+
+interface CloudCodeHookConfig {
+  event: string;
+  async: boolean;
+  timeout: number;
+  path: string;
+}
+
+function createCloudCodeHookRequestPayload(hook?: CloudCodeHook) {
+  if (hook == null) {
+    return undefined;
+  }
+
+  if (!isArray(hook)) {
+    hook = [hook];
+  }
+
+  return hook.map((h) => ({
+    async: h.async,
+    event: h.event,
+    timeout: h.timeout,
+    trigger_path: h.path || ''
+  }));
+}
+
 export interface CloudCodeConfig {
   type: string;
-  path: string;
+  path?: string;
+  hook?: CloudCodeHook;
   env: string;
   entry: string;
   src: string;
@@ -29,6 +58,7 @@ export function createCloudCodeRequestPayloadFromConfig(
     config: {},
     entry_point: cloudCode.entry,
     environment: cloudCode.env,
+    hook: createCloudCodeHookRequestPayload(cloudCode.hook),
     name,
     trigger_config: triggerConfig,
     trigger_type: triggerType,
