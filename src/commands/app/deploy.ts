@@ -99,7 +99,7 @@ async function createArtifact(context: CLIContext, checksum: Checksum) {
 }
 
 async function run(argv: Arguments) {
-  const name = argv.name as string;
+  const name = argv['cloud-code'] as string;
   // TODO: support deploying all cloud code at once
   // skygear-controller need an api to support batch deploy
   if (name == null || name === '') {
@@ -133,12 +133,12 @@ export default createCommand({
         desc: 'Application name',
         type: 'string'
       })
-      .option('name', {
+      .option('cloud-code', {
         desc: 'Cloud code name',
         type: 'string'
       });
   },
-  command: 'deploy',
+  command: 'deploy [cloud-code]',
   describe: 'Deploy skygear cloud code',
   handler: run
 });
