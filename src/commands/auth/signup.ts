@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import { controller } from '../../api';
 import * as config from '../../config';
 import { Arguments, createCommand } from '../../util';
-import requireClusterConfig from '../middleware/requireClusterConfig';
+import { requireClusterConfig } from '../middleware';
 import { askCredentials, updateGlobalConfigUser } from './util';
 
 function run(argv: Arguments) {

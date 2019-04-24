@@ -6,7 +6,7 @@ import tar from 'tar';
 
 import { controller } from '../../api';
 import { Arguments, createCommand } from '../../util';
-import requireUser from '../middleware/requireUser';
+import { requireClusterConfig, requireUser } from '../middleware';
 
 function selectApp(argv: Arguments) {
   if (argv.app) {
@@ -128,6 +128,7 @@ function run(argv: Arguments) {
 export default createCommand({
   builder: (yargs) => {
     return yargs
+      .middleware(requireClusterConfig)
       .middleware(requireUser)
       .default('dest', '.')
       .option('app', {
