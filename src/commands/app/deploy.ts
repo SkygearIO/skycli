@@ -9,6 +9,7 @@ import tar from 'tar';
 import { controller } from '../../api';
 import { CLIContext } from '../../types';
 import { Checksum } from '../../types/artifact';
+import { CloudCodeStatus } from '../../types/cloudCode';
 import { CloudCodeConfig } from '../../types/cloudCodeConfig';
 import { Arguments, createCommand } from '../../util';
 import requireUser from '../middleware/requireUser';
@@ -84,6 +85,49 @@ async function archiveCloudCode(
   return checksum;
 }
 
+function waitForCloudCodeDeployStatus(
+  context: CLIContext,
+  cloudCodeID: string
+) {
+  console.log(chalk`Wait for cloud code to deploy: {green ${cloudCodeID}}`);
+  return new Promise((resolve, reject) =>
+    waitForCloudCodeDeployStatusImpl(context, cloudCodeID, resolve, reject)
+  );
+}
+
+function waitForCloudCodeDeployStatusImpl(
+  context: CLIContext,
+  cloudCodeID: string,
+  // tslint:disable-next-line:no-any
+  resolve: any,
+  // tslint:disable-next-line:no-any
+  reject: any
+) {
+  controller.getCloudCode(context, cloudCodeID).then(
+    (result) => {
+      if (
+        result.status === CloudCodeStatus.Running ||
+        result.status === CloudCodeStatus.DeployFailed
+      ) {
+        resolve(result.status);
+        return;
+      }
+
+      if (result.status !== CloudCodeStatus.Pending) {
+        reject(new Error(`Unexpected cloud code status: ${result.status}`));
+        return;
+      }
+
+      setTimeout(() => {
+        waitForCloudCodeDeployStatusImpl(context, cloudCodeID, resolve, reject);
+      }, 3000);
+    },
+    (err) => {
+      reject(err);
+    }
+  );
+}
+
 async function createArtifact(context: CLIContext, checksum: Checksum) {
   console.log(chalk`Uploading archive`);
   const result = await controller.createArtifactUpload(context, checksum);
@@ -118,8 +162,21 @@ async function run(argv: Arguments) {
   try {
     const checksum = await archiveCloudCode(name, cloudCode);
     const artifactID = await createArtifact(argv.context, checksum);
-    await controller.createCloudCode(argv.context, name, cloudCode, artifactID);
-    console.log(chalk`Cloud code deployed`);
+    const cloudCodeID = await controller.createCloudCode(
+      argv.context,
+      name,
+      cloudCode,
+      artifactID
+    );
+    const cloudCodeStatus = await waitForCloudCodeDeployStatus(
+      argv.context,
+      cloudCodeID
+    );
+    if (cloudCodeStatus === CloudCodeStatus.Running) {
+      console.log(chalk`Cloud code deployed`);
+    } else {
+      console.log(chalk`Cloud code failed to deploy`);
+    }
   } catch (error) {
     console.error(`Failed deploy cloud code ${name}:`, error);
   }
