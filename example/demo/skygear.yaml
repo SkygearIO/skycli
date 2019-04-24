@@ -1,0 +1,8 @@
+app: demo
+cloudCode:
+  hello:
+    type: http-handler
+    path: /hello
+    env: node
+    entry: js/hello
+    src: js

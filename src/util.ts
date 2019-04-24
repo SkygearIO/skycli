@@ -20,7 +20,7 @@ import {
   Arguments as YargsArguments,
   CommandModule as YargsCommandModule
 } from 'yargs';
-import { CLIContext, GlobalConfig } from './types';
+import { AppConfig, CLIContext, GlobalConfig } from './types';
 
 export interface Arguments extends YargsArguments {
   debug: boolean;
@@ -28,6 +28,7 @@ export interface Arguments extends YargsArguments {
   environment: string;
   context: CLIContext;
   globalConfig: GlobalConfig;
+  appConfig: AppConfig;
 }
 
 export interface CommandModule extends YargsCommandModule {
