@@ -15,6 +15,7 @@
  */
 import chalk from 'chalk';
 import _ from 'lodash';
+import moment from 'moment';
 import {
   Arguments as YargsArguments,
   CommandModule as YargsCommandModule
@@ -75,4 +76,8 @@ export function getCommandGroupHelpMessage(
 
 For detailed information on this command and its flags, run:
   skycli ${command} help`;
+}
+
+export function displayDate(date: Date): string {
+  return date && moment(date).format('YYYY-MM-DD HH:mm:ss Z');
 }
