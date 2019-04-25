@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="main.css">
+    <title>skygear next demo</title>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>skygear next demo</h1>
+        <button type="button" id="logout-btn">logout</button>
+      </header>
+      <hr/>
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a class="nav-link" href="/write.html">Write Blog</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="#">List Blog</a>
+        </li>
+      </ul>
+      <div class="text-center">
+        <div class="spinner-border" role="status" id="loading">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+      <div id="demos-section">
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.4.0.min.js"></script>
+    <script src="skygear.min.js"></script>
+    <script src="main.js"></script>
+    <script>
+      var currentUser = skygear.auth.currentUser;
+      if (!currentUser) {
+        goToIndex();
+      } else {
+        fetchBlogs();
+      }
+    </script>
+  </body>
+</html>

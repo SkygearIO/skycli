@@ -1,15 +1,15 @@
 {
-  "name": "js",
+  "name": "frontend",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "lodash": "^4.17.11",
-    "mongodb": "^3.2.3"
+    "express": "^4.16.4"
   }
 }
