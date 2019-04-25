@@ -1,9 +1,9 @@
 export interface User {
   userID: string;
   accessToken: string;
-  metadata: Metadata;
+  loginIDs: LoginIDs;
 }
-export interface Metadata {
+export interface LoginIDs {
   email: string;
 }
 
@@ -11,13 +11,13 @@ export interface Metadata {
 export function userFromJSON(input: any): User {
   return {
     accessToken: input.access_token,
-    metadata: metaFromJSON(input.metadata),
+    loginIDs: loginIDsFromJSON(input.login_ids),
     userID: input.user_id
   };
 }
 
 // tslint:disable-next-line:no-any
-export function metaFromJSON(input: any): Metadata {
+export function loginIDsFromJSON(input: any): LoginIDs {
   return {
     email: input.email
   };

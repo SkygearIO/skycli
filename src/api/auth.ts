@@ -7,7 +7,7 @@ export async function signupWithEmail(
   password: string
 ): Promise<User> {
   return callAPI(context, '/_auth/signup', 'POST', {
-    auth_data: {
+    login_ids: {
       email
     },
     password
@@ -22,7 +22,7 @@ export async function loginWithEmail(
   password: string
 ): Promise<User> {
   return callAPI(context, '/_auth/login', 'POST', {
-    auth_data: {
+    login_ids: {
       email
     },
     password
