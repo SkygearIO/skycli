@@ -5,3 +5,4 @@ export * from './artifact';
 export * from './cloudcode';
 export * from './example';
 export * from './secret';
+export * from './log';

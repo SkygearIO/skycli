@@ -177,6 +177,18 @@ async function run(argv: Arguments) {
     } else {
       console.log(chalk`Cloud code failed to deploy`);
     }
+
+    console.log(chalk`Downloading deploy log`);
+    const logResp = await controller.downloadDeployLog(argv.context, cloudCodeID);
+    console.log(chalk`Deploy log:`);
+    await new Promise((resolve, reject) => {
+      logResp.body
+        .on('data', (data) => {
+          console.log(data.toString('utf-8'));
+        })
+        .on('error', reject)
+        .on('finish', resolve);
+    });
   } catch (error) {
     console.error(`Failed deploy cloud code ${name}:`, error);
   }
