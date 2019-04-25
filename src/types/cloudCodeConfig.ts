@@ -33,6 +33,7 @@ export interface CloudCodeConfig {
   env: string;
   entry: string;
   src: string;
+  secrets: string[];
 }
 
 export function createCloudCodeRequestPayloadFromConfig(
@@ -60,6 +61,7 @@ export function createCloudCodeRequestPayloadFromConfig(
     environment: cloudCode.env,
     hook: createCloudCodeHookRequestPayload(cloudCode.hook),
     name,
+    secrets: cloudCode.secrets,
     trigger_config: triggerConfig,
     trigger_type: triggerType,
     type: cloudCode.type
