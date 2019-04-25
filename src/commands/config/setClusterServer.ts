@@ -34,10 +34,8 @@ function askClusterServer(argv: Arguments) {
   const prompts = [];
   const clusterConfig = argv.context.cluster;
   const server = {
-    apiKey:
-      (argv['api-key'] as string) || (clusterConfig && clusterConfig.apiKey),
-    endpoint:
-      (argv.endpoint as string) || (clusterConfig && clusterConfig.endpoint)
+    apiKey: argv['api-key'] as string,
+    endpoint: argv.endpoint as string
   };
 
   if (server.endpoint) {
