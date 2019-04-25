@@ -20,7 +20,7 @@ function run(argv: Arguments) {
     createVerticalTableRow('Cluster Type', cluster.env),
     createVerticalTableRow('Cluster Endpoint', cluster.endpoint),
     createVerticalTableRow('Cluster API Key', cluster.apiKey),
-    createVerticalTableRow('Account', user.metadata && user.metadata.email)
+    createVerticalTableRow('Account', user.loginID && user.loginID.email)
   );
 
   console.log(table.toString());

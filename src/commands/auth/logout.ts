@@ -15,7 +15,7 @@ function run(argv: Arguments) {
   return inquirer
     .prompt([
       {
-        message: `Log out as ${user.metadata.email}?`,
+        message: `Log out as ${user.loginID.email}?`,
         name: 'confirm',
         type: 'confirm'
       }
