@@ -2,13 +2,12 @@ const MongoClient = require('mongodb').MongoClient;
 
 module.exports = async function (req, res) {
   try {
-    const user = req.body.data;
-    
     const client = await connectDB();
-    await saveUser(client, user);
+    const blogs = await fetchBlogs(client);
     client.close();
-    
-    res.send(user);
+    res.send({
+      result: blogs
+    });
   } catch (err) {
     throw err;
   }
@@ -16,7 +15,7 @@ module.exports = async function (req, res) {
 
 function connectDB() {
   return new Promise((resolve, reject) => {
-    const uri = process.env.MONGO_DB_URL;
+    const uri = 'mongodb+srv://skygear-demo:skygear-demo@skygear-demo-tfhwi.gcp.mongodb.net/test?retryWrites=true';//process.env.MONGO_DB_URL;
     const client = new MongoClient(uri, { useNewUrlParser: true });
 
     client.connect(err => {
@@ -29,18 +28,16 @@ function connectDB() {
   });
 }
 
-function saveUser(client, user) {
+function fetchBlogs(client) {
   return new Promise((resolve, reject) => {
-    const collection = client.db('test').collection('users');
-    collection.updateOne(
-      { id: user.user_id }, 
-      { $set: user }, 
-      { upsert: true }
-    ).then((err, result) => {
-      resolve(user);
-      client.close();
-    }).catch(err => {
-      reject(err);
+    const collection = client.db('test').collection('blogs');
+    collection.find().toArray( (err, result) => {
+      if (err) {
+        reject(err);
+        return
+      }
+
+      resolve(result);
     });
   });
 }

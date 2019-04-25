@@ -1,15 +1,31 @@
-app: demo
+app: myapp
 
 cloudCode:
   hello:
     type: http-handler
     path: /hello
     env: nodejs
-    # entry relative to src path
     entry: hello
     src: js
+  fetch_blogs:
+    type: http-handler
+    path: /fetch_blogs
+    env: nodejs
+    entry: fetch_blogs
+    src: js
+    secrets:
+        - MONGO_DB_URL
+  write_blog:
+    type: http-handler
+    path: /write_blog
+    env: nodejs
+    entry: write_blog
+    src: js
+    secrets:
+        - MONGO_DB_URL
   after_signup:
     type: http-handler
+    path: /after_signup
     hook:
       event: after_signup
       async: true
@@ -17,3 +33,5 @@ cloudCode:
     env: nodejs
     entry: after_signup
     src: js
+    secrets:
+      - MONGO_DB_URL

@@ -2,13 +2,15 @@ const MongoClient = require('mongodb').MongoClient;
 
 module.exports = async function (req, res) {
   try {
-    const user = req.body.data;
+    const userID = req.body.args.userID;
+    const title = req.body.args.title;
+    const content = req.body.args.content;
     
     const client = await connectDB();
-    await saveUser(client, user);
+    await saveBlog(client, userID, title, content);
     client.close();
     
-    res.send(user);
+    res.send('OK');
   } catch (err) {
     throw err;
   }
@@ -29,18 +31,17 @@ function connectDB() {
   });
 }
 
-function saveUser(client, user) {
+function saveBlog(client, userID, title, content) {
   return new Promise((resolve, reject) => {
-    const collection = client.db('test').collection('users');
-    collection.updateOne(
-      { id: user.user_id }, 
-      { $set: user }, 
-      { upsert: true }
-    ).then((err, result) => {
-      resolve(user);
-      client.close();
-    }).catch(err => {
-      reject(err);
+    const collection = client.db('test').collection('blogs');
+    const data = { title, content, userID: userID };
+    collection.insertOne(data, (err, result) => {
+      if (err) {
+        reject(err);
+        return
+      }
+
+      resolve(result);
     });
   });
 }
