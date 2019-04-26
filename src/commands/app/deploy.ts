@@ -128,6 +128,29 @@ function waitForCloudCodeDeployStatusImpl(
   );
 }
 
+function downloadDeployLog(context: CLIContext, cloudCodeID: string) {
+  return new Promise((resolve) =>
+    downloadDeployLogImpl(context, cloudCodeID, resolve)
+  );
+}
+
+function downloadDeployLogImpl(
+  context: CLIContext,
+  cloudCodeID: string,
+  // tslint:disable-next-line:no-any
+  resolve: any
+) {
+  controller
+    .downloadDeployLog(context, cloudCodeID)
+    .then(resolve)
+    .catch(() => {
+      setTimeout(() => {
+        console.log(`Failed to download deploy log, will retry later`);
+        downloadDeployLogImpl(context, cloudCodeID, resolve);
+      }, 3000);
+    });
+}
+
 async function createArtifact(context: CLIContext, checksum: Checksum) {
   console.log(chalk`Uploading archive`);
   const result = await controller.createArtifactUpload(context, checksum);
@@ -179,7 +202,7 @@ async function run(argv: Arguments) {
     }
 
     console.log(chalk`Downloading deploy log`);
-    const logResp = await controller.downloadDeployLog(argv.context, cloudCodeID);
+    const logResp = await downloadDeployLog(argv.context, cloudCodeID);
     console.log(chalk`Deploy log:`);
     await new Promise((resolve, reject) => {
       logResp.body
