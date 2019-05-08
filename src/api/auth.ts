@@ -22,7 +22,7 @@ export async function loginWithEmail(
   password: string
 ): Promise<User> {
   return callAPI(context, '/_auth/login', 'POST', {
-    login_ids: {
+    login_id: {
       email
     },
     password
