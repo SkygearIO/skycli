@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+import fetch, { Response } from 'node-fetch';
 import url from 'url';
 
 import { CLIContext } from '../types';

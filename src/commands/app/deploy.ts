@@ -2,6 +2,7 @@ import globby from '@skygeario/globby';
 import chalk from 'chalk';
 import crypto from 'crypto';
 import fs from 'fs';
+import { Response } from 'node-fetch';
 import os from 'os';
 import path from 'path';
 import tar from 'tar';
@@ -128,7 +129,10 @@ function waitForCloudCodeDeployStatusImpl(
   );
 }
 
-function downloadDeployLog(context: CLIContext, cloudCodeID: string) {
+function downloadDeployLog(
+  context: CLIContext,
+  cloudCodeID: string
+): Promise<Response> {
   return new Promise((resolve) =>
     downloadDeployLogImpl(context, cloudCodeID, resolve)
   );

@@ -1,5 +1,5 @@
 import { ReadStream } from 'fs';
-import fetch from 'node-fetch';
+import fetch, { RequestInit } from 'node-fetch';
 import { CLIContext } from '../types';
 import {
   Checksum,
@@ -26,7 +26,7 @@ export async function uploadArtifact(
   req: PresignedRequest,
   checksumMD5: string,
   stream: ReadStream
-): Promise<undefined> {
+): Promise<void> {
   const opt: RequestInit = {
     headers: req.headers
       .map((header) => header.split(':'))
