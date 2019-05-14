@@ -14,7 +14,12 @@ export async function createCloudCode(
 ): Promise<string> {
   return callAPI(context, '/_controller/cloud_code', 'POST', {
     app_name: context.app,
-    ...createCloudCodeRequestPayloadFromConfig(name, cloudCode, artifactID)
+    artifact_ids: {
+      [name]: artifactID
+    },
+    deployments: {
+      [name]: createCloudCodeRequestPayloadFromConfig(cloudCode)
+    }
   }).then((payload) => {
     return payload.result.cloud_code.id;
   });
