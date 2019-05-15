@@ -1,6 +1,6 @@
 import { isArray } from 'util';
 
-type CloudCodeHook = CloudCodeHookConfig | CloudCodeHookConfig[];
+type CloudCodeHook = CloudCodeHookConfig;
 
 interface CloudCodeHookConfig {
   event: string;
@@ -14,16 +14,12 @@ function createCloudCodeHookRequestPayload(hook?: CloudCodeHook) {
     return undefined;
   }
 
-  if (!isArray(hook)) {
-    hook = [hook];
-  }
-
-  return hook.map((h) => ({
-    async: h.async,
-    event: h.event,
-    timeout: h.timeout,
-    trigger_path: h.path || ''
-  }));
+  return {
+    async: hook.async,
+    event: hook.event,
+    path: hook.path || '',
+    timeout: hook.timeout
+  };
 }
 
 export interface CloudCodeConfig {
@@ -37,33 +33,15 @@ export interface CloudCodeConfig {
 }
 
 export function createCloudCodeRequestPayloadFromConfig(
-  name: string,
-  cloudCode: CloudCodeConfig,
-  artifactID: string
+  cloudCode: CloudCodeConfig
 ) {
-  interface HTTPTriggerConfigPayload {
-    src_path: string;
-  }
-
-  let triggerType: string;
-  let triggerConfig: HTTPTriggerConfigPayload | undefined;
-  if (cloudCode.type === 'http-handler') {
-    triggerType = 'http';
-    triggerConfig = {
-      src_path: cloudCode.path
-    };
-  }
-
   return {
-    artifact_id: artifactID,
     config: {},
-    entry_point: cloudCode.entry,
-    environment: cloudCode.env,
+    entry: cloudCode.entry,
+    env: cloudCode.env,
     hook: createCloudCodeHookRequestPayload(cloudCode.hook),
-    name,
+    path: cloudCode.path,
     secrets: cloudCode.secrets,
-    trigger_config: triggerConfig,
-    trigger_type: triggerType,
     type: cloudCode.type
   };
 }
