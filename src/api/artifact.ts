@@ -3,22 +3,26 @@ import fetch, { RequestInit } from 'node-fetch';
 import { CLIContext } from '../types';
 import {
   Checksum,
-  CreateArtifactUploadResponse,
-  createArtifactUploadResponseFromJSON,
+  CreateArtifactUploadsResponse,
+  createArtifactUploadsResponseFromJSON,
   PresignedRequest
 } from '../types/artifact';
 import { callAPI } from './skygear';
 
-export async function createArtifactUpload(
+export async function createArtifactUploads(
   context: CLIContext,
-  checksum: Checksum
-): Promise<CreateArtifactUploadResponse> {
+  checksums: Checksum[]
+): Promise<CreateArtifactUploadsResponse> {
   return callAPI(context, '/_controller/artifact_upload', 'POST', {
     app_name: context.app,
-    checksum_md5: checksum.md5,
-    checksum_sha256: checksum.sha256
+    upload_requests: checksums.map((checksum) => {
+      return {
+        checksum_md5: checksum.md5,
+        checksum_sha256: checksum.sha256
+      };
+    })
   }).then((payload) => {
-    return createArtifactUploadResponseFromJSON(payload.result);
+    return createArtifactUploadsResponseFromJSON(payload.result);
   });
 }
 
@@ -57,14 +61,14 @@ export async function uploadArtifact(
 }
 
 // createArtifact returns artifact id if success
-export async function createArtifact(
+export async function createArtifacts(
   context: CLIContext,
-  artifactRequest: string
-): Promise<string> {
+  artifactRequest: string[]
+): Promise<string[]> {
   return callAPI(context, '/_controller/artifact', 'POST', {
     app_name: context.app,
-    artifact_request: artifactRequest
+    artifact_requests: artifactRequest
   }).then((payload) => {
-    return payload.result.artifact.id;
+    return payload.result.artifacts.map((a) => a.id);
   });
 }

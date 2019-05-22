@@ -1,9 +1,9 @@
 export enum CloudCodeStatus {
-  Pending = 'pending',
-  Running = 'running',
-  DeployFailed = 'deploy failed',
-  Stopping = 'stopping',
-  Stopped = 'stopped'
+  Pending = 'Pending',
+  Running = 'Running',
+  DeployFailed = 'DeployFailed',
+  Stopped = 'Stopped',
+  StopFailed = 'StopFailed'
 }
 
 export interface CloudCode {

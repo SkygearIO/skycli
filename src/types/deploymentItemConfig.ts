@@ -22,7 +22,7 @@ function createCloudCodeHookRequestPayload(hook?: CloudCodeHook) {
   };
 }
 
-export interface CloudCodeConfig {
+export interface DeploymentItemConfig {
   type: string;
   path?: string;
   hook?: CloudCodeHook;
@@ -32,16 +32,16 @@ export interface CloudCodeConfig {
   secrets: string[];
 }
 
-export function createCloudCodeRequestPayloadFromConfig(
-  cloudCode: CloudCodeConfig
+export function createDeploymentItemRequestPayloadFromConfig(
+  deployment: DeploymentItemConfig
 ) {
   return {
     config: {},
-    entry: cloudCode.entry,
-    env: cloudCode.env,
-    hook: createCloudCodeHookRequestPayload(cloudCode.hook),
-    path: cloudCode.path,
-    secrets: cloudCode.secrets,
-    type: cloudCode.type
+    entry: deployment.entry,
+    env: deployment.env,
+    hook: createCloudCodeHookRequestPayload(deployment.hook),
+    path: deployment.path,
+    secrets: deployment.secrets,
+    type: deployment.type
   };
 }

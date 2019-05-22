@@ -8,6 +8,8 @@ export interface CreateArtifactUploadResponse {
   artifactRequest: string;
 }
 
+export type CreateArtifactUploadsResponse = CreateArtifactUploadResponse[];
+
 export interface PresignedRequest {
   method: string;
   url: string;
@@ -15,17 +17,19 @@ export interface PresignedRequest {
   headers: string[];
 }
 
-export function createArtifactUploadResponseFromJSON(
+export function createArtifactUploadsResponseFromJSON(
   // tslint:disable-next-line: no-any
   input: any
-): CreateArtifactUploadResponse {
-  return {
-    artifactRequest: input.artifact_request,
-    uploadRequest: {
-      fields: input.upload_request.fields,
-      headers: input.upload_request.headers,
-      method: input.upload_request.method,
-      url: input.upload_request.url
-    }
-  };
+): CreateArtifactUploadsResponse {
+  return input.upload_requests.map((r) => {
+    return {
+      artifactRequest: r.artifact_request,
+      uploadRequest: {
+        fields: r.upload_request.fields,
+        headers: r.upload_request.headers,
+        method: r.upload_request.method,
+        url: r.upload_request.url
+      }
+    };
+  });
 }

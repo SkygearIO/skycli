@@ -1,6 +1,6 @@
 app: myapp
 
-cloudCode:
+deployments:
   hello:
     type: http-handler
     path: /hello
