@@ -2,15 +2,18 @@ import globby from '@skygeario/globby';
 import chalk from 'chalk';
 import crypto from 'crypto';
 import fs from 'fs';
+import inquirer from 'inquirer';
 import os from 'os';
 import path from 'path';
 import tar from 'tar';
 
 import { controller } from '../../api';
 import {
+  App,
   Checksum,
   CLIContext,
   DeploymentItemConfig,
+  DeploymentItemsResponse,
   DeploymentStatus
 } from '../../types';
 import { Arguments, createCommand } from '../../util';
@@ -127,6 +130,52 @@ function waitForDeploymentStatusImpl(
   );
 }
 
+async function confirmIfItemsWillBeRemovedInNewDeployment(
+  context: CLIContext,
+  newItems: string[]
+) {
+  const app: App = await controller.getAppByName(context, context.app);
+  if (!app.lastDeploymentID) {
+    // no last deployment, no need to check
+    return;
+  }
+
+  // get deployment items and show prompt if needed
+  const deploymentItemsResp: DeploymentItemsResponse = await controller.getDeploymentItems(
+    context,
+    app.lastDeploymentID
+  );
+
+  const itemsWillBeRemoved: string[] = deploymentItemsResp.cloudCodes.reduce(
+    (acc, oldItem) => {
+      if (newItems.indexOf(oldItem.name) === -1) {
+        acc.push(oldItem.name);
+      }
+      return acc;
+    },
+    []
+  );
+
+  if (itemsWillBeRemoved.length) {
+    const applyItemColor = (str) => chalk.green(str);
+    const answers = await inquirer.prompt([
+      {
+        message: `Item(s) ${itemsWillBeRemoved
+          .map(applyItemColor)
+          .join(', ')} will be removed in this deployment. Confirm?`,
+        name: 'proceed',
+        type: 'confirm'
+      }
+    ]);
+
+    if (!answers.proceed) {
+      throw new Error('cancelled');
+    }
+  }
+
+  return;
+}
+
 /* Log deployment log
 function downloadDeployLog(
   context: CLIContext,
@@ -163,6 +212,8 @@ async function run(argv: Arguments) {
 
   try {
     const itemNames: string[] = Object.keys(deploymentMap);
+    await confirmIfItemsWillBeRemovedInNewDeployment(argv.context, itemNames);
+
     const checksums: Checksum[] = [];
 
     // archive and get checksum
@@ -241,6 +292,9 @@ async function run(argv: Arguments) {
     });
     */
   } catch (error) {
+    if (error.message === 'cancelled') {
+      return;
+    }
     throw new Error('Fail to deploy. ' + error);
   }
 }
