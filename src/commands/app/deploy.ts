@@ -2,28 +2,29 @@ import globby from '@skygeario/globby';
 import chalk from 'chalk';
 import crypto from 'crypto';
 import fs from 'fs';
-import { Response } from 'node-fetch';
 import os from 'os';
 import path from 'path';
 import tar from 'tar';
 
 import { controller } from '../../api';
-import { CLIContext } from '../../types';
-import { Checksum } from '../../types/artifact';
-import { CloudCodeStatus } from '../../types/cloudCode';
-import { CloudCodeConfig } from '../../types/cloudCodeConfig';
+import {
+  Checksum,
+  CLIContext,
+  DeploymentItemConfig,
+  DeploymentStatus
+} from '../../types';
 import { Arguments, createCommand } from '../../util';
 import requireUser from '../middleware/requireUser';
 
-function archivePath() {
-  return path.join(os.tmpdir(), 'skygear-src.tgz');
+function createArchivePath(index: number) {
+  return path.join(os.tmpdir(), `skygear-src-${index}.tgz`);
 }
 
-function createArchiveReadStream() {
-  return fs.createReadStream(archivePath());
+function createArchiveReadStream(archivePath: string) {
+  return fs.createReadStream(archivePath);
 }
 
-function archiveSrc(srcPath: string) {
+function archiveSrc(srcPath: string, archivePath: string) {
   return globby(srcPath, {
     dot: true,
     gitignore: true,
@@ -37,7 +38,7 @@ function archiveSrc(srcPath: string) {
     .then((paths: string[]) => {
       const opt = {
         cwd: srcPath,
-        file: archivePath(),
+        file: archivePath,
         gzip: true,
         // set portable to true, so the archive is the same for same content
         portable: true
@@ -46,12 +47,12 @@ function archiveSrc(srcPath: string) {
     });
 }
 
-function getChecksum(): Promise<Checksum> {
+function getChecksum(archivePath: string): Promise<Checksum> {
   const md5 = crypto.createHash('md5');
   const sha256 = crypto.createHash('sha256');
   return new Promise((resolve, reject) => {
     try {
-      const stream = createArchiveReadStream();
+      const stream = createArchiveReadStream(archivePath);
       stream.on('data', (data) => {
         md5.update(data, 'utf8');
         sha256.update(data, 'utf8');
@@ -75,52 +76,49 @@ function getChecksum(): Promise<Checksum> {
 
 async function archiveCloudCode(
   name: string,
-  cloudCode: CloudCodeConfig
+  cloudCode: DeploymentItemConfig,
+  archivePath: string
 ): Promise<Checksum> {
-  console.log(chalk`Deploying cloud code: {green ${name}}`);
-  await archiveSrc(cloudCode.src);
-  console.log('Archive created');
-  const checksum = await getChecksum();
+  console.log(chalk`Archiving cloud code: {green ${name}}`);
+  await archiveSrc(cloudCode.src, archivePath);
+  const checksum = await getChecksum(archivePath);
   console.log(`Archive checksum md5: ${checksum.md5}`);
   console.log(`Archive checksum sha256: ${checksum.sha256}`);
   return checksum;
 }
 
-function waitForCloudCodeDeployStatus(
-  context: CLIContext,
-  cloudCodeID: string
-) {
-  console.log(chalk`Wait for cloud code to deploy: {green ${cloudCodeID}}`);
+function waitForDeploymentStatus(context: CLIContext, cloudCodeID: string) {
+  console.log(chalk`Wait for deployment: {green ${cloudCodeID}}`);
   return new Promise((resolve, reject) =>
-    waitForCloudCodeDeployStatusImpl(context, cloudCodeID, resolve, reject)
+    waitForDeploymentStatusImpl(context, cloudCodeID, resolve, reject)
   );
 }
 
-function waitForCloudCodeDeployStatusImpl(
+function waitForDeploymentStatusImpl(
   context: CLIContext,
-  cloudCodeID: string,
+  deploymentID: string,
   // tslint:disable-next-line:no-any
   resolve: any,
   // tslint:disable-next-line:no-any
   reject: any
 ) {
-  controller.getCloudCode(context, cloudCodeID).then(
+  controller.getDeployment(context, deploymentID).then(
     (result) => {
       if (
-        result.status === CloudCodeStatus.Running ||
-        result.status === CloudCodeStatus.DeployFailed
+        result.status === DeploymentStatus.Running ||
+        result.status === DeploymentStatus.DeployFailed
       ) {
         resolve(result.status);
         return;
       }
 
-      if (result.status !== CloudCodeStatus.Pending) {
+      if (result.status !== DeploymentStatus.Pending) {
         reject(new Error(`Unexpected cloud code status: ${result.status}`));
         return;
       }
 
       setTimeout(() => {
-        waitForCloudCodeDeployStatusImpl(context, cloudCodeID, resolve, reject);
+        waitForDeploymentStatusImpl(context, deploymentID, resolve, reject);
       }, 3000);
     },
     (err) => {
@@ -129,6 +127,7 @@ function waitForCloudCodeDeployStatusImpl(
   );
 }
 
+/* Log deployment log
 function downloadDeployLog(
   context: CLIContext,
   cloudCodeID: string
@@ -154,57 +153,81 @@ function downloadDeployLogImpl(
       }, 3000);
     });
 }
-
-async function createArtifact(context: CLIContext, checksum: Checksum) {
-  console.log(chalk`Uploading archive`);
-  const result = await controller.createArtifactUpload(context, checksum);
-  const stream = createArchiveReadStream();
-  await controller.uploadArtifact(result.uploadRequest, checksum.md5, stream);
-  console.log(chalk`Archive uploaded`);
-  const artifactID = await controller.createArtifact(
-    context,
-    result.artifactRequest
-  );
-  console.log(chalk`Artifact created`);
-  return artifactID;
-}
+*/
 
 async function run(argv: Arguments) {
-  const name = argv['cloud-code'] as string;
-  // TODO: support deploying all cloud code at once
-  // skygear-controller need an api to support batch deploy
-  if (name == null || name === '') {
-    console.error(chalk`Need name of cloud code, use --name`);
-    return;
+  const deploymentMap = argv.appConfig.deployments || {};
+  if (!Object.keys(deploymentMap).length) {
+    throw new Error('No deployment items to be deployed.');
   }
 
-  const cloudCodeMap = argv.appConfig.cloudCode || {};
-  const cloudCode = cloudCodeMap[name];
-  if (cloudCode == null) {
-    console.error(chalk`Cloud code {red ${name}} not found`);
-    return;
-  }
-
-  console.log(chalk`Deploy cloud code to app: {green ${argv.context.app}}`);
   try {
-    const checksum = await archiveCloudCode(name, cloudCode);
-    const artifactID = await createArtifact(argv.context, checksum);
-    const cloudCodeID = await controller.createCloudCode(
-      argv.context,
-      name,
-      cloudCode,
-      artifactID
-    );
-    const cloudCodeStatus = await waitForCloudCodeDeployStatus(
-      argv.context,
-      cloudCodeID
-    );
-    if (cloudCodeStatus === CloudCodeStatus.Running) {
-      console.log(chalk`Cloud code deployed`);
-    } else {
-      console.log(chalk`Cloud code failed to deploy`);
+    const itemNames: string[] = Object.keys(deploymentMap);
+    const checksums: Checksum[] = [];
+
+    // archive and get checksum
+    for (let i = 0; i < itemNames.length; i++) {
+      const name = itemNames[i];
+      const deployment = deploymentMap[name];
+      const archivePath = createArchivePath(i);
+      const checksum = await archiveCloudCode(name, deployment, archivePath);
+      checksums.push(checksum);
     }
 
+    // create artifact upload
+    const uploads = await controller.createArtifactUploads(
+      argv.context,
+      checksums
+    );
+
+    // upload artifact
+    const artifactRequests: string[] = [];
+    for (let i = 0; i < checksums.length; i++) {
+      const checksum = checksums[i];
+      const upload = uploads[i];
+      const stream = createArchiveReadStream(createArchivePath(i));
+      await controller.uploadArtifact(
+        upload.uploadRequest,
+        checksum.md5,
+        stream
+      );
+      const currentProgress = i + 1;
+      console.log(`Archive uploaded (${currentProgress}/${checksums.length})`);
+      artifactRequests.push(upload.artifactRequest);
+    }
+
+    // create artifacts
+    const artifactIDs = await controller.createArtifacts(
+      argv.context,
+      artifactRequests
+    );
+    const artifactIDMap = {};
+    for (let i = 0; i < itemNames.length; i++) {
+      const name = itemNames[i];
+      artifactIDMap[name] = artifactIDs[i];
+    }
+
+    // create deployment
+    const deploymentID = await controller.createDeployment(
+      argv.context,
+      deploymentMap,
+      artifactIDMap
+    );
+
+    // wait for deployment status
+    const deploymentStatus = await waitForDeploymentStatus(
+      argv.context,
+      deploymentID
+    );
+
+    if (deploymentStatus === DeploymentStatus.Running) {
+      console.log(chalk`Deployment completed`);
+      return;
+    } else {
+      throw new Error('Deployment failed');
+    }
+
+    /* Load deployment log
     console.log(chalk`Downloading deploy log`);
     const logResp = await downloadDeployLog(argv.context, cloudCodeID);
     console.log(chalk`Deploy log:`);
@@ -216,25 +239,20 @@ async function run(argv: Arguments) {
         .on('error', reject)
         .on('finish', resolve);
     });
+    */
   } catch (error) {
-    console.error(`Failed deploy cloud code ${name}:`, error);
+    throw new Error('Fail to deploy. ' + error);
   }
 }
 
 export default createCommand({
   builder: (yargs) => {
-    return yargs
-      .middleware(requireUser)
-      .option('app', {
-        desc: 'Application name',
-        type: 'string'
-      })
-      .option('cloud-code', {
-        desc: 'Cloud code name',
-        type: 'string'
-      });
+    return yargs.middleware(requireUser).option('app', {
+      desc: 'Application name',
+      type: 'string'
+    });
   },
-  command: 'deploy [cloud-code]',
-  describe: 'Deploy skygear cloud code',
+  command: 'deploy [name]',
+  describe: 'Deploy skygear application',
   handler: run
 });

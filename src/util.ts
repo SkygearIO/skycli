@@ -44,7 +44,9 @@ export function createCommand(module: CommandModule) {
       if (p && typeof p.catch === 'function') {
         p.catch((err: Error | string) => {
           if (err) {
-            if (typeof err === 'object') {
+            if (err instanceof Error) {
+              err = `${err}`;
+            } else if (typeof err === 'object') {
               err = JSON.stringify(err);
             }
             console.log(chalk.red(err));

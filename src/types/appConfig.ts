@@ -1,6 +1,6 @@
-import { CloudCodeConfig } from './cloudCodeConfig';
+import { DeploymentItemConfig } from './deploymentItemConfig';
 
 export interface AppConfig {
   app: string;
-  cloudCode: { [name: string]: CloudCodeConfig };
+  deployments: { [name: string]: DeploymentItemConfig };
 }
