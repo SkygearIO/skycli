@@ -1,9 +1,11 @@
 import {
   CLIContext,
+  cloudCodeFromJSON,
   createDeploymentItemRequestPayloadFromConfig,
   Deployment,
   deploymentFromJSON,
-  DeploymentItemConfig
+  DeploymentItemConfig,
+  DeploymentItemsResponse
 } from '../types';
 import { callAPI } from './skygear';
 
@@ -38,5 +40,21 @@ export async function getDeployment(
     'GET'
   ).then((payload) => {
     return deploymentFromJSON(payload.result.deployment);
+  });
+}
+
+export async function getDeploymentItems(
+  context: CLIContext,
+  deploymentID: string
+): Promise<DeploymentItemsResponse> {
+  return callAPI(
+    context,
+    `/_controller/deployment/${deploymentID}/items`,
+    'GET'
+  ).then((payload) => {
+    const cloudCodesJSON = payload.result.cloud_codes;
+    return {
+      cloudCodes: cloudCodesJSON.map(cloudCodeFromJSON)
+    };
   });
 }

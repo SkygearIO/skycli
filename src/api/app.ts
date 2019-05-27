@@ -31,3 +31,15 @@ export async function getApps(context: CLIContext): Promise<App[]> {
     return result.map(appFromJSON);
   });
 }
+
+export async function getAppByName(
+  context: CLIContext,
+  appName: string
+): Promise<App> {
+  return callAPI(context, `/_controller/app/${appName}`, 'GET').then(
+    (payload) => {
+      const result = payload.result.app;
+      return appFromJSON(result);
+    }
+  );
+}
