@@ -158,7 +158,7 @@ function downloadDeployLogImpl(
 async function run(argv: Arguments) {
   const deploymentMap = argv.appConfig.deployments || {};
   if (!Object.keys(deploymentMap).length) {
-    return Promise.reject('No deployment items to be deploy.');
+    throw new Error('No deployment items to be deployed.');
   }
 
   try {
@@ -224,7 +224,7 @@ async function run(argv: Arguments) {
       console.log(chalk`Deployment completed`);
       return;
     } else {
-      return Promise.reject('Deployment failed');
+      throw new Error('Deployment failed');
     }
 
     /* Load deployment log
@@ -241,7 +241,7 @@ async function run(argv: Arguments) {
     });
     */
   } catch (error) {
-    return Promise.reject('Fail to deploy. ' + error);
+    throw new Error('Fail to deploy. ' + error);
   }
 }
 
