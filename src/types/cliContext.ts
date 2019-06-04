@@ -5,12 +5,16 @@ export interface CLIContext {
   cluster: ClusterConfig | null;
   user: User | null;
   app: string | null;
+  debug: boolean;
+  verbose: boolean;
 }
 
 export function createEmptyCLIContext(): CLIContext {
   return {
     app: null,
     cluster: null,
-    user: null
+    debug: false,
+    user: null,
+    verbose: false
   };
 }

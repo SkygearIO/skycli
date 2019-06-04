@@ -2,6 +2,7 @@ import fetch, { Response } from 'node-fetch';
 import url from 'url';
 
 import { CLIContext } from '../types';
+import { NotFoundError } from './error';
 
 function defaultHeaders(context: CLIContext) {
   return {
@@ -12,7 +13,8 @@ function defaultHeaders(context: CLIContext) {
   };
 }
 
-async function handleFailureResponse(response: Response) {
+// tslint:disable-next-line:no-any
+export async function handleFailureResponse(response: Response): Promise<any> {
   const payload = await response
     .json()
     .then((p) => {
@@ -22,8 +24,15 @@ async function handleFailureResponse(response: Response) {
       throw new Error(response.statusText);
     });
 
-  const message = payload.error && payload.error.message;
-  throw new Error(message || `Fail to parse error: ${JSON.stringify(payload)}`);
+  const message =
+    (payload.error && payload.error.message) ||
+    `Fail to parse error: ${JSON.stringify(payload)}`;
+  // TODO: handle more error type
+  if (response.status === 404) {
+    throw new NotFoundError(message);
+  } else {
+    throw new Error(message);
+  }
 }
 
 export function callAPI(

@@ -27,6 +27,8 @@ export function currentCLIContext(argv: Arguments): CLIContext {
   return {
     app: appName,
     cluster: globalConfig.cluster && globalConfig.cluster[currentContextKey],
-    user: globalConfig.user && globalConfig.user[currentContextKey]
+    debug: !!argv.debug,
+    user: globalConfig.user && globalConfig.user[currentContextKey],
+    verbose: !!argv.verbose
   };
 }

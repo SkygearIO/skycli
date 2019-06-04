@@ -7,6 +7,7 @@ export * from './clusterConfig';
 export * from './deployment';
 export * from './deploymentItemConfig';
 export * from './globalConfig';
+export * from './logEntry';
 export * from './tenantConfig';
 export * from './user';
 export * from './secret';
