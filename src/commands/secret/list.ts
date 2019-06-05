@@ -11,7 +11,7 @@ function run(argv: Arguments) {
     .getSecrets(argv.context)
     .then((secrets: Secret[]) => {
       if (secrets.length === 0) {
-        console.log(chalk`No secrets in app {green ${argv.context.app}}`);
+        console.log(chalk`No secrets in app {green ${argv.context.app || ''}}`);
         return Promise.resolve();
       }
       const table = new Table({

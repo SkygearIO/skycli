@@ -4,7 +4,6 @@ import inquirer from 'inquirer';
 import { controller } from '../../api';
 import { Arguments, createCommand } from '../../util';
 import { requireApp, requireClusterConfig, requireUser } from '../middleware';
-import { validateSecretName } from './util';
 
 function confirm(secretName: string) {
   return inquirer.prompt([
@@ -26,7 +25,7 @@ function run(argv: Arguments) {
       }
       return controller.deleteSecret(argv.context, secretName);
     })
-    .then((secret) => {
+    .then((_secret) => {
       console.log(chalk`{green Success!} Deleted secret ${secretName}`);
       return;
     })
