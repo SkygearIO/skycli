@@ -95,13 +95,13 @@ export function save(
   let configPath = findConfig(domain);
   if (!configPath) {
     configPath = findConfig(domain, false);
-    if (!!configPath) {
+    if (configPath) {
       fs.ensureDirSync(path.dirname(configPath));
     }
   }
 
   const content = yaml.safeDump(configObject);
-  if (!!configPath) {
+  if (configPath) {
     fs.writeFileSync(configPath, content);
   }
 }
