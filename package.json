@@ -7,7 +7,7 @@
     "skycli": "./bin/skycli.js"
   },
   "scripts": {
-    "test": "gulp test && typecheck",
+    "test": "gulp test",
     "typecheck": "tsc --noEmit",
     "lint": "eslint 'src/**/*.ts'",
     "prettier": "prettier --write 'src/**/*.ts'",
