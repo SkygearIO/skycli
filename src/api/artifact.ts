@@ -31,14 +31,16 @@ export async function uploadArtifact(
   checksumMD5: string,
   stream: ReadStream
 ): Promise<void> {
+  const headers: { [name: string]: string } = req.headers
+    .map((header) => header.split(':'))
+    .reduce((acc, curr) => ({ ...acc, [curr[0]]: curr[1] }), {});
+
   const opt: RequestInit = {
-    headers: req.headers
-      .map((header) => header.split(':'))
-      .reduce((acc, curr) => ({ ...acc, [curr[0]]: curr[1] }), {}),
     method: req.method
   };
 
-  opt.headers['Content-MD5'] = checksumMD5;
+  headers['Content-MD5'] = checksumMD5;
+  opt.headers = headers;
 
   if (req.method === 'PUT') {
     // From https://github.com/bitinn/node-fetch#post-data-using-a-file-stream,
@@ -69,6 +71,6 @@ export async function createArtifacts(
     app_name: context.app,
     artifact_requests: artifactRequest
   }).then((payload) => {
-    return payload.result.artifacts.map((a) => a.id);
+    return payload.result.artifacts.map((a: { id: string }) => a.id);
   });
 }
