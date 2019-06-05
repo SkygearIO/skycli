@@ -18,7 +18,7 @@ install:
 
 script:
   - npm test
-  - npm run tsc --noImplicitAny
+  - npm run tsc
   - npm run tslint -- -c tslint.ideal.json 'src/**/*.ts' 'test/**/*.ts'
   - npm run prettier-check
 
