@@ -108,7 +108,7 @@ function run(argv: Arguments) {
           .on('finish', resolve);
       });
     })
-    .then((e) => {
+    .then((_e) => {
       // update skygear.yaml with app
       const configPath = path.join(projectDir, 'skygear.yaml');
       prependFile(configPath, `app: ${appName}\n`);

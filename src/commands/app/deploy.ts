@@ -134,7 +134,12 @@ async function confirmIfItemsWillBeRemovedInNewDeployment(
   context: CLIContext,
   newItems: string[]
 ) {
-  const app: App = await controller.getAppByName(context, context.app);
+  const appName = context.app;
+  if (!appName) {
+    return;
+  }
+
+  const app: App = await controller.getAppByName(context, appName);
   if (!app.lastDeploymentID) {
     // no last deployment, no need to check
     return;
@@ -147,7 +152,7 @@ async function confirmIfItemsWillBeRemovedInNewDeployment(
   );
 
   const itemsWillBeRemoved: string[] = deploymentItemsResp.cloudCodes.reduce(
-    (acc, oldItem) => {
+    (acc: string[], oldItem) => {
       if (newItems.indexOf(oldItem.name) === -1) {
         acc.push(oldItem.name);
       }
@@ -157,7 +162,7 @@ async function confirmIfItemsWillBeRemovedInNewDeployment(
   );
 
   if (itemsWillBeRemoved.length) {
-    const applyItemColor = (str) => chalk.green(str);
+    const applyItemColor = (str: string) => chalk.green(str);
     const answers = await inquirer.prompt([
       {
         message: `Item(s) ${itemsWillBeRemoved
@@ -252,7 +257,7 @@ async function run(argv: Arguments) {
       argv.context,
       artifactRequests
     );
-    const artifactIDMap = {};
+    const artifactIDMap: { [name: string]: string } = {};
     for (let i = 0; i < itemNames.length; i++) {
       const name = itemNames[i];
       artifactIDMap[name] = artifactIDs[i];
