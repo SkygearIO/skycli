@@ -27,7 +27,6 @@ function run(argv: Arguments) {
     })
     .then((_secret) => {
       console.log(chalk`{green Success!} Deleted secret ${secretName}`);
-      return;
     })
     .catch((error) => {
       if (error === 'cancelled') {

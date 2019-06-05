@@ -45,8 +45,7 @@ export function callAPI(
   }).then((response) => {
     if (response.status === 200) {
       return response.json();
-    } else {
-      return handleFailureResponse(response);
     }
+    return handleFailureResponse(response);
   });
 }

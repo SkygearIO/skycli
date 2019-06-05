@@ -15,7 +15,6 @@ function run(argv: Arguments) {
       console.log(
         chalk`{green Success!} Renamed secret from ${oldSecretName} to ${newSecretName}`
       );
-      return;
     })
     .catch((error) => {
       return Promise.reject('Fail to rename secret. ' + error);

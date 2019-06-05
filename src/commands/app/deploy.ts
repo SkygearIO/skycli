@@ -177,8 +177,6 @@ async function confirmIfItemsWillBeRemovedInNewDeployment(
       throw new Error('cancelled');
     }
   }
-
-  return;
 }
 
 /* Log deployment log
@@ -279,9 +277,8 @@ async function run(argv: Arguments) {
     if (deploymentStatus === DeploymentStatus.Running) {
       console.log(chalk`Deployment completed`);
       return;
-    } else {
-      throw new Error('Deployment failed');
     }
+    throw new Error('Deployment failed');
 
     /* Load deployment log
     console.log(chalk`Downloading deploy log`);
