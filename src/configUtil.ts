@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { AppConfig, CLIContext, GlobalConfig } from './types';
+import { CLIContext } from './types';
 import { Arguments } from './util';
 
 export function currentCLIContext(argv: Arguments): CLIContext {
-  const globalConfig = argv.globalConfig as GlobalConfig;
+  const globalConfig = argv.globalConfig;
   const currentContextKey = globalConfig.currentContext;
 
-  const appConfig = argv.appConfig as AppConfig;
+  const appConfig = argv.appConfig;
   // specify app in command or from config file
   const appName = (argv.app as string) || appConfig.app;
 
