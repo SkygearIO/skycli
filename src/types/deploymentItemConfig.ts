@@ -1,5 +1,3 @@
-import { isArray } from 'util';
-
 type CloudCodeHook = CloudCodeHookConfig;
 
 interface CloudCodeHookConfig {
