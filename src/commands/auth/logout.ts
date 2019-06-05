@@ -6,40 +6,38 @@ import * as config from '../../config';
 import { Arguments, createCommand } from '../../util';
 import { updateGlobalConfigUser } from './util';
 
-function run(argv: Arguments) {
+async function run(argv: Arguments) {
   const user = argv.context.user;
   if (!user) {
-    return Promise.reject(`Not logged in to accounts.`);
+    throw new Error(`Not logged in to accounts.`);
   }
 
-  return inquirer
-    .prompt([
+  try {
+    const answers = await inquirer.prompt([
       {
         message: `Log out as ${user.loginIDs.email}?`,
         name: 'confirm',
         type: 'confirm'
       }
-    ])
-    .then((answers) => {
-      if (!answers.confirm) {
-        return Promise.reject(`Cancelled logout.`);
-      }
+    ]);
+    if (!answers.confirm) {
+      throw new Error('cancelled');
+    }
 
-      return controller.logout(argv.context);
-    })
-    .then(() => {
-      // remove user from global config
-      const newGlobalConfig = updateGlobalConfigUser(argv.globalConfig, null);
-      config.save(newGlobalConfig, config.ConfigDomain.GlobalDomain);
+    await controller.logout(argv.context);
+  } catch (error) {
+    if (error.message === 'cancelled') {
+      return;
+    }
+    if (argv.debug) {
+      console.error(error);
+    }
+  }
 
-      console.log(chalk.green('Successfully logged out.'));
-    })
-    .catch((error) => {
-      if (argv.debug) {
-        console.error(error);
-      }
-      return Promise.reject(`${error}`);
-    });
+  // remove user from global config
+  const newGlobalConfig = updateGlobalConfigUser(argv.globalConfig, null);
+  config.save(newGlobalConfig, config.ConfigDomain.GlobalDomain);
+  console.log(chalk.green('Successfully logged out.'));
 }
 
 export default createCommand({
