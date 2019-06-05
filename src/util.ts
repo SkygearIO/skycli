@@ -16,10 +16,7 @@
 import chalk from 'chalk';
 import _ from 'lodash';
 import moment from 'moment';
-import {
-  Arguments as YargsArguments,
-  CommandModule as YargsCommandModule
-} from 'yargs';
+import { Arguments as YargsArguments, Argv } from 'yargs';
 import { AppConfig, CLIContext, GlobalConfig } from './types';
 
 export interface Arguments extends YargsArguments {
@@ -31,12 +28,22 @@ export interface Arguments extends YargsArguments {
   appConfig: AppConfig;
 }
 
-export interface CommandModule extends YargsCommandModule {
-  execute?(argv: Arguments): Promise<void>;
-  handler(argv: Arguments): Promise<void>;
+// Ideally we should extend yargs's CommandModule
+// but we have our own Arguments which is
+// incompatiable with xargs's Arguments
+// so we have to give up.
+export interface CommandModule {
+  describe?: string;
+  command?: string[] | string;
+  builder?: (yargs: Argv) => Argv;
+  handler: (argv: Arguments) => Promise<void>;
+
+  execute: (argv: Arguments) => Promise<void>;
 }
 
-export function createCommand(module: CommandModule) {
+export function createCommand(
+  module: Pick<CommandModule, Exclude<keyof CommandModule, 'execute'>>
+) {
   return _.assign({}, module, {
     execute: module.handler,
     handler: (argv: Arguments) => {
@@ -70,7 +77,10 @@ export function getCommandGroupHelpMessage(
     .map((cmd) => {
       if (typeof cmd.command === 'string') {
         return cmd.command.split(' ');
+      } else if (cmd.command == null) {
+        return [''];
       }
+      return cmd.command;
     })
     .map((cmd) => cmd[0])
     .join(' | ');
