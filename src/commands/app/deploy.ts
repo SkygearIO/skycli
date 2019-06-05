@@ -134,7 +134,12 @@ async function confirmIfItemsWillBeRemovedInNewDeployment(
   context: CLIContext,
   newItems: string[]
 ) {
-  const app: App = await controller.getAppByName(context, context.app);
+  const appName = context.app;
+  if (!appName) {
+    return;
+  }
+
+  const app: App = await controller.getAppByName(context, appName);
   if (!app.lastDeploymentID) {
     // no last deployment, no need to check
     return;
@@ -147,7 +152,7 @@ async function confirmIfItemsWillBeRemovedInNewDeployment(
   );
 
   const itemsWillBeRemoved: string[] = deploymentItemsResp.cloudCodes.reduce(
-    (acc, oldItem) => {
+    (acc: string[], oldItem) => {
       if (newItems.indexOf(oldItem.name) === -1) {
         acc.push(oldItem.name);
       }
@@ -157,7 +162,7 @@ async function confirmIfItemsWillBeRemovedInNewDeployment(
   );
 
   if (itemsWillBeRemoved.length) {
-    const applyItemColor = (str) => chalk.green(str);
+    const applyItemColor = (str: string) => chalk.green(str);
     const answers = await inquirer.prompt([
       {
         message: `Item(s) ${itemsWillBeRemoved
@@ -172,8 +177,6 @@ async function confirmIfItemsWillBeRemovedInNewDeployment(
       throw new Error('cancelled');
     }
   }
-
-  return;
 }
 
 /* Log deployment log
@@ -221,6 +224,7 @@ async function run(argv: Arguments) {
       const name = itemNames[i];
       const deployment = deploymentMap[name];
       const archivePath = createArchivePath(i);
+      // eslint-disable-next-line no-await-in-loop
       const checksum = await archiveCloudCode(name, deployment, archivePath);
       checksums.push(checksum);
     }
@@ -237,6 +241,7 @@ async function run(argv: Arguments) {
       const checksum = checksums[i];
       const upload = uploads[i];
       const stream = createArchiveReadStream(createArchivePath(i));
+      // eslint-disable-next-line no-await-in-loop
       await controller.uploadArtifact(
         upload.uploadRequest,
         checksum.md5,
@@ -252,7 +257,7 @@ async function run(argv: Arguments) {
       argv.context,
       artifactRequests
     );
-    const artifactIDMap = {};
+    const artifactIDMap: { [name: string]: string } = {};
     for (let i = 0; i < itemNames.length; i++) {
       const name = itemNames[i];
       artifactIDMap[name] = artifactIDs[i];
@@ -274,9 +279,8 @@ async function run(argv: Arguments) {
     if (deploymentStatus === DeploymentStatus.Running) {
       console.log(chalk`Deployment completed`);
       return;
-    } else {
-      throw new Error('Deployment failed');
     }
+    throw new Error('Deployment failed');
 
     /* Load deployment log
     console.log(chalk`Downloading deploy log`);

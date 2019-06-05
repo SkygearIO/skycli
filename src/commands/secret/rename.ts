@@ -11,11 +11,10 @@ function run(argv: Arguments) {
 
   return controller
     .renameSecret(argv.context, oldSecretName, newSecretName)
-    .then((secret) => {
+    .then((_secret) => {
       console.log(
         chalk`{green Success!} Renamed secret from ${oldSecretName} to ${newSecretName}`
       );
-      return;
     })
     .catch((error) => {
       return Promise.reject('Fail to rename secret. ' + error);

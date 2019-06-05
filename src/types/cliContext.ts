@@ -2,9 +2,9 @@ import { ClusterConfig } from './clusterConfig';
 import { User } from './user';
 
 export interface CLIContext {
-  cluster: ClusterConfig;
-  user: User;
-  app: string;
+  cluster: ClusterConfig | null;
+  user: User | null;
+  app: string | null;
 }
 
 export function createEmptyCLIContext(): CLIContext {

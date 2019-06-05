@@ -32,7 +32,6 @@ const urlPrompt: inquirer.Question = {
 
 function askClusterServer(argv: Arguments) {
   const prompts = [];
-  const clusterConfig = argv.context.cluster;
   const server = {
     apiKey: argv['api-key'] as string,
     endpoint: argv.endpoint as string

@@ -1,5 +1,5 @@
 export interface ClusterConfig {
-  env: string;
+  env: string | null;
   endpoint: string;
   apiKey: string;
 }

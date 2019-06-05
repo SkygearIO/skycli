@@ -5,14 +5,14 @@ import authSignup from './auth/signup';
 
 const subCommands = [authLogin, authLogout, authSignup];
 
-function run(argv: Arguments) {
+function run(_argv: Arguments) {
   console.log(getCommandGroupHelpMessage('auth', subCommands));
   return Promise.resolve();
 }
 
 export default createCommand({
   builder: (yargs) => {
-    return subCommands.reduce((y, cmd) => y.command(cmd), yargs);
+    return subCommands.reduce((y, cmd) => y.command(cmd as any), yargs);
   },
   command: 'auth',
   describe: 'Skycli auth commands',

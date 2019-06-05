@@ -48,7 +48,10 @@ function migrate(configObject: Dictionary<any>) {
   return migrated;
 }
 
-function findConfig(domain: ConfigDomain, exists: boolean = true) {
+function findConfig(
+  domain: ConfigDomain,
+  exists: boolean = true
+): string | undefined {
   const configPath = untildify(configPaths[domain]);
   const absolute = path.isAbsolute(configPath);
 
@@ -60,6 +63,7 @@ function findConfig(domain: ConfigDomain, exists: boolean = true) {
 
   // If the config path is not already an absolute path, recursively
   // find the config file until we find an existing one.
+  // eslint-disable-next-line no-unmodified-loop-condition
   while (!absolute && currentDir !== path.dirname(currentDir)) {
     fullPath = path.resolve(currentDir, configPath);
     if (fs.existsSync(fullPath)) {
@@ -91,11 +95,15 @@ export function save(
   let configPath = findConfig(domain);
   if (!configPath) {
     configPath = findConfig(domain, false);
-    fs.ensureDirSync(path.dirname(configPath));
+    if (configPath) {
+      fs.ensureDirSync(path.dirname(configPath));
+    }
   }
 
   const content = yaml.safeDump(configObject);
-  fs.writeFileSync(configPath, content);
+  if (configPath) {
+    fs.writeFileSync(configPath, content);
+  }
 }
 
 export function set(

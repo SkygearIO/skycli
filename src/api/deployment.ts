@@ -14,7 +14,11 @@ export async function createDeployment(
   deployments: { [name: string]: DeploymentItemConfig },
   artifactIDs: { [name: string]: string }
 ): Promise<string> {
-  const deploymentsRequestPayload = {};
+  const deploymentsRequestPayload: {
+    [key: string]: ReturnType<
+      typeof createDeploymentItemRequestPayloadFromConfig
+    >;
+  } = {};
   Object.keys(deployments).map((key) => {
     deploymentsRequestPayload[
       key

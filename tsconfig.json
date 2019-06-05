@@ -1,11 +1,14 @@
 {
   "include": [
-    "src/**/*.ts"
+    "src"
   ],
   "compilerOptions": {
-    "noImplicitAny": false,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "strict": true,
     "resolveJsonModule": true,
-    "noEmit": true,
     "allowSyntheticDefaultImports": true,
     "target": "es5",
     "lib": [
@@ -14,4 +17,3 @@
     ]
   }
 }
-

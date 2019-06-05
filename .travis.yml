@@ -17,10 +17,10 @@ install:
   - npm audit
 
 script:
-  - npm test
-  - npm run tsc --noImplicitAny
-  - npm run tslint -- -c tslint.ideal.json 'src/**/*.ts' 'test/**/*.ts'
   - npm run prettier-check
+  - npm run typecheck
+  - npm run lint
+  - npm test
 
 before_deploy:
   - npm run build-bin

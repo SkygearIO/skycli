@@ -6,14 +6,14 @@ import secretRename from './secret/rename';
 
 const subCommands = [secretList, secretCreate, secretRename, secretDelete];
 
-function run(argv: Arguments) {
+function run(_argv: Arguments) {
   console.log(getCommandGroupHelpMessage('secret', subCommands));
   return Promise.resolve();
 }
 
 export default createCommand({
   builder: (yargs) => {
-    return subCommands.reduce((y, cmd) => y.command(cmd), yargs);
+    return subCommands.reduce((y, cmd) => y.command(cmd as any), yargs);
   },
   command: 'secret',
   describe: 'Skycli secret management commands',

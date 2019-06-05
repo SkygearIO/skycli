@@ -11,9 +11,8 @@ function run(argv: Arguments) {
 
   return controller
     .createSecret(argv.context, secretName, secretValue)
-    .then((secret) => {
+    .then((_secret) => {
       console.log(chalk`{green Success!} Created secret ${secretName}`);
-      return;
     })
     .catch((error) => {
       return Promise.reject('Fail to create secret. ' + error);
