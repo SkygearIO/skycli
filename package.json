@@ -9,6 +9,7 @@
   "scripts": {
     "test": "gulp test && typecheck",
     "typecheck": "tsc --noEmit",
+    "lint": "eslint 'src/**/*.ts'",
     "prettier": "prettier --write 'src/**/*.ts'",
     "prettier-check": "prettier --check 'src/**/*.ts'",
     "prepare": "gulp build",
@@ -54,6 +55,7 @@
     "@babel/preset-env": "^7.3.1",
     "@babel/preset-typescript": "^7.3.3",
     "@babel/register": "^7.0.0",
+    "@oursky/eslint-config": "0.18.0",
     "@types/core-js": "^0.9.46",
     "@types/fs-extra": "^5.0.5",
     "@types/inquirer": "0.0.36",
@@ -65,9 +67,16 @@
     "@types/query-string": "^5.1.0",
     "@types/untildify": "^3.0.0",
     "@types/yargs": "^13.0.0",
+    "@typescript-eslint/eslint-plugin": "1.9.0",
+    "@typescript-eslint/parser": "1.9.0",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-transform-builtin-extend": "^1.1.2",
     "chai": "^4.2.0",
+    "eslint": "5.16.0",
+    "eslint-config-prettier": "4.3.0",
+    "eslint-plugin-react": "7.13.0",
+    "eslint-plugin-react-hooks": "1.6.0",
+    "eslint-plugin-react-native": "3.7.0",
     "extend": "^3.0.2",
     "gulp": "^4.0.0",
     "gulp-babel": "^8.0.0",
@@ -76,7 +85,7 @@
     "pkg": "^4.3.7",
     "prettier": "^1.16.4",
     "require-dir": "^0.3.2",
-    "typescript": "^3.3.1"
+    "typescript": "3.3.3333"
   },
   "resolutions": {
     "natives": "1.1.3"

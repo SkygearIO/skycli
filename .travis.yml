@@ -19,6 +19,7 @@ install:
 script:
   - npm run prettier-check
   - npm run typecheck
+  - npm run lint
   - npm test
 
 before_deploy:

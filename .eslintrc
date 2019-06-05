@@ -1,0 +1,6 @@
+{
+  "extends": ["@oursky"],
+  "rules": {
+    "no-console": 0
+  }
+}
