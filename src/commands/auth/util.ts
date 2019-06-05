@@ -6,13 +6,17 @@ import { Arguments } from '../../util';
 
 export function updateGlobalConfigUser(
   config: GlobalConfig,
-  user: User
+  user: User | null
 ): GlobalConfig {
   const newConfig = { ...config };
   const currentContextKey = newConfig.currentContext;
   const currentUserKey = newConfig.context[currentContextKey].user;
   newConfig.user = newConfig.user || {};
-  newConfig.user[currentUserKey] = user;
+  if (user == null) {
+    delete newConfig.user[currentUserKey];
+  } else {
+    newConfig.user[currentUserKey] = user;
+  }
   return newConfig;
 }
 
