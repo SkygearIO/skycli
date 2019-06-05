@@ -6,7 +6,7 @@ import { callAPI } from './skygear';
 export async function getExamples(context: CLIContext): Promise<string[]> {
   return callAPI(context, '/_controller/examples', 'GET').then((payload) => {
     const result = payload.result.examples;
-    return result.map((e) => e.path);
+    return result.map((e: any) => e.path);
   });
 }
 

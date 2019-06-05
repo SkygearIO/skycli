@@ -1,4 +1,3 @@
-import secret from '../commands/secret';
 import { CLIContext, Secret, secretFromJSON } from '../types';
 import { callAPI } from './skygear';
 
@@ -19,12 +18,12 @@ export async function createSecret(
   secretValue: string
 ): Promise<Secret> {
   return callAPI(context, `/_controller/secret`, 'POST', {
-    app_name: context.app,
+    app_name: context.app || '',
     secret_name: secretName,
     secret_value: secretValue
   }).then((payload) => {
     const result = payload.result.secret;
-    return result ? secretFromJSON(result) : null;
+    return secretFromJSON(result);
   });
 }
 

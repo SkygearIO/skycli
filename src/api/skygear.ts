@@ -18,7 +18,7 @@ async function handleFailureResponse(response: Response) {
     .then((p) => {
       return p;
     })
-    .catch((error) => {
+    .catch((_error) => {
       throw new Error(response.statusText);
     });
 
