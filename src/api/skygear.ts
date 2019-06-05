@@ -34,7 +34,11 @@ export function callAPI(
   data?: any
   // tslint:disable-next-line:no-any
 ): Promise<any> {
-  return fetch(url.resolve(context.cluster.endpoint, path), {
+  const endpoint = context.cluster && context.cluster.endpoint;
+  if (!endpoint) {
+    return Promise.reject(new Error('no endpoint'));
+  }
+  return fetch(url.resolve(endpoint, path), {
     body: data && JSON.stringify(data),
     headers: defaultHeaders(context),
     method

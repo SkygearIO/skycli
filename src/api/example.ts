@@ -14,8 +14,12 @@ export async function downloadExample(
   context: CLIContext,
   exampleName: string
 ) {
+  const endpoint = context.cluster && context.cluster.endpoint;
+  if (!endpoint) {
+    return Promise.reject(new Error('no endpoint'));
+  }
   const dlURL = url.resolve(
-    context.cluster.endpoint,
+    endpoint,
     `/_controller/example/download/${exampleName}.tar.gz`
   );
   return fetch(dlURL).then((resp) => {
