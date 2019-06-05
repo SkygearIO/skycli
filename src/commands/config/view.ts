@@ -17,7 +17,7 @@ function run(argv: Arguments) {
   }) as VerticalTable;
 
   table.push(
-    createVerticalTableRow('Cluster Type', cluster.env),
+    createVerticalTableRow('Cluster Type', cluster.env || ''),
     createVerticalTableRow('Cluster Endpoint', cluster.endpoint),
     createVerticalTableRow('Cluster API Key', cluster.apiKey),
     createVerticalTableRow('Account', user.loginIDs && user.loginIDs.email)
