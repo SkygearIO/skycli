@@ -3,13 +3,6 @@ export interface Checksum {
   md5: string;
 }
 
-export interface CreateArtifactUploadResponse {
-  uploadRequest: PresignedRequest;
-  artifactRequest: string;
-}
-
-export type CreateArtifactUploadsResponse = CreateArtifactUploadResponse[];
-
 export interface PresignedRequest {
   method: string;
   url: string;
@@ -17,11 +10,18 @@ export interface PresignedRequest {
   headers: string[];
 }
 
+export interface CreateArtifactUploadResponse {
+  uploadRequest: PresignedRequest;
+  artifactRequest: string;
+}
+
+export type CreateArtifactUploadsResponse = CreateArtifactUploadResponse[];
+
 export function createArtifactUploadsResponseFromJSON(
   // tslint:disable-next-line: no-any
   input: any
 ): CreateArtifactUploadsResponse {
-  return input.upload_requests.map((r) => {
+  return input.upload_requests.map((r: any) => {
     return {
       artifactRequest: r.artifact_request,
       uploadRequest: {
