@@ -48,7 +48,10 @@ function migrate(configObject: Dictionary<any>) {
   return migrated;
 }
 
-function findConfig(domain: ConfigDomain, exists: boolean = true) {
+function findConfig(
+  domain: ConfigDomain,
+  exists: boolean = true
+): string | undefined {
   const configPath = untildify(configPaths[domain]);
   const absolute = path.isAbsolute(configPath);
 
@@ -91,11 +94,15 @@ export function save(
   let configPath = findConfig(domain);
   if (!configPath) {
     configPath = findConfig(domain, false);
-    fs.ensureDirSync(path.dirname(configPath));
+    if (!!configPath) {
+      fs.ensureDirSync(path.dirname(configPath));
+    }
   }
 
   const content = yaml.safeDump(configObject);
-  fs.writeFileSync(configPath, content);
+  if (!!configPath) {
+    fs.writeFileSync(configPath, content);
+  }
 }
 
 export function set(
