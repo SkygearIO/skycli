@@ -17,10 +17,9 @@ install:
   - npm audit
 
 script:
-  - npm test
-  - npm run tsc
-  - npm run tslint -- -c tslint.ideal.json 'src/**/*.ts' 'test/**/*.ts'
   - npm run prettier-check
+  - npm run typecheck
+  - npm test
 
 before_deploy:
   - npm run build-bin
