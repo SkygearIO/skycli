@@ -224,6 +224,7 @@ async function run(argv: Arguments) {
       const name = itemNames[i];
       const deployment = deploymentMap[name];
       const archivePath = createArchivePath(i);
+      // eslint-disable-next-line no-await-in-loop
       const checksum = await archiveCloudCode(name, deployment, archivePath);
       checksums.push(checksum);
     }
@@ -240,6 +241,7 @@ async function run(argv: Arguments) {
       const checksum = checksums[i];
       const upload = uploads[i];
       const stream = createArchiveReadStream(createArchivePath(i));
+      // eslint-disable-next-line no-await-in-loop
       await controller.uploadArtifact(
         upload.uploadRequest,
         checksum.md5,
