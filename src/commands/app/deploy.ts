@@ -1,4 +1,3 @@
-import globby from '@skygeario/globby';
 import chalk from 'chalk';
 import crypto from 'crypto';
 import fs from 'fs';
@@ -19,6 +18,7 @@ import {
 } from '../../types';
 import { Arguments, createCommand } from '../../util';
 import requireUser from '../middleware/requireUser';
+import { skyignore } from '../../ignore';
 
 function createArchivePath(index: number) {
   return path.join(os.tmpdir(), `skygear-src-${index}.tgz`);
@@ -29,26 +29,16 @@ function createArchiveReadStream(archivePath: string) {
 }
 
 function archiveSrc(srcPath: string, archivePath: string) {
-  return globby(srcPath, {
-    dot: true,
-    gitignore: true,
-    gitignoreName: '.skyignore'
-  })
-    .then((paths: string[]) => {
-      // globby returns path relative to the current dir
-      // transform the path relative to srcPath for archive
-      return paths.map((p) => path.relative(srcPath, p));
-    })
-    .then((paths: string[]) => {
-      const opt = {
-        cwd: srcPath,
-        file: archivePath,
-        gzip: true,
-        // set portable to true, so the archive is the same for same content
-        portable: true
-      };
-      return tar.c(opt, paths);
-    });
+  return skyignore(srcPath).then((paths: string[]) => {
+    const opt = {
+      cwd: srcPath,
+      file: archivePath,
+      gzip: true,
+      // set portable to true, so the archive is the same for same content
+      portable: true
+    };
+    return tar.c(opt, paths);
+  });
 }
 
 function getChecksum(archivePath: string): Promise<Checksum> {
