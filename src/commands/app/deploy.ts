@@ -7,14 +7,15 @@ import os from 'os';
 import path from 'path';
 import tar from 'tar';
 
-import { controller } from '../../api';
+import { controller, ErrorName } from '../../api';
 import {
   App,
   Checksum,
   CLIContext,
   DeploymentItemConfig,
   DeploymentItemsResponse,
-  DeploymentStatus
+  DeploymentStatus,
+  LogEntry
 } from '../../types';
 import { Arguments, createCommand } from '../../util';
 import requireUser from '../middleware/requireUser';
@@ -91,7 +92,6 @@ async function archiveCloudCode(
 }
 
 function waitForDeploymentStatus(context: CLIContext, cloudCodeID: string) {
-  console.log(chalk`Wait for deployment: {green ${cloudCodeID}}`);
   return new Promise((resolve, reject) =>
     waitForDeploymentStatusImpl(context, cloudCodeID, resolve, reject)
   );
@@ -179,33 +179,48 @@ async function confirmIfItemsWillBeRemovedInNewDeployment(
   }
 }
 
-/* Log deployment log
 function downloadDeployLog(
   context: CLIContext,
-  cloudCodeID: string
+  deploymentID: string,
+  onLogReceive: (log: LogEntry) => void
 ): Promise<Response> {
-  return new Promise((resolve) =>
-    downloadDeployLogImpl(context, cloudCodeID, resolve)
+  return new Promise((resolve, reject) =>
+    downloadDeployLogImpl(context, deploymentID, onLogReceive, resolve, reject)
   );
 }
 
 function downloadDeployLogImpl(
   context: CLIContext,
-  cloudCodeID: string,
+  deploymentID: string,
+  onLogReceive: (log: LogEntry) => void,
   // tslint:disable-next-line:no-any
-  resolve: any
+  resolve: any,
+  // tslint:disable-next-line:no-any
+  reject: any
 ) {
   controller
-    .downloadDeployLog(context, cloudCodeID)
+    .downloadDeployLog(context, deploymentID, onLogReceive)
     .then(resolve)
-    .catch(() => {
-      setTimeout(() => {
-        console.log(`Failed to download deploy log, will retry later`);
-        downloadDeployLogImpl(context, cloudCodeID, resolve);
-      }, 3000);
+    .catch((err) => {
+      // retry when the log is not found, wait for the deployment start
+      if (err.name === ErrorName.NotFound) {
+        if (context.debug) {
+          console.log(`Failed to download deploy log, will retry later`);
+        }
+        setTimeout(() => {
+          downloadDeployLogImpl(
+            context,
+            deploymentID,
+            onLogReceive,
+            resolve,
+            reject
+          );
+        }, 3000);
+      } else {
+        reject(err);
+      }
     });
 }
-*/
 
 async function run(argv: Arguments) {
   const deploymentMap = argv.appConfig.deployments || {};
@@ -270,6 +285,13 @@ async function run(argv: Arguments) {
       artifactIDMap
     );
 
+    console.log(chalk`Wait for deployment: {green ${deploymentID}}`);
+    await downloadDeployLog(argv.context, deploymentID, (log) => {
+      if (log.message) {
+        console.log(log.message);
+      }
+    });
+
     // wait for deployment status
     const deploymentStatus = await waitForDeploymentStatus(
       argv.context,
@@ -281,20 +303,6 @@ async function run(argv: Arguments) {
       return;
     }
     throw new Error('Deployment failed');
-
-    /* Load deployment log
-    console.log(chalk`Downloading deploy log`);
-    const logResp = await downloadDeployLog(argv.context, cloudCodeID);
-    console.log(chalk`Deploy log:`);
-    await new Promise((resolve, reject) => {
-      logResp.body
-        .on('data', (data) => {
-          console.log(data.toString('utf-8'));
-        })
-        .on('error', reject)
-        .on('finish', resolve);
-    });
-    */
   } catch (error) {
     if (error.message === 'cancelled') {
       return;
