@@ -10,6 +10,12 @@ export async function downloadDeployLog(
   cur: number = 0
 ): Promise<void> {
   const resp = await sendDownloadLogRequest(context, deploymentID, cur);
+  if (resp.status === 416) {
+    if (context.debug) {
+      console.log('Reached the end of the log...');
+    }
+    return;
+  }
   const result: { needReconnect: boolean; nextCur: number } = await new Promise(
     (resolve, reject) => {
       let count = 0;
@@ -72,7 +78,11 @@ export async function sendDownloadLogRequest(
     },
     method: 'POST'
   }).then((response) => {
-    if (response.status !== 200 && response.status !== 206) {
+    if (
+      response.status !== 200 &&
+      response.status !== 206 &&
+      response.status !== 416
+    ) {
       return handleFailureResponse(response);
     }
 
