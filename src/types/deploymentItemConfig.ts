@@ -1,5 +1,3 @@
-type CloudCodeHook = CloudCodeHookConfig;
-
 interface CloudCodeHookConfig {
   event: string;
   async: boolean;
@@ -7,7 +5,17 @@ interface CloudCodeHookConfig {
   path: string;
 }
 
-function createCloudCodeHookRequestPayload(hook?: CloudCodeHook) {
+export interface DeploymentItemConfig {
+  type: string;
+  path?: string;
+  hook?: CloudCodeHookConfig;
+  env: string;
+  entry: string;
+  src: string;
+  secrets: string[];
+}
+
+function createCloudCodeHookRequestPayload(hook?: CloudCodeHookConfig) {
   if (hook == null) {
     return undefined;
   }
@@ -18,16 +26,6 @@ function createCloudCodeHookRequestPayload(hook?: CloudCodeHook) {
     path: hook.path || '',
     timeout: hook.timeout
   };
-}
-
-export interface DeploymentItemConfig {
-  type: string;
-  path?: string;
-  hook?: CloudCodeHook;
-  env: string;
-  entry: string;
-  src: string;
-  secrets: string[];
 }
 
 export function createDeploymentItemRequestPayloadFromConfig(
