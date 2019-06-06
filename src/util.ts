@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 import chalk from 'chalk';
-import _ from 'lodash';
 import moment from 'moment';
 import { Arguments as YargsArguments, Argv } from 'yargs';
 import { AppConfig, CLIContext, GlobalConfig } from './types';
@@ -44,7 +43,7 @@ export interface CommandModule {
 export function createCommand(
   module: Pick<CommandModule, Exclude<keyof CommandModule, 'execute'>>
 ) {
-  return _.assign({}, module, {
+  return Object.assign({}, module, {
     execute: module.handler,
     handler: (argv: Arguments) => {
       const p = module.handler(argv);
