@@ -4,13 +4,13 @@ deployments:
   hello:
     type: http-handler
     path: /hello
-    env: nodejs
+    runtime_environment: nodejs
     entry: hello
     src: js
   fetch_blogs:
     type: http-handler
     path: /fetch_blogs
-    env: nodejs
+    runtime_environment: nodejs
     entry: fetch_blogs
     src: js
     secrets:
@@ -18,7 +18,7 @@ deployments:
   write_blog:
     type: http-handler
     path: /write_blog
-    env: nodejs
+    runtime_environment: nodejs
     entry: write_blog
     src: js
     secrets:
@@ -30,7 +30,7 @@ deployments:
       event: after_signup
       async: true
       timeout: 65
-    env: nodejs
+    runtime_environment: nodejs
     entry: after_signup
     src: js
     secrets:

@@ -9,7 +9,7 @@ export interface DeploymentItemConfig {
   type: string;
   path?: string;
   hook?: CloudCodeHookConfig;
-  env: string;
+  runtime_environment: string;
   entry: string;
   src: string;
   secrets: string[];
@@ -34,7 +34,7 @@ export function createDeploymentItemRequestPayloadFromConfig(
   return {
     config: {},
     entry: deployment.entry,
-    env: deployment.env,
+    runtime_environment: deployment.runtime_environment,
     hook: createCloudCodeHookRequestPayload(deployment.hook),
     path: deployment.path,
     secrets: deployment.secrets,

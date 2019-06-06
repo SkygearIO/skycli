@@ -69,7 +69,7 @@ cf:
   function1:
     type: http-handler
     path: /hello-world
-    env: node
+    runtime_environment: node
     src: hello-world
 $ cat hello-world/index.js
 module.exports = async function (context) {
@@ -108,7 +108,7 @@ after_signup:
         event: after_signup
         async: true
         timeout: 65
-    env: nodejs
+    runtime_environment: nodejs
     entry: after_signup
     src: js
     secrets:
@@ -143,7 +143,7 @@ $ curl http://localhost:8080
 write_blog:
     type: http-handler
     path: /write_blog
-    env: nodejs
+    runtime_environment: nodejs
     entry: write_blog
     src: js
     secrets:
@@ -160,7 +160,7 @@ write_blog:
 fetch_blogs:
     type: http-handler
     path: /fetch_blogs
-    env: nodejs
+    runtime_environment: nodejs
     entry: fetch_blogs
     src: js
     secrets:
