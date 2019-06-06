@@ -15,7 +15,9 @@
  */
 import fs from 'fs-extra';
 import * as yaml from 'js-yaml';
-import _, { Dictionary, PropertyPath } from 'lodash';
+import { Dictionary, PropertyPath } from 'lodash';
+import _get from 'lodash/get';
+import _set from 'lodash/set';
 import * as os from 'os';
 import path from 'path';
 import untildify from 'untildify';
@@ -37,7 +39,7 @@ const configPaths: { [domain: string]: string } = {
 
 // tslint:disable-next-line:no-any
 function migrate(configObject: Dictionary<any>) {
-  const migrated = _.assign({}, configObject);
+  const migrated = Object.assign({}, configObject);
   if (typeof migrated.version === 'undefined') {
     migrated.version = currentConfigVersion;
   }
@@ -113,9 +115,9 @@ export function set(
   domain: ConfigDomain = ConfigDomain.GlobalDomain
 ) {
   const configObject = load(domain);
-  const oldValue = _.get(configObject, name);
+  const oldValue = _get(configObject, name);
   if (value !== oldValue) {
-    _.set(configObject, name, value);
+    _set(configObject, name, value);
     save(configObject, domain);
   }
 }
