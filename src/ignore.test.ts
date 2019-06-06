@@ -1,4 +1,4 @@
-import { walk, skyignore } from './ignore';
+import { walk, skyignore, dockerignore } from './ignore';
 
 test('walk', async () => {
   const paths = await walk('fixture/walk');
@@ -15,5 +15,12 @@ test('skyignore', async () => {
     'included-directory/included-file',
     'included-file'
   ];
+  expect(expected).toEqual(paths);
+});
+
+test('dockerignore', async () => {
+  const paths = await dockerignore('fixture/dockerignore');
+  paths.sort();
+  const expected = ['.dockerignore', 'src/main.go'];
   expect(expected).toEqual(paths);
 });
