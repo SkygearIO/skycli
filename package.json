@@ -7,7 +7,7 @@
     "skycli": "./bin/skycli.js"
   },
   "scripts": {
-    "test": "true",
+    "test": "jest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint 'src/**/*.ts'",
     "prettier": "prettier --write 'src/**/*.ts'",
@@ -58,6 +58,7 @@
     "@types/core-js": "^0.9.46",
     "@types/fs-extra": "^5.0.5",
     "@types/inquirer": "0.0.36",
+    "@types/jest": "^24.0.13",
     "@types/js-yaml": "^3.12.1",
     "@types/lodash": "^4.14.92",
     "@types/moment": "^2.13.0",
@@ -80,6 +81,7 @@
     "gulp": "^4.0.0",
     "gulp-babel": "^8.0.0",
     "gulp-exclude-gitignore": "^1.2.0",
+    "jest": "^24.8.0",
     "pkg": "^4.3.7",
     "prettier": "^1.16.4",
     "require-dir": "^0.3.2",
@@ -87,6 +89,9 @@
   },
   "resolutions": {
     "natives": "1.1.3"
+  },
+  "jest": {
+    "setupFiles": ["<rootDir>/src/setupJest.js"]
   },
   "pkg": {
     "assets": [
