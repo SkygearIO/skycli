@@ -11,6 +11,7 @@ import {
   App,
   Checksum,
   CLIContext,
+  HttpServiceConfig,
   DeploymentItemConfig,
   DeploymentItemsResponse,
   DeploymentStatus,
@@ -53,13 +54,28 @@ function archiveCloudCodeSrc(srcPath: string, archivePath: string) {
   });
 }
 
-function archiveMicroserviceSrc(context: string, archivePath: string) {
-  return dockerignore(context).then((paths: string[]) => {
-    return tarCreate({
-      cwd: context,
-      file: archivePath,
-      paths
-    });
+async function archiveMicroserviceSrc(
+  config: HttpServiceConfig,
+  archivePath: string
+) {
+  const paths = await dockerignore(config.context);
+  // Verify dockerfile exist
+  const dockerfile: string = config.dockerfile || 'Dockerfile';
+  // path.join("./a/b") === "a/b";
+  // We need to ensure the path is implicit
+  // because the value in paths are all implicit
+  // A path is implicit is it is relative and does not start with "./"
+  const dockerfilePath = path.join(dockerfile);
+  if (paths.indexOf(dockerfilePath) < 0) {
+    throw new Error(
+      'expected dockerfile to exists: ' +
+        path.join(config.context, dockerfilePath)
+    );
+  }
+  return tarCreate({
+    cwd: config.context,
+    file: archivePath,
+    paths
   });
 }
 
@@ -101,7 +117,7 @@ async function archiveDeploymentItem(
       await archiveCloudCodeSrc(deployment.src, archivePath);
       break;
     case 'http-service':
-      await archiveMicroserviceSrc(deployment.context, archivePath);
+      await archiveMicroserviceSrc(deployment, archivePath);
       break;
     default:
       throw new Error('unexpected type');
