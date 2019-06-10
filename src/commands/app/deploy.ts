@@ -18,7 +18,7 @@ import {
 } from '../../types';
 import { Arguments, createCommand } from '../../util';
 import requireUser from '../middleware/requireUser';
-import { skyignore } from '../../ignore';
+import { skyignore, dockerignore } from '../../ignore';
 
 function createArchivePath(index: number) {
   return path.join(os.tmpdir(), `skygear-src-${index}.tgz`);
@@ -28,16 +28,38 @@ function createArchiveReadStream(archivePath: string) {
   return fs.createReadStream(archivePath);
 }
 
+async function tarCreate(options: {
+  cwd: string;
+  file: string;
+  paths: string[];
+}): Promise<void> {
+  const opt = {
+    cwd: options.cwd,
+    file: options.file,
+    gzip: true,
+    // set portable to true, so the archive is the same for same content
+    portable: true
+  };
+  await tar.create(opt, options.paths);
+}
+
 function archiveCloudCodeSrc(srcPath: string, archivePath: string) {
   return skyignore(srcPath).then((paths: string[]) => {
-    const opt = {
+    return tarCreate({
       cwd: srcPath,
       file: archivePath,
-      gzip: true,
-      // set portable to true, so the archive is the same for same content
-      portable: true
-    };
-    return tar.c(opt, paths);
+      paths
+    });
+  });
+}
+
+function archiveMicroserviceSrc(context: string, archivePath: string) {
+  return dockerignore(context).then((paths: string[]) => {
+    return tarCreate({
+      cwd: context,
+      file: archivePath,
+      paths
+    });
   });
 }
 
@@ -79,8 +101,8 @@ async function archiveDeploymentItem(
       await archiveCloudCodeSrc(deployment.src, archivePath);
       break;
     case 'http-service':
-      // TODO: archive microservice
-      throw new Error('TODO');
+      await archiveMicroserviceSrc(deployment.context, archivePath);
+      break;
     default:
       throw new Error('unexpected type');
   }
