@@ -41,7 +41,6 @@ export interface DeploymentItemConfigPayload {
   type: DeploymentItemType;
   path: string;
   secrets: string[];
-  config: {};
   // http-handler
   entry?: string;
   hook?: HookConfigPayload;
@@ -75,9 +74,7 @@ export function createDeploymentItemRequestPayloadFromConfig(
   const payload: DeploymentItemConfigPayload = {
     type: deployment.type,
     path: deployment.path,
-    secrets: deployment.secrets,
-    // TODO: Remove this empty object
-    config: {}
+    secrets: deployment.secrets
   };
   switch (deployment.type) {
     case 'http-handler':
