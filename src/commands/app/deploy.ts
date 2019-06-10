@@ -28,7 +28,7 @@ function createArchiveReadStream(archivePath: string) {
   return fs.createReadStream(archivePath);
 }
 
-function archiveSrc(srcPath: string, archivePath: string) {
+function archiveCloudCodeSrc(srcPath: string, archivePath: string) {
   return skyignore(srcPath).then((paths: string[]) => {
     const opt = {
       cwd: srcPath,
@@ -68,13 +68,22 @@ function getChecksum(archivePath: string): Promise<Checksum> {
   });
 }
 
-async function archiveCloudCode(
+async function archiveDeploymentItem(
   name: string,
-  cloudCode: DeploymentItemConfig,
+  deployment: DeploymentItemConfig,
   archivePath: string
 ): Promise<Checksum> {
   console.log(chalk`Archiving cloud code: {green ${name}}`);
-  await archiveSrc(cloudCode.src, archivePath);
+  switch (deployment.type) {
+    case 'http-handler':
+      await archiveCloudCodeSrc(deployment.src, archivePath);
+      break;
+    case 'http-service':
+      // TODO: archive microservice
+      throw new Error('TODO');
+    default:
+      throw new Error('unexpected type');
+  }
   const checksum = await getChecksum(archivePath);
   console.log(`Archive checksum md5: ${checksum.md5}`);
   console.log(`Archive checksum sha256: ${checksum.sha256}`);
@@ -231,7 +240,11 @@ async function run(argv: Arguments) {
       const deployment = deploymentMap[name];
       const archivePath = createArchivePath(i);
       // eslint-disable-next-line no-await-in-loop
-      const checksum = await archiveCloudCode(name, deployment, archivePath);
+      const checksum = await archiveDeploymentItem(
+        name,
+        deployment,
+        archivePath
+      );
       checksums.push(checksum);
     }
 
