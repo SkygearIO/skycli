@@ -29,6 +29,10 @@ export interface HookConfig {
 
 export type DeploymentItemConfig = HttpHandlerConfig | HttpServiceConfig;
 
+export interface Deployments {
+  [name: string]: DeploymentItemConfig;
+}
+
 export interface HookConfigPayload {
   event: string;
   async: boolean;

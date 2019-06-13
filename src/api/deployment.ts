@@ -1,12 +1,11 @@
 import {
   CLIContext,
-  cloudCodeFromJSON,
   createDeploymentItemRequestPayloadFromConfig,
   createHookRequestPayload,
   Deployment,
+  Deployments,
   deploymentFromJSON,
   DeploymentItemConfig,
-  DeploymentItemsResponse,
   HookConfig
 } from '../types';
 import { callAPI } from './skygear';
@@ -57,15 +56,12 @@ export async function getDeployment(
 export async function getDeploymentItems(
   context: CLIContext,
   deploymentID: string
-): Promise<DeploymentItemsResponse> {
+): Promise<{ deployments: Deployments }> {
   return callAPI(
     context,
     `/_controller/deployment/${deploymentID}/items`,
     'GET'
   ).then((payload) => {
-    const cloudCodesJSON = payload.result.cloud_codes;
-    return {
-      cloudCodes: cloudCodesJSON.map(cloudCodeFromJSON)
-    };
+    return payload.result;
   });
 }

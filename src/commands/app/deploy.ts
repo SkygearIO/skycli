@@ -12,8 +12,8 @@ import {
   Checksum,
   CLIContext,
   HttpServiceConfig,
+  Deployments,
   DeploymentItemConfig,
-  DeploymentItemsResponse,
   DeploymentStatus,
   LogEntry
 } from '../../types';
@@ -169,7 +169,7 @@ function waitForDeploymentStatusImpl(
 
 async function confirmIfItemsWillBeRemovedInNewDeployment(
   context: CLIContext,
-  newItems: string[]
+  deployments: Deployments
 ) {
   const appName = context.app;
   if (!appName) {
@@ -183,20 +183,22 @@ async function confirmIfItemsWillBeRemovedInNewDeployment(
   }
 
   // get deployment items and show prompt if needed
-  const deploymentItemsResp: DeploymentItemsResponse = await controller.getDeploymentItems(
-    context,
-    app.lastDeploymentID
-  );
+  const {
+    deployments: existingDeployments
+  } = await controller.getDeploymentItems(context, app.lastDeploymentID);
 
-  const itemsWillBeRemoved: string[] = deploymentItemsResp.cloudCodes.reduce(
-    (acc: string[], oldItem) => {
-      if (newItems.indexOf(oldItem.name) === -1) {
-        acc.push(oldItem.name);
-      }
-      return acc;
-    },
-    []
-  );
+  const itemsWillBeRemoved: string[] = [];
+  for (const itemName of Object.keys(existingDeployments)) {
+    // item is considered removed if
+    // itemName is found in existing deployment but not found in new deployment
+    // or
+    // itemName is found in both deployment but the types differ.
+    const existingItem = existingDeployments[itemName];
+    const newItem = deployments[itemName];
+    if (!newItem || existingItem.type !== newItem.type) {
+      itemsWillBeRemoved.push(itemName);
+    }
+  }
 
   if (itemsWillBeRemoved.length) {
     const applyItemColor = (str: string) => chalk.green(str);
@@ -268,7 +270,10 @@ async function run(argv: Arguments) {
   const hooks = argv.appConfig.hooks || [];
   try {
     const itemNames: string[] = Object.keys(deploymentMap);
-    await confirmIfItemsWillBeRemovedInNewDeployment(argv.context, itemNames);
+    await confirmIfItemsWillBeRemovedInNewDeployment(
+      argv.context,
+      deploymentMap
+    );
 
     const checksums: Checksum[] = [];
 
