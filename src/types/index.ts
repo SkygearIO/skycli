@@ -2,7 +2,6 @@ export * from './app';
 export * from './appConfig';
 export * from './artifact';
 export * from './cliContext';
-export * from './cloudCode';
 export * from './clusterConfig';
 export * from './deployment';
 export * from './deploymentItemConfig';
