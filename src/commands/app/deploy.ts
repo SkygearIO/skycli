@@ -218,6 +218,7 @@ async function run(argv: Arguments) {
     throw new Error('No deployment items to be deployed.');
   }
 
+  const hooks = argv.appConfig.hooks || [];
   try {
     const itemNames: string[] = Object.keys(deploymentMap);
     await confirmIfItemsWillBeRemovedInNewDeployment(argv.context, itemNames);
@@ -272,7 +273,8 @@ async function run(argv: Arguments) {
     const deploymentID = await controller.createDeployment(
       argv.context,
       deploymentMap,
-      artifactIDMap
+      artifactIDMap,
+      hooks
     );
 
     console.log(chalk`Wait for deployment: {green ${deploymentID}}`);

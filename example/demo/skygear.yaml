@@ -26,12 +26,14 @@ deployments:
   after_signup:
     type: http-handler
     path: /after_signup
-    hook:
-      event: after_signup
-      async: true
-      timeout: 65
     runtime_environment: nodejs
     entry: after_signup
     src: js
     secrets:
       - MONGO_DB_URL
+
+hooks:
+  - path: /after_signup
+    async: true
+    timeout: 65
+    event: after_signup
