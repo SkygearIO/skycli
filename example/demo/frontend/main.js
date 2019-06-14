@@ -4,11 +4,11 @@ skygear.config({
 });
 
 function goToIndex() {
-  window.location.href = "/";
+  window.location.href = '/';
 }
 
 function goToWriteBlogs() {
-  window.location.href = "/write.html";
+  window.location.href = '/write.html';
 }
 
 function setSignupErrorMsg(msg) {
@@ -16,27 +16,42 @@ function setSignupErrorMsg(msg) {
 }
 
 function signup(email, password, data) {
-  skygear.auth.signup({
-    email: email
-  }, password, data)
-  .then(function(user) {
-    goToWriteBlogs();
-  }, function(err) {
-    stopLoading();
-    setSignupErrorMsg(err);
-  });
+  skygear.auth
+    .signup(
+      {
+        email: email
+      },
+      password,
+      data
+    )
+    .then(
+      function(user) {
+        goToWriteBlogs();
+      },
+      function(err) {
+        stopLoading();
+        setSignupErrorMsg(err);
+      }
+    );
 }
 
 function login(email, password) {
-  skygear.auth.login({
-    email: email
-  }, password)
-  .then(function(user) {
-    goToWriteBlogs();
-  }, function(err) {
-    stopLoading();
-    setSignupErrorMsg(err);
-  });
+  skygear.auth
+    .login(
+      {
+        email: email
+      },
+      password
+    )
+    .then(
+      function(user) {
+        goToWriteBlogs();
+      },
+      function(err) {
+        stopLoading();
+        setSignupErrorMsg(err);
+      }
+    );
 }
 
 $('#signup-btn').click(function() {
@@ -62,12 +77,12 @@ $('#logout-btn').click(function() {
 });
 
 $('#write-blog-btn').click(function() {
-  var title = $('#blogTitleInput').val()
+  var title = $('#blogTitleInput').val();
   var content = $('#blogContentTextArea').val();
   var data = {
     userID: skygear.auth.currentUser.userID,
     title,
-    content,
+    content
   };
 
   startLoading();
@@ -80,17 +95,18 @@ $('#write-blog-btn').click(function() {
 });
 
 function fetchBlogs() {
-  skygear.lambda('fetch_blogs', { }).then(function(results) {
+  skygear.lambda('fetch_blogs', {}).then(function(results) {
     let output = '';
     if (results) {
-      results.forEach(r => {
-        output += `<div><p>title: ${r.title}</p><p>content: ${r.content}</p><hr/></div>`;
-      })
+      results.forEach((r) => {
+        output += `<div><p>title: ${r.title}</p><p>content: ${
+          r.content
+        }</p><hr/></div>`;
+      });
     }
     stopLoading();
     $('#demos-section').append(output);
   });
-
 }
 
 function startLoading() {
