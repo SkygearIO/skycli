@@ -1,5 +1,3 @@
-import { CloudCode } from '../types/cloudCode';
-
 export enum DeploymentStatus {
   Pending = 'Pending',
   Running = 'Running',
@@ -20,8 +18,4 @@ export function deploymentFromJSON(input: any): Deployment {
     id: input.id,
     status: input.status
   };
-}
-
-export interface DeploymentItemsResponse {
-  cloudCodes: CloudCode[];
 }

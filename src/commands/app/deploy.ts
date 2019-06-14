@@ -11,14 +11,15 @@ import {
   App,
   Checksum,
   CLIContext,
+  HttpServiceConfig,
+  Deployments,
   DeploymentItemConfig,
-  DeploymentItemsResponse,
   DeploymentStatus,
   LogEntry
 } from '../../types';
 import { Arguments, createCommand } from '../../util';
 import requireUser from '../middleware/requireUser';
-import { skyignore } from '../../ignore';
+import { skyignore, dockerignore } from '../../ignore';
 
 function createArchivePath(index: number) {
   return path.join(os.tmpdir(), `skygear-src-${index}.tgz`);
@@ -28,16 +29,53 @@ function createArchiveReadStream(archivePath: string) {
   return fs.createReadStream(archivePath);
 }
 
-function archiveSrc(srcPath: string, archivePath: string) {
+async function tarCreate(options: {
+  cwd: string;
+  file: string;
+  paths: string[];
+}): Promise<void> {
+  const opt = {
+    cwd: options.cwd,
+    file: options.file,
+    gzip: true,
+    // set portable to true, so the archive is the same for same content
+    portable: true
+  };
+  await tar.create(opt, options.paths);
+}
+
+function archiveCloudCodeSrc(srcPath: string, archivePath: string) {
   return skyignore(srcPath).then((paths: string[]) => {
-    const opt = {
+    return tarCreate({
       cwd: srcPath,
       file: archivePath,
-      gzip: true,
-      // set portable to true, so the archive is the same for same content
-      portable: true
-    };
-    return tar.c(opt, paths);
+      paths
+    });
+  });
+}
+
+async function archiveMicroserviceSrc(
+  config: HttpServiceConfig,
+  archivePath: string
+) {
+  const paths = await dockerignore(config.context);
+  // Verify dockerfile exist
+  const dockerfile: string = config.dockerfile || 'Dockerfile';
+  // path.join("./a/b") === "a/b";
+  // We need to ensure the path is implicit
+  // because the value in paths are all implicit
+  // A path is implicit is it is relative and does not start with "./"
+  const dockerfilePath = path.join(dockerfile);
+  if (paths.indexOf(dockerfilePath) < 0) {
+    throw new Error(
+      'expected dockerfile to exists: ' +
+        path.join(config.context, dockerfilePath)
+    );
+  }
+  return tarCreate({
+    cwd: config.context,
+    file: archivePath,
+    paths
   });
 }
 
@@ -68,13 +106,22 @@ function getChecksum(archivePath: string): Promise<Checksum> {
   });
 }
 
-async function archiveCloudCode(
+async function archiveDeploymentItem(
   name: string,
-  cloudCode: DeploymentItemConfig,
+  deployment: DeploymentItemConfig,
   archivePath: string
 ): Promise<Checksum> {
   console.log(chalk`Archiving cloud code: {green ${name}}`);
-  await archiveSrc(cloudCode.src, archivePath);
+  switch (deployment.type) {
+    case 'http-handler':
+      await archiveCloudCodeSrc(deployment.src, archivePath);
+      break;
+    case 'http-service':
+      await archiveMicroserviceSrc(deployment, archivePath);
+      break;
+    default:
+      throw new Error('unexpected type');
+  }
   const checksum = await getChecksum(archivePath);
   console.log(`Archive checksum md5: ${checksum.md5}`);
   console.log(`Archive checksum sha256: ${checksum.sha256}`);
@@ -122,7 +169,7 @@ function waitForDeploymentStatusImpl(
 
 async function confirmIfItemsWillBeRemovedInNewDeployment(
   context: CLIContext,
-  newItems: string[]
+  deployments: Deployments
 ) {
   const appName = context.app;
   if (!appName) {
@@ -136,20 +183,22 @@ async function confirmIfItemsWillBeRemovedInNewDeployment(
   }
 
   // get deployment items and show prompt if needed
-  const deploymentItemsResp: DeploymentItemsResponse = await controller.getDeploymentItems(
-    context,
-    app.lastDeploymentID
-  );
+  const {
+    deployments: existingDeployments
+  } = await controller.getDeploymentItems(context, app.lastDeploymentID);
 
-  const itemsWillBeRemoved: string[] = deploymentItemsResp.cloudCodes.reduce(
-    (acc: string[], oldItem) => {
-      if (newItems.indexOf(oldItem.name) === -1) {
-        acc.push(oldItem.name);
-      }
-      return acc;
-    },
-    []
-  );
+  const itemsWillBeRemoved: string[] = [];
+  for (const itemName of Object.keys(existingDeployments)) {
+    // item is considered removed if
+    // itemName is found in existing deployment but not found in new deployment
+    // or
+    // itemName is found in both deployment but the types differ.
+    const existingItem = existingDeployments[itemName];
+    const newItem = deployments[itemName];
+    if (!newItem || existingItem.type !== newItem.type) {
+      itemsWillBeRemoved.push(itemName);
+    }
+  }
 
   if (itemsWillBeRemoved.length) {
     const applyItemColor = (str: string) => chalk.green(str);
@@ -221,7 +270,10 @@ async function run(argv: Arguments) {
   const hooks = argv.appConfig.hooks || [];
   try {
     const itemNames: string[] = Object.keys(deploymentMap);
-    await confirmIfItemsWillBeRemovedInNewDeployment(argv.context, itemNames);
+    await confirmIfItemsWillBeRemovedInNewDeployment(
+      argv.context,
+      deploymentMap
+    );
 
     const checksums: Checksum[] = [];
 
@@ -231,7 +283,11 @@ async function run(argv: Arguments) {
       const deployment = deploymentMap[name];
       const archivePath = createArchivePath(i);
       // eslint-disable-next-line no-await-in-loop
-      const checksum = await archiveCloudCode(name, deployment, archivePath);
+      const checksum = await archiveDeploymentItem(
+        name,
+        deployment,
+        archivePath
+      );
       checksums.push(checksum);
     }
 
