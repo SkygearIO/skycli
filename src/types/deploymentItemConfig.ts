@@ -1,4 +1,4 @@
-interface CloudCodeHookConfig {
+export interface HookConfig {
   event: string;
   async: boolean;
   timeout: number;
@@ -8,14 +8,14 @@ interface CloudCodeHookConfig {
 export interface DeploymentItemConfig {
   type: string;
   path?: string;
-  hook?: CloudCodeHookConfig;
+  hook?: HookConfig;
   runtime_environment: string;
   entry: string;
   src: string;
   secrets: string[];
 }
 
-function createCloudCodeHookRequestPayload(hook?: CloudCodeHookConfig) {
+export function createHookRequestPayload(hook?: HookConfig) {
   if (hook == null) {
     return undefined;
   }
@@ -35,7 +35,7 @@ export function createDeploymentItemRequestPayloadFromConfig(
     config: {},
     entry: deployment.entry,
     runtime_environment: deployment.runtime_environment,
-    hook: createCloudCodeHookRequestPayload(deployment.hook),
+    hook: createHookRequestPayload(deployment.hook),
     path: deployment.path,
     secrets: deployment.secrets,
     type: deployment.type

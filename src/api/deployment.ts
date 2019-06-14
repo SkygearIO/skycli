@@ -2,17 +2,20 @@ import {
   CLIContext,
   cloudCodeFromJSON,
   createDeploymentItemRequestPayloadFromConfig,
+  createHookRequestPayload,
   Deployment,
   deploymentFromJSON,
   DeploymentItemConfig,
-  DeploymentItemsResponse
+  DeploymentItemsResponse,
+  HookConfig
 } from '../types';
 import { callAPI } from './skygear';
 
 export async function createDeployment(
   context: CLIContext,
   deployments: { [name: string]: DeploymentItemConfig },
-  artifactIDs: { [name: string]: string }
+  artifactIDs: { [name: string]: string },
+  hooks: HookConfig[]
 ): Promise<string> {
   const deploymentsRequestPayload: {
     [key: string]: ReturnType<
@@ -24,10 +27,14 @@ export async function createDeployment(
       key
     ] = createDeploymentItemRequestPayloadFromConfig(deployments[key]);
   });
+  const hooksRequestPayload = hooks.map((h) => {
+    return createHookRequestPayload(h);
+  });
   return callAPI(context, '/_controller/deployment', 'POST', {
     app_name: context.app,
     artifact_ids: artifactIDs,
     deployments: deploymentsRequestPayload,
+    hooks: hooksRequestPayload,
     sync: true
   }).then((payload) => {
     return payload.result.deployment.id;
