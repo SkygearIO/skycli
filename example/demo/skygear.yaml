@@ -1,11 +1,6 @@
 app: myapp
 
 deployments:
-  truth:
-    type: http-service
-    path: /truth
-    context: go
-    port: 8080
   hello:
     type: http-handler
     path: /hello
