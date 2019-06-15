@@ -86,7 +86,7 @@ $('#write-blog-btn').click(function() {
   };
 
   startLoading();
-  skygear.lambda('write_blog', data).then(function() {
+  skygear.lambda('api/write_blog', data).then(function() {
     stopLoading();
     $('#write-blog-form').trigger('reset');
   });
@@ -95,7 +95,7 @@ $('#write-blog-btn').click(function() {
 });
 
 function fetchBlogs() {
-  skygear.lambda('fetch_blogs', {}).then(function(results) {
+  skygear.lambda('api/fetch_blogs', {}).then(function(results) {
     let output = '';
     if (results) {
       results.forEach((r) => {
