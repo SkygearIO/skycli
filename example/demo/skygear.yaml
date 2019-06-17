@@ -1,44 +1,21 @@
-app: myapp
+app: blog
 
 deployments:
-  truth:
+  express:
     type: http-service
-    path: /truth
-    context: go
+    path: /api
+    context: express
     port: 8080
-  hello:
-    type: http-handler
-    path: /hello
-    runtime_environment: nodejs
-    entry: hello
-    src: js
-  fetch_blogs:
-    type: http-handler
-    path: /fetch_blogs
-    runtime_environment: nodejs
-    entry: fetch_blogs
-    src: js
-    secrets:
-        - MONGO_DB_URL
-  write_blog:
-    type: http-handler
-    path: /write_blog
-    runtime_environment: nodejs
-    entry: write_blog
-    src: js
-    secrets:
-        - MONGO_DB_URL
-  after_signup:
-    type: http-handler
-    path: /after_signup
-    runtime_environment: nodejs
-    entry: after_signup
-    src: js
     secrets:
       - MONGO_DB_URL
+  frontend:
+    type: http-service
+    path: /
+    context: frontend
+    port: 8080
 
 hooks:
-  - path: /after_signup
+  - path: /api/after_signup
     async: true
     timeout: 65
     event: after_signup
