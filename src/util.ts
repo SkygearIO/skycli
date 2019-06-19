@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import chalk from 'chalk';
 import moment from 'moment';
 import { Arguments as YargsArguments, Argv } from 'yargs';
 import { AppConfig, CLIContext, GlobalConfig } from './types';
+import { printError } from './error';
 
 export interface Arguments extends YargsArguments {
   debug: boolean;
@@ -46,19 +46,18 @@ export function createCommand(
   return Object.assign({}, module, {
     execute: module.handler,
     handler: (argv: Arguments) => {
-      const p = module.handler(argv);
-      if (p && typeof p.catch === 'function') {
-        p.catch((err: Error | string) => {
-          if (err) {
-            if (err instanceof Error) {
-              err = `${err}`;
-            } else if (typeof err === 'object') {
-              err = JSON.stringify(err);
-            }
-            console.log(chalk.red(err));
-          }
-          process.exit(1);
-        });
+      // Handle both sync and async error
+      try {
+        const p = module.handler(argv);
+        if (p && typeof p.catch === 'function') {
+          p.catch((e) => {
+            printError(e);
+            process.exit(1);
+          });
+        }
+      } catch (e) {
+        printError(e);
+        process.exit(1);
       }
     }
   });
