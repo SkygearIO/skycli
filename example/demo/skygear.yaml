@@ -17,5 +17,5 @@ deployments:
 hooks:
   - path: /api/after_signup
     async: true
-    timeout: 65
+    timeout: 60
     event: after_signup
