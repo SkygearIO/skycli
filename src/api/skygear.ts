@@ -2,7 +2,6 @@ import fetch, { Response } from 'node-fetch';
 import url from 'url';
 
 import { CLIContext } from '../types';
-import { NotFoundError } from './error';
 
 function defaultHeaders(context: CLIContext) {
   return {
@@ -15,31 +14,22 @@ function defaultHeaders(context: CLIContext) {
 
 // tslint:disable-next-line:no-any
 export async function handleFailureResponse(response: Response): Promise<any> {
-  const payload = await response
-    .json()
-    .then((p) => {
-      return p;
-    })
-    .catch((_error) => {
-      throw new Error(response.statusText);
-    });
+  // By default, we use statusText as error message
+  // This is a fallback only.
+  const preparedError = new Error(response.statusText);
+  // Attach response to error
+  (preparedError as any).response = response;
 
-  // Invalid argument
-  if (payload && payload.error && payload.error.code === 108) {
-    const message = payload.error.message;
-    const args = payload.error.info.arguments || [];
-    throw new Error([message, ...args].join('\n'));
-  } else {
-    const message =
-      (payload.error && payload.error.message) ||
-      `Fail to parse error: ${JSON.stringify(payload)}`;
-    // TODO: handle more error type
-    if (response.status === 404) {
-      throw new NotFoundError(message);
-    } else {
-      throw new Error(message);
+  try {
+    // Attach json to error
+    const json = await response.json();
+    (preparedError as any).json = json;
+    // Use skyerr message if available
+    if (json && json.error && json.error.message) {
+      preparedError.message = json.error.message;
     }
-  }
+  } catch {}
+  throw preparedError;
 }
 
 export function callAPI(
