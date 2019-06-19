@@ -24,14 +24,21 @@ export async function handleFailureResponse(response: Response): Promise<any> {
       throw new Error(response.statusText);
     });
 
-  const message =
-    (payload.error && payload.error.message) ||
-    `Fail to parse error: ${JSON.stringify(payload)}`;
-  // TODO: handle more error type
-  if (response.status === 404) {
-    throw new NotFoundError(message);
+  // Invalid argument
+  if (payload && payload.error && payload.error.code === 108) {
+    const message = payload.error.message;
+    const args = payload.error.info.arguments || [];
+    throw new Error([message, ...args].join('\n'));
   } else {
-    throw new Error(message);
+    const message =
+      (payload.error && payload.error.message) ||
+      `Fail to parse error: ${JSON.stringify(payload)}`;
+    // TODO: handle more error type
+    if (response.status === 404) {
+      throw new NotFoundError(message);
+    } else {
+      throw new Error(message);
+    }
   }
 }
 

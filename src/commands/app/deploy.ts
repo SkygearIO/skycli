@@ -263,11 +263,10 @@ function downloadDeployLogImpl(
 
 async function run(argv: Arguments) {
   const deploymentMap = argv.appConfig.deployments || {};
-  if (!Object.keys(deploymentMap).length) {
-    throw new Error('No deployment items to be deployed.');
-  }
-
   const hooks = argv.appConfig.hooks || [];
+
+  await controller.validateDeployment(argv.context, deploymentMap, hooks);
+
   try {
     const itemNames: string[] = Object.keys(deploymentMap);
     await confirmIfItemsWillBeRemovedInNewDeployment(
