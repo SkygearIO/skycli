@@ -1,6 +1,9 @@
 import chalk from 'chalk';
 import { Response } from 'node-fetch';
 
+export const ErrorCodeInvalidArgument: 108 = 108;
+export type ErrorCode = typeof ErrorCodeInvalidArgument;
+
 export class HTTPError extends Error {
   response: Response;
   json: any;
@@ -37,7 +40,7 @@ export function printError(error: any) {
     const skyerr = error.json.error;
     switch (skyerr.code) {
       // invalid argument
-      case 108:
+      case ErrorCodeInvalidArgument:
         s = [skyerr.message, ...(skyerr.info.arguments || [])].join('\n');
         break;
       default:
