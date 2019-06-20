@@ -2,6 +2,7 @@ import fetch, { Response } from 'node-fetch';
 import url from 'url';
 
 import { CLIContext } from '../types';
+import { makeHTTPError } from '../error';
 
 function defaultHeaders(context: CLIContext) {
   return {
@@ -14,22 +15,8 @@ function defaultHeaders(context: CLIContext) {
 
 // tslint:disable-next-line:no-any
 export async function handleFailureResponse(response: Response): Promise<any> {
-  // By default, we use statusText as error message
-  // This is a fallback only.
-  const preparedError = new Error(response.statusText);
-  // Attach response to error
-  (preparedError as any).response = response;
-
-  try {
-    // Attach json to error
-    const json = await response.json();
-    (preparedError as any).json = json;
-    // Use skyerr message if available
-    if (json && json.error && json.error.message) {
-      preparedError.message = json.error.message;
-    }
-  } catch {}
-  throw preparedError;
+  const httpError = await makeHTTPError(response);
+  throw httpError;
 }
 
 export function callAPI(
