@@ -6,7 +6,8 @@ import os from 'os';
 import path from 'path';
 import tar from 'tar';
 
-import { controller, ErrorName } from '../../api';
+import { isHTTP404 } from '../../error';
+import { controller } from '../../api';
 import {
   App,
   Checksum,
@@ -242,7 +243,7 @@ function downloadDeployLogImpl(
     .then(resolve)
     .catch((err) => {
       // retry when the log is not found, wait for the deployment start
-      if (err.name === ErrorName.NotFound) {
+      if (isHTTP404(err)) {
         if (context.debug) {
           console.log(`Failed to download deploy log, will retry later`);
         }
@@ -263,11 +264,10 @@ function downloadDeployLogImpl(
 
 async function run(argv: Arguments) {
   const deploymentMap = argv.appConfig.deployments || {};
-  if (!Object.keys(deploymentMap).length) {
-    throw new Error('No deployment items to be deployed.');
-  }
-
   const hooks = argv.appConfig.hooks || [];
+
+  await controller.validateDeployment(argv.context, deploymentMap, hooks);
+
   try {
     const itemNames: string[] = Object.keys(deploymentMap);
     await confirmIfItemsWillBeRemovedInNewDeployment(

@@ -72,6 +72,9 @@ export function createHookRequestPayload(
   };
 }
 
+// TODO: Remove this function because
+// it is almost doing nothing except
+// handling http-handler hook
 export function createDeploymentItemRequestPayloadFromConfig(
   deployment: DeploymentItemConfig
 ): DeploymentItemConfigPayload {

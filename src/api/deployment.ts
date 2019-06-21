@@ -6,9 +6,33 @@ import {
   Deployments,
   deploymentFromJSON,
   DeploymentItemConfig,
-  HookConfig
+  HookConfig,
+  DeploymentItemConfigPayload
 } from '../types';
 import { callAPI } from './skygear';
+
+export async function validateDeployment(
+  context: CLIContext,
+  deployments: { [name: string]: DeploymentItemConfig },
+  hooks: HookConfig[]
+): Promise<void> {
+  const deploymentsRequestPayload: {
+    [key: string]: DeploymentItemConfigPayload;
+  } = {};
+  Object.keys(deployments).map((key) => {
+    deploymentsRequestPayload[
+      key
+    ] = createDeploymentItemRequestPayloadFromConfig(deployments[key]);
+  });
+  const hooksRequestPayload = hooks.map((h) => {
+    return createHookRequestPayload(h);
+  });
+  return callAPI(context, '/_controller/deployment/validate', 'POST', {
+    app_name: context.app,
+    deployments: deploymentsRequestPayload,
+    hooks: hooksRequestPayload
+  });
+}
 
 export async function createDeployment(
   context: CLIContext,
@@ -17,9 +41,7 @@ export async function createDeployment(
   hooks: HookConfig[]
 ): Promise<string> {
   const deploymentsRequestPayload: {
-    [key: string]: ReturnType<
-      typeof createDeploymentItemRequestPayloadFromConfig
-    >;
+    [key: string]: DeploymentItemConfigPayload;
   } = {};
   Object.keys(deployments).map((key) => {
     deploymentsRequestPayload[
