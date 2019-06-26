@@ -67,10 +67,14 @@ function run(argv: Arguments) {
     .then((payload) => {
       console.log(chalk`Your API endpoint: {green ${payload.endpoint}}.`);
       console.log(
-        chalk`Your Client API Key: {green ${payload.config.apiKey}}.`
+        chalk`Your Client API Key: {green ${
+          payload.config.user_config.api_key
+        }}.`
       );
       console.log(
-        chalk`Your Master API Key: {green ${payload.config.masterKey}}.`
+        chalk`Your Master API Key: {green ${
+          payload.config.user_config.master_key
+        }}.`
       );
       console.log('Created app successfully! \n');
 
