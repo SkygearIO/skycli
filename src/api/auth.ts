@@ -7,9 +7,7 @@ export async function signupWithEmail(
   password: string
 ): Promise<User> {
   return callAPI(context, '/_auth/signup', 'POST', {
-    login_ids: {
-      email
-    },
+    login_ids: [{ key: 'email', value: email }],
     password
   }).then((payload) => {
     return userFromJSON(payload.result);
@@ -22,9 +20,7 @@ export async function loginWithEmail(
   password: string
 ): Promise<User> {
   return callAPI(context, '/_auth/login', 'POST', {
-    login_id: {
-      email
-    },
+    login_id: email,
     password
   }).then((payload) => {
     return userFromJSON(payload.result);
