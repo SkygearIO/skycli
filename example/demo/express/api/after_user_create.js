@@ -2,7 +2,7 @@ const MongoClient = require('mongodb').MongoClient;
 
 module.exports = async function(req, res) {
   try {
-    const user = req.body.data;
+    const user = req.body.payload.user;
 
     const client = await connectDB();
     await saveUser(client, user);
@@ -33,7 +33,7 @@ function saveUser(client, user) {
   return new Promise((resolve, reject) => {
     const collection = client.db('test').collection('users');
     collection
-      .updateOne({ id: user.user_id }, { $set: user }, { upsert: true })
+      .updateOne({ id: user.id }, { $set: user }, { upsert: true })
       .then((err, result) => {
         resolve(user);
         client.close();

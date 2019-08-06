@@ -15,7 +15,5 @@ deployments:
     port: 8080
 
 hooks:
-  - path: /api/after_signup
-    async: true
-    timeout: 60
-    event: after_signup
+  - path: /api/after_user_create
+    event: after_user_create
