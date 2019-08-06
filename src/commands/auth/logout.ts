@@ -15,8 +15,7 @@ async function run(argv: Arguments) {
   try {
     const answers = await inquirer.prompt([
       {
-        // TODO(identity): Get email from current identity
-        message: `Log out as ${user.userID}?`,
+        message: `Log out as ${user.email}?`,
         name: 'confirm',
         type: 'confirm'
       }
