@@ -16,8 +16,7 @@
     "start": "gulp watch",
     "skycli": "gulp build && ./bin/skycli.js",
     "build-bin": "gulp build && mkdir -p dist-bin && pkg --out-path dist-bin --targets node8-macos,node8-linux,node8-win .",
-    "clean": "rm -rf dist dist-bin",
-    "postpublish": "./scripts/brew-publish.sh"
+    "clean": "rm -rf dist dist-bin"
   },
   "repository": {
     "type": "git",
