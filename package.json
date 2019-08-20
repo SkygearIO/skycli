@@ -16,7 +16,8 @@
     "start": "gulp watch",
     "skycli": "gulp build && ./bin/skycli.js",
     "build-bin": "gulp build && mkdir -p dist-bin && pkg --out-path dist-bin --targets node8-macos,node8-linux,node8-win .",
-    "clean": "rm -rf dist dist-bin"
+    "clean": "rm -rf dist dist-bin",
+    "prepare-new-release": "git log --first-parent `git describe --abbrev=0`.. > new-release"
   },
   "repository": {
     "type": "git",
