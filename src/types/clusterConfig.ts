@@ -1,7 +1,7 @@
 export interface ClusterConfig {
   env: string | null;
   endpoint: string;
-  apiKey: string;
+  api_key: string;
 }
 
 export function createClusterConfig(
@@ -9,7 +9,7 @@ export function createClusterConfig(
   apiKey: string
 ): ClusterConfig {
   return {
-    apiKey,
+    api_key: apiKey,
     endpoint,
     env: null
   };
@@ -21,7 +21,7 @@ export function clusterConfigFromJSON(input: any): ClusterConfig {
     throw Error(`Invalid cluster config: ${input}`);
   }
   return {
-    apiKey: input.apiKey,
+    api_key: input.api_key,
     endpoint: input.endpoint,
     env: input.env
   };

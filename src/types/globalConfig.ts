@@ -28,7 +28,7 @@ interface ContextMap {
 export interface GlobalConfig {
   cluster: ClusterConfigMap;
   context: ContextMap;
-  currentContext: string;
+  current_context: string;
   user: UserMap;
 }
 
@@ -38,7 +38,7 @@ export function createGlobalConfig(): GlobalConfig {
     context: {
       [defaultContext]: createConfigContext()
     },
-    currentContext: defaultContext,
+    current_context: defaultContext,
     user: {}
   };
 }

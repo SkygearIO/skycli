@@ -18,7 +18,7 @@ import { Arguments } from './util';
 
 export function currentCLIContext(argv: Arguments): CLIContext {
   const globalConfig = argv.globalConfig;
-  const currentContextKey = globalConfig.currentContext;
+  const currentContextKey = globalConfig.current_context;
 
   const appConfig = argv.appConfig;
   // specify app in command or from config file
