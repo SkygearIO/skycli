@@ -1,6 +1,6 @@
 {
-  "name": "skycli",
-  "version": "2.0.0",
+  "name": "@skygear/skycli",
+  "version": "2.0.0-alpha.0",
   "description": "Skycli is tool for managing Skygear cluster",
   "main": "index.js",
   "bin": {
@@ -17,7 +17,7 @@
     "skycli": "gulp build && ./bin/skycli.js",
     "build-bin": "gulp build && mkdir -p dist-bin && pkg --out-path dist-bin --targets node8-macos,node8-linux,node8-win .",
     "clean": "rm -rf dist dist-bin",
-    "postpublish": "./scripts/brew-publish.sh"
+    "prepare-new-release": "git log --first-parent `git describe --abbrev=0`.. > new-release"
   },
   "repository": {
     "type": "git",

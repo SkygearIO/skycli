@@ -5,11 +5,7 @@ cache:
     - node_modules
 
 node_js:
-  - '10'
-  - '8'
-
-before_install:
-  - npm i -g npm@6.8.0
+  - "12"
 
 install:
   - npm install
@@ -34,7 +30,7 @@ deploy:
     on:
       repo: SkygearIO/skycli
       tags: true
-      node_js: 8
+      node_js: 12
 
 notifications:
   slack:
