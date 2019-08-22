@@ -28,11 +28,16 @@ async function updateUserConfigByEditor(
 
 async function run(argv: Arguments) {
   try {
-    const userConfig = await controller.getUserConfig(argv.context);
-    const userConfigYAML = yaml.safeDump(userConfig);
-    const updatedUserConfigYAML = await updateUserConfigByEditor(
-      userConfigYAML
-    );
+    let updatedUserConfigYAML = '';
+    if (argv.file) {
+      // file mode
+      updatedUserConfigYAML = argv.file as string;
+    } else {
+      // editor mode
+      const userConfig = await controller.getUserConfig(argv.context);
+      const userConfigYAML = yaml.safeDump(userConfig);
+      updatedUserConfigYAML = await updateUserConfigByEditor(userConfigYAML);
+    }
 
     const updatedUserConfigJSON = yaml.safeLoad(updatedUserConfigYAML);
 
@@ -52,7 +57,15 @@ export default createCommand({
     return yargs
       .middleware(requireClusterConfig)
       .middleware(requireUser)
-      .middleware(requireApp);
+      .middleware(requireApp)
+      .option('file', {
+        alias: 'f',
+        type: 'string',
+        describe: 'Current app user config file in yaml format'
+      })
+      .coerce('file', function(arg) {
+        return require('fs').readFileSync(arg, 'utf8');
+      });
   },
   command: 'update-user-config',
   describe: 'Update current app user config',
