@@ -6,3 +6,4 @@ export * from './deployment';
 export * from './example';
 export * from './secret';
 export * from './log';
+export * from './userConfig';
