@@ -9,7 +9,7 @@ import { Arguments, createCommand } from '../../util';
 import { requireClusterConfig, requireUser } from '../middleware';
 
 function selectApp(argv: Arguments) {
-  if (argv.app) {
+  if (argv.app && argv.app instanceof String) {
     return Promise.resolve({ app: argv.app });
   }
 

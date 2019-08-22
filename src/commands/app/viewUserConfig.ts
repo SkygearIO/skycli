@@ -4,17 +4,10 @@ import { controller } from '../../api';
 import { Arguments, createCommand } from '../../util';
 import { requireApp, requireClusterConfig, requireUser } from '../middleware';
 
-function run(argv: Arguments) {
-  return controller
-    .getUserConfig(argv.context)
-    .then((userConfig: any) => {
-      const userConfigYAML = yaml.safeDump(userConfig);
-      console.log(userConfigYAML);
-      return Promise.resolve();
-    })
-    .catch((error) => {
-      return Promise.reject('Fail to fetch secrets. ' + error);
-    });
+async function run(argv: Arguments) {
+  const userConfig = await controller.getUserConfig(argv.context);
+  const userConfigYAML = yaml.safeDump(userConfig);
+  console.log(userConfigYAML);
 }
 
 export default createCommand({
