@@ -75,9 +75,9 @@ function run(argv: Arguments) {
     })
     .then((payload) => {
       payload.endpoint = endpoint;
-      payload.apiKey = apiKey;
+      payload.api_key = apiKey;
       const newGlobalConfig = createGlobalConfig();
-      const currentContextKey = newGlobalConfig.currentContext;
+      const currentContextKey = newGlobalConfig.current_context;
       const currentClusterKey =
         newGlobalConfig.context[currentContextKey].cluster;
       newGlobalConfig.cluster[currentClusterKey] = payload;

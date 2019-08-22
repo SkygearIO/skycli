@@ -8,8 +8,8 @@ function defaultHeaders(context: CLIContext) {
   return {
     Accept: 'application/json',
     'Content-Type': 'application/json',
-    'X-Skygear-API-Key': (context.cluster && context.cluster.apiKey) || '',
-    'X-Skygear-Access-Token': (context.user && context.user.accessToken) || ''
+    'X-Skygear-API-Key': (context.cluster && context.cluster.api_key) || '',
+    'X-Skygear-Access-Token': (context.user && context.user.access_token) || ''
   };
 }
 

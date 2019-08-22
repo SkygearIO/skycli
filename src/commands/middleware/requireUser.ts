@@ -3,7 +3,7 @@ import { MiddlewareFunction } from 'yargs';
 import { Arguments } from '../../util';
 
 function requireUser(argv: Arguments): Promise<void> {
-  if (argv.context.user && argv.context.user.accessToken) {
+  if (argv.context.user && argv.context.user.access_token) {
     return Promise.resolve();
   }
 

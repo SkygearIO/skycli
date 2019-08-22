@@ -9,7 +9,7 @@ export function updateGlobalConfigUser(
   user: User | null
 ): GlobalConfig {
   const newConfig = { ...config };
-  const currentContextKey = newConfig.currentContext;
+  const currentContextKey = newConfig.current_context;
   const currentUserKey = newConfig.context[currentContextKey].user;
   newConfig.user = newConfig.user || {};
   if (user == null) {
