@@ -3,8 +3,15 @@ import appCreate from './app/create';
 import appDeploy from './app/deploy';
 import appScaffold from './app/scaffold';
 import viewUserConfig from './app/viewUserConfig';
+import updateUserConfig from './app/updateUserConfig';
 
-const subCommands = [appCreate, appScaffold, appDeploy, viewUserConfig];
+const subCommands = [
+  appCreate,
+  appScaffold,
+  appDeploy,
+  viewUserConfig,
+  updateUserConfig
+];
 
 function run(_argv: Arguments) {
   console.log(getCommandGroupHelpMessage('app', subCommands));
