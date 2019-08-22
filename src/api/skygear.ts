@@ -9,7 +9,10 @@ function defaultHeaders(context: CLIContext) {
     Accept: 'application/json',
     'Content-Type': 'application/json',
     'X-Skygear-API-Key': (context.cluster && context.cluster.api_key) || '',
-    'X-Skygear-Access-Token': (context.user && context.user.access_token) || ''
+    Authorization:
+      context.user && context.user.access_token
+        ? `Bearer ${context.user.access_token}`
+        : ''
   };
 }
 

@@ -74,8 +74,10 @@ export async function sendDownloadLogRequest(
     headers: {
       Range: `bytes=${cur}-`,
       'X-Skygear-API-Key': (context.cluster && context.cluster.api_key) || '',
-      'X-Skygear-Access-Token':
-        (context.user && context.user.access_token) || ''
+      Authorization:
+        context.user && context.user.access_token
+          ? `Bearer ${context.user.access_token}`
+          : ''
     },
     method: 'POST'
   }).then((response) => {
