@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import inquirer from 'inquirer';
+import { edit } from 'external-editor';
 import * as yaml from 'js-yaml';
 
 import { controller } from '../../api';
@@ -9,17 +9,7 @@ import { requireApp, requireClusterConfig, requireUser } from '../middleware';
 async function updateUserConfigByEditor(
   userConfigYAML: string
 ): Promise<string> {
-  const editor = [
-    {
-      type: 'editor',
-      name: 'user_config',
-      message: 'Edit user config.',
-      default: userConfigYAML
-    }
-  ];
-
-  const answers = await inquirer.prompt(editor);
-  const updatedUserConfig = answers.user_config as string;
+  const updatedUserConfig = edit(userConfigYAML);
   if (updatedUserConfig === userConfigYAML) {
     throw new Error('cancelled');
   }
