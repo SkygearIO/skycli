@@ -15,10 +15,14 @@ export interface Secret {
 }
 
 export interface UserConfiguration {
-  api_key?: string;
+  clients: { [id: string]: APIClientConfig };
   master_key?: string;
   welcome_email?: WelcomeEmailConfiguration;
   forgot_password?: ForgotPasswordConfiguration;
+}
+
+export interface APIClientConfig {
+  api_key: string;
 }
 
 export interface WelcomeEmailConfiguration {
