@@ -3,7 +3,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const afterSignup = require('./api/after_signup');
+const afterUserCreate = require('./api/after_user_create');
 const writeBlog = require('./api/write_blog');
 const fetchBlogs = require('./api/fetch_blogs');
 
@@ -16,7 +16,7 @@ app.use(bodyParser.json());
 app.get('/', (req, res) => {
   res.send('Welcome\n');
 });
-app.post('/after_signup', afterSignup);
+app.post('/after_user_create', afterUserCreate);
 app.post('/write_blog', writeBlog);
 app.post('/fetch_blogs', fetchBlogs);
 
