@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { CLIContext } from './types';
+import { CLIContext, UserContext } from './types';
 import { Arguments } from './util';
+import { decodeUser, decodeIdentity } from '@skygear/node-client';
 
 export function currentCLIContext(argv: Arguments): CLIContext {
   const globalConfig = argv.globalConfig;
@@ -24,11 +25,25 @@ export function currentCLIContext(argv: Arguments): CLIContext {
   // specify app in command or from config file
   const appName = (argv.app as string) || appConfig.app;
 
+  // decode user context from global yaml config
+  const clusterUserConfig =
+    globalConfig.user && globalConfig.user[currentContextKey];
+  const userContext: UserContext | null =
+    (clusterUserConfig &&
+      clusterUserConfig.user &&
+      clusterUserConfig.identity &&
+      clusterUserConfig.access_token && {
+        user: decodeUser(clusterUserConfig.user),
+        identity: decodeIdentity(clusterUserConfig.identity),
+        access_token: clusterUserConfig.access_token
+      }) ||
+    null;
+
   return {
     app: appName,
     cluster: globalConfig.cluster && globalConfig.cluster[currentContextKey],
     debug: !!argv.debug,
-    user: globalConfig.user && globalConfig.user[currentContextKey],
+    user: userContext,
     verbose: !!argv.verbose
   };
 }

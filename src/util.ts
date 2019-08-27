@@ -17,6 +17,7 @@ import moment from 'moment';
 import { Arguments as YargsArguments, Argv } from 'yargs';
 import { AppConfig, CLIContext, GlobalConfig } from './types';
 import { printError } from './error';
+import { cliContainer } from './container';
 
 export interface Arguments extends YargsArguments {
   debug: boolean;
@@ -47,18 +48,19 @@ export function createCommand(
     execute: module.handler,
     handler: (argv: Arguments) => {
       // Handle both sync and async error
-      try {
-        const p = module.handler(argv);
-        if (p && typeof p.catch === 'function') {
-          p.catch((e) => {
-            printError(e);
-            process.exit(1);
-          });
-        }
-      } catch (e) {
-        printError(e);
-        process.exit(1);
-      }
+      const clusterConfig = argv.context && argv.context.cluster;
+      cliContainer.container
+        .configure({
+          endpoint: (clusterConfig && clusterConfig.endpoint) || '',
+          apiKey: (clusterConfig && clusterConfig.api_key) || ''
+        })
+        .then(() => {
+          return module.handler(argv);
+        })
+        .catch((e) => {
+          printError(e);
+          process.exit(1);
+        });
     }
   });
 }

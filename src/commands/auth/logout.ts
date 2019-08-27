@@ -1,21 +1,21 @@
 import chalk from 'chalk';
 import inquirer from 'inquirer';
 
-import { controller } from '../../api';
-import * as config from '../../config';
 import { Arguments, createCommand } from '../../util';
-import { updateGlobalConfigUser } from './util';
+import { cliContainer } from '../../container';
 
 async function run(argv: Arguments) {
-  const user = argv.context.user;
-  if (!user) {
+  const userContext = argv.context.user;
+
+  if (!userContext) {
     throw new Error(`Not logged in to accounts.`);
   }
 
   try {
+    const email = (userContext && userContext.identity.claims.email) || '';
     const answers = await inquirer.prompt([
       {
-        message: `Log out as ${user.email}?`,
+        message: `Log out as ${email}?`,
         name: 'confirm',
         type: 'confirm'
       }
@@ -23,21 +23,14 @@ async function run(argv: Arguments) {
     if (!answers.confirm) {
       throw new Error('cancelled');
     }
-
-    await controller.logout(argv.context);
+    await cliContainer.container.auth.logout();
+    console.log(chalk.green('Successfully logged out.'));
   } catch (error) {
     if (error.message === 'cancelled') {
       return;
     }
-    if (argv.debug) {
-      console.error(error);
-    }
+    throw error;
   }
-
-  // remove user from global config
-  const newGlobalConfig = updateGlobalConfigUser(argv.globalConfig, null);
-  config.save(newGlobalConfig, config.ConfigDomain.GlobalDomain);
-  console.log(chalk.green('Successfully logged out.'));
 }
 
 export default createCommand({

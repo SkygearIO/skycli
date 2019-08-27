@@ -1,8 +1,13 @@
 import { ClusterConfig } from './clusterConfig';
-import { User } from './user';
+import { JSONObject } from '@skygear/node-client';
 
 const defaultContext = 'default';
 
+interface ClusterUserConfig {
+  identity: JSONObject;
+  user: JSONObject;
+  access_token: string;
+}
 interface ConfigContext {
   cluster: string;
   user: string;
@@ -16,7 +21,7 @@ function createConfigContext(): ConfigContext {
 }
 
 interface UserMap {
-  [s: string]: User;
+  [s: string]: ClusterUserConfig;
 }
 interface ClusterConfigMap {
   [s: string]: ClusterConfig;
