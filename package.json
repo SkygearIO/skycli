@@ -35,6 +35,7 @@
   "homepage": "https://skygear.io/",
   "dependencies": {
     "@babel/polyfill": "^7.0.0",
+    "@skygear/node-client": "^2.0.0-alpha.9",
     "@zeit/dockerignore": "0.0.5",
     "chalk": "^2.4.2",
     "cli-table3": "^0.5.1",
@@ -53,6 +54,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.41",
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
     "@babel/preset-env": "^7.3.1",
     "@babel/preset-typescript": "^7.3.3",
     "@babel/register": "^7.0.0",
