@@ -1,31 +1,23 @@
 import chalk from 'chalk';
 import Table, { HorizontalTable } from 'cli-table3';
 
-import { controller } from '../../api';
-import { Secret } from '../../types';
 import { Arguments, createCommand, displayDate } from '../../util';
 import { requireApp, requireClusterConfig, requireUser } from '../middleware';
+import { cliContainer } from '../../container';
 
-function run(argv: Arguments) {
-  return controller
-    .getSecrets(argv.context)
-    .then((secrets: Secret[]) => {
-      if (secrets.length === 0) {
-        console.log(chalk`No secrets in app {green ${argv.context.app || ''}}`);
-        return Promise.resolve();
-      }
-      const table = new Table({
-        head: ['NAME', 'CREATED_AT']
-      }) as HorizontalTable;
-      secrets.map((s: Secret) => {
-        table.push([s.name, displayDate(s.createdAt)]);
-      });
-      console.log(table.toString());
-      return Promise.resolve();
-    })
-    .catch((error) => {
-      return Promise.reject('Fail to fetch secrets. ' + error);
-    });
+async function run(argv: Arguments) {
+  const secrets = await cliContainer.getSecrets(argv.context.app || '');
+  if (secrets.length === 0) {
+    console.log(chalk`No secrets in app {green ${argv.context.app || ''}}`);
+    return;
+  }
+  const table = new Table({
+    head: ['NAME', 'CREATED_AT']
+  }) as HorizontalTable;
+  secrets.map((s) => {
+    table.push([s.name, displayDate(s.created_at)]);
+  });
+  console.log(table.toString());
 }
 
 export default createCommand({

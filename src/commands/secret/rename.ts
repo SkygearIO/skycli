@@ -1,24 +1,22 @@
 import chalk from 'chalk';
 
-import { controller } from '../../api';
 import { Arguments, createCommand } from '../../util';
 import { requireApp, requireClusterConfig, requireUser } from '../middleware';
 import { validateSecretName } from './util';
+import { cliContainer } from '../../container';
 
-function run(argv: Arguments) {
+async function run(argv: Arguments) {
   const oldSecretName = argv['old-name'] as string;
   const newSecretName = argv['new-name'] as string;
 
-  return controller
-    .renameSecret(argv.context, oldSecretName, newSecretName)
-    .then((_secret) => {
-      console.log(
-        chalk`{green Success!} Renamed secret from ${oldSecretName} to ${newSecretName}`
-      );
-    })
-    .catch((error) => {
-      return Promise.reject('Fail to rename secret. ' + error);
-    });
+  await cliContainer.renameSecret(
+    argv.context.app || '',
+    oldSecretName,
+    newSecretName
+  );
+  console.log(
+    chalk`{green Success!} Renamed secret from ${oldSecretName} to ${newSecretName}`
+  );
 }
 
 export default createCommand({
