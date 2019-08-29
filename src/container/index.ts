@@ -9,7 +9,7 @@ import {
   Identity
 } from '@skygear/node-client';
 
-import { ControllerContainer } from './ControllerContainer';
+import { CLIContainer } from './CLIContainer';
 import { save, load, ConfigDomain } from '../config';
 import { GlobalConfig } from '../types';
 
@@ -124,7 +124,7 @@ class CLIYAMLContainerStorage implements ContainerStorage {
   }
 }
 
-export const cliContainer = new ControllerContainer(
+export const cliContainer = new CLIContainer(
   new NodeContainer({
     storage: new CLIYAMLContainerStorage()
   })

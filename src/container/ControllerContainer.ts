@@ -18,7 +18,7 @@ function decodeApp(app: any): App {
 }
 
 export class ControllerContainer<T extends BaseAPIClient> {
-  private CONTROLLER_URL = "/_controller";
+  protected CONTROLLER_URL = "/_controller";
   container: Container<T>;
 
   constructor(container: Container<T>) {
