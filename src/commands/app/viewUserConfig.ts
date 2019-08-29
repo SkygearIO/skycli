@@ -1,11 +1,13 @@
 import * as yaml from 'js-yaml';
 
-import { controller } from '../../api';
 import { Arguments, createCommand } from '../../util';
 import { requireApp, requireClusterConfig, requireUser } from '../middleware';
+import { cliContainer } from '../../container';
 
 async function run(argv: Arguments) {
-  const userConfig = await controller.getUserConfig(argv.context);
+  const userConfig = await cliContainer.getUserConfiguration(
+    argv.context.app || ''
+  );
   const userConfigYAML = yaml.safeDump(userConfig);
   console.log(userConfigYAML);
 }

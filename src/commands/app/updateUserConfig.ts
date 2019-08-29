@@ -2,9 +2,9 @@ import chalk from 'chalk';
 import { edit } from 'external-editor';
 import * as yaml from 'js-yaml';
 
-import { controller } from '../../api';
 import { Arguments, createCommand } from '../../util';
 import { requireApp, requireClusterConfig, requireUser } from '../middleware';
+import { cliContainer } from '../../container';
 
 async function updateUserConfigByEditor(
   userConfigYAML: string
@@ -18,20 +18,21 @@ async function updateUserConfigByEditor(
 
 async function run(argv: Arguments) {
   try {
+    const appName = argv.context.app || '';
     let updatedUserConfigYAML = '';
     if (argv.file) {
       // file mode
       updatedUserConfigYAML = argv.file as string;
     } else {
       // editor mode
-      const userConfig = await controller.getUserConfig(argv.context);
+      const userConfig = await cliContainer.getUserConfiguration(appName);
       const userConfigYAML = yaml.safeDump(userConfig);
       updatedUserConfigYAML = await updateUserConfigByEditor(userConfigYAML);
     }
 
     const updatedUserConfigJSON = yaml.safeLoad(updatedUserConfigYAML);
 
-    await controller.setUserConfig(argv.context, updatedUserConfigJSON);
+    await cliContainer.setUserConfiguration(appName, updatedUserConfigJSON);
     console.log(chalk`{green Success!} Updated user config.`);
   } catch (err) {
     if (err.message === 'cancelled') {
