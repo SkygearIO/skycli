@@ -12,6 +12,7 @@ function decodeApp(app: any): App {
   return {
     id: app.id,
     name: app.name,
+    last_deployment_id: app.last_deployment_id,
     created_at: new Date(app.created_at),
     updated_at: new Date(app.updated_at),
   };
@@ -124,6 +125,12 @@ export class ControllerContainer<T extends BaseAPIClient> {
       ({ apps }) => {
         return apps.map(decodeApp);
       }
+    );
+  }
+
+  async getAppByName(appName: string): Promise<App> {
+    return this.fetchAPI("GET", `/_controller/app/${appName}`).then(({ app }) =>
+      decodeApp(app)
     );
   }
 

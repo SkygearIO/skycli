@@ -7,20 +7,19 @@ import path from 'path';
 import tar from 'tar';
 
 import { isHTTP404 } from '../../error';
-import { controller } from '../../api';
-import {
-  App,
-  Checksum,
-  CLIContext,
-  HttpServiceConfig,
-  Deployments,
-  DeploymentItemConfig,
-  DeploymentStatus,
-  LogEntry
-} from '../../types';
+import { CLIContext } from '../../types';
 import { Arguments, createCommand } from '../../util';
 import requireUser from '../middleware/requireUser';
 import { skyignore, dockerignore } from '../../ignore';
+import { cliContainer } from '../../container';
+import {
+  DeploymentStatus,
+  Checksum,
+  LogEntry,
+  DeploymentItemsMap,
+  DeploymentItemConfig,
+  HttpServiceConfig
+} from '../../container/types';
 
 function createArchivePath(index: number) {
   return path.join(os.tmpdir(), `skygear-src-${index}.tgz`);
@@ -143,7 +142,7 @@ function waitForDeploymentStatusImpl(
   // tslint:disable-next-line:no-any
   reject: any
 ) {
-  controller.getDeployment(context, deploymentID).then(
+  cliContainer.getDeployment(deploymentID).then(
     (result) => {
       if (
         result.status === DeploymentStatus.Running ||
@@ -169,24 +168,23 @@ function waitForDeploymentStatusImpl(
 }
 
 async function confirmIfItemsWillBeRemovedInNewDeployment(
-  context: CLIContext,
-  deployments: Deployments
+  appName: string,
+  deployments: DeploymentItemsMap
 ) {
-  const appName = context.app;
   if (!appName) {
     return;
   }
 
-  const app: App = await controller.getAppByName(context, appName);
-  if (!app.lastDeploymentID) {
+  const app = await cliContainer.getAppByName(appName);
+  if (!app.last_deployment_id) {
     // no last deployment, no need to check
     return;
   }
 
   // get deployment items and show prompt if needed
-  const {
-    deployments: existingDeployments
-  } = await controller.getDeploymentItems(context, app.lastDeploymentID);
+  const existingDeployments = await cliContainer.getDeploymentItems(
+    app.last_deployment_id
+  );
 
   const itemsWillBeRemoved: string[] = [];
   for (const itemName of Object.keys(existingDeployments)) {
@@ -238,8 +236,8 @@ function downloadDeployLogImpl(
   // tslint:disable-next-line:no-any
   reject: any
 ) {
-  controller
-    .downloadDeployLog(context, deploymentID, onLogReceive)
+  cliContainer
+    .downloadDeployLog(deploymentID, onLogReceive)
     .then(resolve)
     .catch((err) => {
       // retry when the log is not found, wait for the deployment start
@@ -265,15 +263,13 @@ function downloadDeployLogImpl(
 async function run(argv: Arguments) {
   const deploymentMap = argv.appConfig.deployments || {};
   const hooks = argv.appConfig.hooks || [];
+  const appName = argv.context.app || '';
 
-  await controller.validateDeployment(argv.context, deploymentMap, hooks);
+  await cliContainer.validateDeployment(appName, deploymentMap, hooks);
 
   try {
     const itemNames: string[] = Object.keys(deploymentMap);
-    await confirmIfItemsWillBeRemovedInNewDeployment(
-      argv.context,
-      deploymentMap
-    );
+    await confirmIfItemsWillBeRemovedInNewDeployment(appName, deploymentMap);
 
     const checksums: Checksum[] = [];
 
@@ -292,8 +288,8 @@ async function run(argv: Arguments) {
     }
 
     // create artifact upload
-    const uploads = await controller.createArtifactUploads(
-      argv.context,
+    const uploads = await cliContainer.createArtifactUploads(
+      appName,
       checksums
     );
 
@@ -304,7 +300,7 @@ async function run(argv: Arguments) {
       const upload = uploads[i];
       const stream = createArchiveReadStream(createArchivePath(i));
       // eslint-disable-next-line no-await-in-loop
-      await controller.uploadArtifact(
+      await cliContainer.uploadArtifact(
         upload.uploadRequest,
         checksum.md5,
         stream
@@ -315,8 +311,8 @@ async function run(argv: Arguments) {
     }
 
     // create artifacts
-    const artifactIDs = await controller.createArtifacts(
-      argv.context,
+    const artifactIDs = await cliContainer.createArtifacts(
+      appName,
       artifactRequests
     );
     const artifactIDMap: { [name: string]: string } = {};
@@ -326,8 +322,8 @@ async function run(argv: Arguments) {
     }
 
     // create deployment
-    const deploymentID = await controller.createDeployment(
-      argv.context,
+    const deploymentID = await cliContainer.createDeployment(
+      appName,
       deploymentMap,
       artifactIDMap,
       hooks
@@ -355,7 +351,7 @@ async function run(argv: Arguments) {
     if (error.message === 'cancelled') {
       return;
     }
-    throw new Error('Fail to deploy. ' + error);
+    throw error;
   }
 }
 

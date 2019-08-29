@@ -1,4 +1,4 @@
-import { DeploymentItemConfig, HookConfig } from './deploymentItemConfig';
+import { DeploymentItemConfig, HookConfig } from '../container/types';
 
 export interface AppConfig {
   app: string;
