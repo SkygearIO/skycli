@@ -1,10 +1,10 @@
 import chalk from 'chalk';
 import inquirer from 'inquirer';
 
-import { controller } from '../../api';
 import * as config from '../../config';
 import { createGlobalConfig } from '../../types';
 import { Arguments, createCommand } from '../../util';
+import { cliContainer } from '../../container';
 
 const apiKeyPrompt: inquirer.Question = {
   message: 'Cluster api key:',
@@ -63,30 +63,25 @@ function askClusterServer(argv: Arguments) {
   });
 }
 
-function run(argv: Arguments) {
-  let endpoint: string;
-  let apiKey: string;
+async function run(argv: Arguments) {
+  const { endpoint, apiKey } = await askClusterServer(argv);
 
-  return askClusterServer(argv)
-    .then((answers) => {
-      endpoint = answers.endpoint;
-      apiKey = answers.apiKey;
-      return controller.getConfig(endpoint, apiKey);
-    })
-    .then((payload) => {
-      payload.endpoint = endpoint;
-      payload.api_key = apiKey;
-      const newGlobalConfig = createGlobalConfig();
-      const currentContextKey = newGlobalConfig.current_context;
-      const currentClusterKey =
-        newGlobalConfig.context[currentContextKey].cluster;
-      newGlobalConfig.cluster[currentClusterKey] = payload;
-      config.save(newGlobalConfig, config.ConfigDomain.GlobalDomain);
-      console.log(chalk`Running Skygear cluster at {green ${endpoint}}.`);
-    })
-    .catch((error) => {
-      return Promise.reject('Fail to fetch cluster config. ' + error);
-    });
+  await cliContainer.container.configure({
+    endpoint,
+    apiKey
+  });
+
+  const env = await cliContainer.getClusterEnv();
+  const newGlobalConfig = createGlobalConfig();
+  const currentContextKey = newGlobalConfig.current_context;
+  const currentClusterKey = newGlobalConfig.context[currentContextKey].cluster;
+  newGlobalConfig.cluster[currentClusterKey] = {
+    endpoint: endpoint,
+    api_key: apiKey,
+    env: env
+  };
+  config.save(newGlobalConfig, config.ConfigDomain.GlobalDomain);
+  console.log(chalk`Running Skygear cluster at {green ${endpoint}}.`);
 }
 
 export default createCommand({

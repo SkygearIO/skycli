@@ -7,6 +7,12 @@ import { makeHTTPError } from '../error';
 export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
   T
 > {
+  async getClusterEnv(): Promise<string> {
+    return this.fetchAPI('GET', `${this.CONTROLLER_URL}/config`).then(
+      ({ env }) => env
+    );
+  }
+
   async getExamples(): Promise<string[]> {
     return this.fetchAPI('GET', `${this.CONTROLLER_URL}/examples`).then(
       ({ examples }) => examples.map((e: any) => e.path)
