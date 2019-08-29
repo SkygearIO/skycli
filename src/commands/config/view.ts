@@ -16,14 +16,16 @@ function run(argv: Arguments) {
     head: ['Property', 'Value']
   }) as VerticalTable;
 
+  const userEmail =
+    userContext &&
+    'loginID' in userContext.identity &&
+    userContext.identity.loginID;
+
   table.push(
     createVerticalTableRow('Cluster Type', cluster.env || ''),
     createVerticalTableRow('Cluster Endpoint', cluster.endpoint),
     createVerticalTableRow('Cluster API Key', cluster.api_key),
-    createVerticalTableRow(
-      'Account',
-      (userContext && userContext.identity.claims.email) || ''
-    )
+    createVerticalTableRow('Account', userEmail || '')
   );
 
   console.log(table.toString());

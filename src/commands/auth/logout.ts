@@ -12,7 +12,8 @@ async function run(argv: Arguments) {
   }
 
   try {
-    const email = (userContext && userContext.identity.claims.email) || '';
+    const email =
+      ('loginID' in userContext.identity && userContext.identity.loginID) || '';
     const answers = await inquirer.prompt([
       {
         message: `Log out as ${email}?`,
