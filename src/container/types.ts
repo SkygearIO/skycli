@@ -5,6 +5,8 @@ export interface App {
   updated_at: Date;
 }
 
+export type Endpoint = string;
+
 export interface Secret {
   name: string;
   created_at: Date;
@@ -12,6 +14,8 @@ export interface Secret {
 }
 
 export interface UserConfiguration {
+  api_key?: string;
+  master_key?: string;
   welcome_email?: WelcomeEmailConfiguration;
   forgot_password?: ForgotPasswordConfiguration;
 }

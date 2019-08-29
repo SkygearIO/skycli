@@ -6,7 +6,7 @@ import {
   decodeError
 } from '@skygear/node-client';
 
-import { Secret, App, UserConfiguration } from "./types";
+import { Secret, App, UserConfiguration, Endpoint } from "./types";
 
 function decodeApp(app: any): App {
   return {
@@ -96,7 +96,7 @@ export class ControllerContainer<T extends BaseAPIClient> {
       json: {
         app_name: appName,
         new_secret_name: newSecretName,
-        old_secret_name: oldSecretName
+        old_secret_name: oldSecretName,
       },
     });
   }
@@ -107,11 +107,15 @@ export class ControllerContainer<T extends BaseAPIClient> {
     });
   }
 
-  async createApp(name: string): Promise<App> {
+  async createApp(name: string): Promise<[App, UserConfiguration, Endpoint]> {
     return this.fetchAPI("POST", `${this.CONTROLLER_URL}/app`, {
       json: { name },
-    }).then(({ app }) => {
-      return decodeApp(app);
+    }).then(({ app, tenant_config, endpoint }) => {
+      return [decodeApp(app), tenant_config.user_config, endpoint] as [
+        App,
+        UserConfiguration,
+        Endpoint
+      ];
     });
   }
 
