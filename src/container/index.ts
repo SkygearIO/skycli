@@ -12,11 +12,20 @@ import {
 import { CLIContainer } from './CLIContainer';
 import { save, load, ConfigDomain } from '../config';
 import { GlobalConfig } from '../types';
+import { createGlobalConfig } from '../configUtil';
 
 class CLIYAMLContainerStorage implements ContainerStorage {
+  private loadGlobalConfig(): GlobalConfig {
+    let globalConfig = load(ConfigDomain.GlobalDomain) as GlobalConfig;
+    if (!Object.keys(globalConfig).length) {
+      globalConfig = createGlobalConfig();
+    }
+    return globalConfig;
+  }
+
   async setUser(namespace: string, user: User): Promise<void> {
     const e = encodeUser(user);
-    const globalConfig = load(ConfigDomain.GlobalDomain) as GlobalConfig;
+    const globalConfig = this.loadGlobalConfig();
     const newConfig = {
       ...globalConfig,
       user: {
@@ -32,7 +41,7 @@ class CLIYAMLContainerStorage implements ContainerStorage {
 
   async setIdentity(namespace: string, identity: Identity): Promise<void> {
     const e = encodeIdentity(identity);
-    const globalConfig = load(ConfigDomain.GlobalDomain) as GlobalConfig;
+    const globalConfig = this.loadGlobalConfig();
     const newConfig = {
       ...globalConfig,
       user: {
@@ -47,7 +56,7 @@ class CLIYAMLContainerStorage implements ContainerStorage {
   }
 
   async setAccessToken(namespace: string, accessToken: string): Promise<void> {
-    const globalConfig = load(ConfigDomain.GlobalDomain) as GlobalConfig;
+    const globalConfig = this.loadGlobalConfig();
     const newConfig = {
       ...globalConfig,
       user: {
@@ -69,7 +78,7 @@ class CLIYAMLContainerStorage implements ContainerStorage {
   }
 
   async getUser(namespace: string): Promise<User | null> {
-    const globalConfig = load(ConfigDomain.GlobalDomain) as GlobalConfig;
+    const globalConfig = this.loadGlobalConfig();
     const d = globalConfig.user[namespace] && globalConfig.user[namespace].user;
     if (d) {
       return decodeUser(d);
@@ -78,7 +87,7 @@ class CLIYAMLContainerStorage implements ContainerStorage {
   }
 
   async getIdentity(namespace: string): Promise<Identity | null> {
-    const globalConfig = load(ConfigDomain.GlobalDomain) as GlobalConfig;
+    const globalConfig = this.loadGlobalConfig();
     const d =
       globalConfig.user[namespace] && globalConfig.user[namespace].identity;
     if (d) {
@@ -88,7 +97,7 @@ class CLIYAMLContainerStorage implements ContainerStorage {
   }
 
   async getAccessToken(namespace: string): Promise<string | null> {
-    const globalConfig = load(ConfigDomain.GlobalDomain) as GlobalConfig;
+    const globalConfig = this.loadGlobalConfig();
     return (
       globalConfig.user[namespace] && globalConfig.user[namespace].access_token
     );
@@ -99,21 +108,21 @@ class CLIYAMLContainerStorage implements ContainerStorage {
   }
 
   async delUser(namespace: string): Promise<void> {
-    const globalConfig = load(ConfigDomain.GlobalDomain) as GlobalConfig;
+    const globalConfig = this.loadGlobalConfig();
     const newConfig = { ...globalConfig };
     delete newConfig.user[namespace].user;
     save(newConfig, ConfigDomain.GlobalDomain);
   }
 
   async delIdentity(namespace: string): Promise<void> {
-    const globalConfig = load(ConfigDomain.GlobalDomain) as GlobalConfig;
+    const globalConfig = this.loadGlobalConfig();
     const newConfig = { ...globalConfig };
     delete newConfig.user[namespace].identity;
     save(newConfig, ConfigDomain.GlobalDomain);
   }
 
   async delAccessToken(namespace: string): Promise<void> {
-    const globalConfig = load(ConfigDomain.GlobalDomain) as GlobalConfig;
+    const globalConfig = this.loadGlobalConfig();
     const newConfig = { ...globalConfig };
     delete newConfig.user[namespace].access_token;
     save(newConfig, ConfigDomain.GlobalDomain);
