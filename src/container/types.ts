@@ -1,7 +1,7 @@
 export interface App {
   id: string;
   name: string;
-  last_deployment_id: string;
+  last_deployment_id?: string;
   created_at: Date;
   updated_at: Date;
 }
