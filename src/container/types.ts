@@ -56,8 +56,6 @@ export interface HttpServiceConfig {
 
 export interface HookConfig {
   event: string;
-  async: boolean;
-  timeout: number;
   path: string;
 }
 

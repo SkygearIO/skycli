@@ -43,10 +43,8 @@ function encodeDeploymentItemConfig(deployment: DeploymentItemConfig): any {
 
 function encodeHook(hook: HookConfig): any {
   return {
-    async: hook.async,
     event: hook.event,
-    path: hook.path || '',
-    timeout: hook.timeout
+    path: hook.path || ''
   };
 }
 
