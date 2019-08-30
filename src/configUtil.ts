@@ -41,9 +41,12 @@ export function currentCLIContext(argv: Arguments): CLIContext {
   // specify app in command or from config file
   const appName = (argv.app as string) || appConfig.app;
 
+  const clusterContextKey = globalConfig.context[currentContextKey].cluster;
+  const userContextKey = globalConfig.context[currentContextKey].user;
+
   // decode user context from global yaml config
   const clusterUserConfig =
-    globalConfig.user && globalConfig.user[currentContextKey];
+    globalConfig.user && globalConfig.user[userContextKey];
   const userContext: UserContext | null =
     (clusterUserConfig &&
       clusterUserConfig.user &&
@@ -57,7 +60,7 @@ export function currentCLIContext(argv: Arguments): CLIContext {
 
   return {
     app: appName,
-    cluster: globalConfig.cluster && globalConfig.cluster[currentContextKey],
+    cluster: globalConfig.cluster && globalConfig.cluster[clusterContextKey],
     debug: !!argv.debug,
     user: userContext,
     verbose: !!argv.verbose

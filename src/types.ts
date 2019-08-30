@@ -7,12 +7,12 @@ export interface ClusterConfig {
   api_key: string;
 }
 
-interface ClusterUserConfig {
+export interface ClusterUserConfig {
   identity: JSONObject;
   user: JSONObject;
   access_token: string;
 }
-interface ConfigContext {
+export interface ConfigContext {
   cluster: string;
   user: string;
 }
