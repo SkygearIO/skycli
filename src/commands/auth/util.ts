@@ -1,24 +1,7 @@
 import chalk from 'chalk';
 import inquirer from 'inquirer';
 
-import { GlobalConfig, User } from '../../types';
 import { Arguments } from '../../util';
-
-export function updateGlobalConfigUser(
-  config: GlobalConfig,
-  user: User | null
-): GlobalConfig {
-  const newConfig = { ...config };
-  const currentContextKey = newConfig.current_context;
-  const currentUserKey = newConfig.context[currentContextKey].user;
-  newConfig.user = newConfig.user || {};
-  if (user == null) {
-    delete newConfig.user[currentUserKey];
-  } else {
-    newConfig.user[currentUserKey] = user;
-  }
-  return newConfig;
-}
 
 const emailPrompt: inquirer.Question = {
   message: 'Email:',

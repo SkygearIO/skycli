@@ -57,21 +57,10 @@ function findConfig(
   const configPath = untildify(configPaths[domain]);
   const absolute = path.isAbsolute(configPath);
 
-  let currentDir = process.cwd();
+  const currentDir = process.cwd();
   let fullPath = absolute ? configPath : path.resolve(currentDir, configPath);
   if (!exists) {
     return fullPath;
-  }
-
-  // If the config path is not already an absolute path, recursively
-  // find the config file until we find an existing one.
-  // eslint-disable-next-line no-unmodified-loop-condition
-  while (!absolute && currentDir !== path.dirname(currentDir)) {
-    fullPath = path.resolve(currentDir, configPath);
-    if (fs.existsSync(fullPath)) {
-      return fullPath;
-    }
-    currentDir = path.dirname(currentDir);
   }
 
   fullPath = path.resolve(currentDir, configPath);

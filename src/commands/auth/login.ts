@@ -1,40 +1,14 @@
 import chalk from 'chalk';
 
-import { controller } from '../../api';
-import * as config from '../../config';
 import { Arguments, createCommand } from '../../util';
 import { requireClusterConfig } from '../middleware';
-import { askCredentials, updateGlobalConfigUser } from './util';
+import { askCredentials } from './util';
+import { cliContainer } from '../../container';
 
-function run(argv: Arguments) {
-  let email: string;
-
-  return askCredentials(argv)
-    .then((answers) => {
-      email = answers.email;
-      return controller.loginWithEmail(
-        argv.context,
-        answers.email,
-        answers.password
-      );
-    })
-    .then((payload) => {
-      if (argv.debug) {
-        console.log(payload);
-      }
-      const newGlobalConfig = updateGlobalConfigUser(
-        argv.globalConfig,
-        payload
-      );
-      config.save(newGlobalConfig, config.ConfigDomain.GlobalDomain);
-      console.log(chalk`Login as {green ${email}}.`);
-    })
-    .catch((error) => {
-      if (argv.debug) {
-        console.error(error);
-      }
-      return Promise.reject(`${error}`);
-    });
+async function run(argv: Arguments) {
+  const answers = await askCredentials(argv);
+  await cliContainer.container.auth.login(answers.email, answers.password);
+  console.log(chalk`Login as {green ${answers.email}}.`);
 }
 
 export default createCommand({

@@ -1,22 +1,19 @@
 import chalk from 'chalk';
 
-import { controller } from '../../api';
 import { Arguments, createCommand } from '../../util';
 import { requireApp, requireClusterConfig, requireUser } from '../middleware';
 import { validateSecretName } from './util';
+import { cliContainer } from '../../container';
 
-function run(argv: Arguments) {
+async function run(argv: Arguments) {
   const secretName = argv.name as string;
   const secretValue = argv.value as string;
-
-  return controller
-    .createSecret(argv.context, secretName, secretValue)
-    .then((_secret) => {
-      console.log(chalk`{green Success!} Created secret ${secretName}`);
-    })
-    .catch((error) => {
-      return Promise.reject('Fail to create secret. ' + error);
-    });
+  await cliContainer.createSecret(
+    argv.context.app || '',
+    secretName,
+    secretValue
+  );
+  console.log(chalk`{green Success!} Created secret ${secretName}`);
 }
 
 export default createCommand({
