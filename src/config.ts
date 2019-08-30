@@ -22,7 +22,8 @@ import * as os from 'os';
 import path from 'path';
 import untildify from 'untildify';
 
-import { AppConfig, createGlobalConfig, GlobalConfig } from './types';
+import { AppConfig, GlobalConfig } from './types';
+import { createGlobalConfig } from './configUtil';
 
 const currentConfigVersion = 1;
 

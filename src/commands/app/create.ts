@@ -1,10 +1,10 @@
 import chalk from 'chalk';
 import inquirer from 'inquirer';
 
-import { controller } from '../../api';
 import { Arguments, createCommand } from '../../util';
 import { requireClusterConfig, requireUser } from '../middleware';
 import AppScaffoldCommand from './scaffold';
+import { cliContainer } from '../../container';
 
 const appNamePrompt: inquirer.Question = {
   message: 'What is your app name?',
@@ -21,21 +21,8 @@ const appNamePrompt: inquirer.Question = {
   }
 };
 
-function ask(argv: Arguments) {
-  const prompts = [];
-  const appName = argv.app as string;
-
-  if (appName) {
-    console.log(chalk`App name: {green ${appName}}.`);
-  } else {
-    prompts.push(appNamePrompt);
-  }
-
-  if (prompts.length === 0) {
-    return Promise.resolve({ appName });
-  }
-
-  return inquirer.prompt(prompts).then((answers) => {
+function ask() {
+  return inquirer.prompt([appNamePrompt]).then((answers) => {
     return {
       ...answers
     };
@@ -55,48 +42,43 @@ function confirmScaffoldApp() {
   ]);
 }
 
-function run(argv: Arguments) {
-  let appName: string;
+async function run(argv: Arguments) {
+  let appName = argv.app as string;
 
-  return ask(argv)
-    .then((answers) => {
-      appName = answers.app;
-      console.log('Creating app...');
-      return controller.createApp(argv.context, appName);
-    })
-    .then((payload) => {
-      console.log(chalk`Your API endpoint: {green ${payload.endpoint}}.`);
-      console.log(
-        chalk`Your Client API Key: {green ${
-          payload.config.user_config.api_key
-        }}.`
-      );
-      console.log(
-        chalk`Your Master API Key: {green ${
-          payload.config.user_config.master_key
-        }}.`
-      );
-      console.log('Created app successfully! \n');
+  if (!appName) {
+    const answers = await ask();
+    if (!answers.app) {
+      return;
+    }
+    appName = answers.app;
+  }
 
-      return confirmScaffoldApp();
-    })
-    .then((answers) => {
-      if (!answers.scaffoldNow) {
-        console.log(
-          chalk`\nTo setup later, please run:\n    skycli app scaffold`
-        );
-        return;
-      }
+  console.log(chalk`App name: {green ${appName}}.`);
+  console.log('Creating app...');
 
-      return AppScaffoldCommand.execute({
-        ...argv,
-        app: appName,
-        dest: '.'
-      });
-    })
-    .catch((error) => {
-      return Promise.reject('Fail to create application. ' + error);
-    });
+  const payload = await cliContainer.createApp(appName);
+  const userConfig = payload[1];
+  const endpoint = payload[2];
+
+  console.log(chalk`Your API endpoint: {green ${endpoint}}.`);
+  console.log(chalk`Your Client API Key: {green ${userConfig.api_key || ''}}.`);
+  console.log(
+    chalk`Your Master API Key: {green ${userConfig.master_key || ''}}.`
+  );
+
+  console.log('Created app successfully! \n');
+
+  const answers = await confirmScaffoldApp();
+  if (!answers.scaffoldNow) {
+    console.log(chalk`\nTo setup later, please run:\n    skycli app scaffold`);
+    return;
+  }
+
+  return AppScaffoldCommand.execute({
+    ...argv,
+    app: appName,
+    dest: '.'
+  });
 }
 
 export default createCommand({
