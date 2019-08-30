@@ -37,7 +37,6 @@ export interface ForgotPasswordConfiguration {
 export interface HttpHandlerConfig {
   type: 'http-handler';
   path: string;
-  hook?: HookConfig;
   runtime_environment: string;
   entry: string;
   src: string;
