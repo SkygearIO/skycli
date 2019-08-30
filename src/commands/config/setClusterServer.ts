@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import inquirer from 'inquirer';
 
 import * as config from '../../config';
-import { createGlobalConfig } from '../../types';
+import { createGlobalConfig } from '../../configUtil';
 import { Arguments, createCommand } from '../../util';
 import { cliContainer } from '../../container';
 

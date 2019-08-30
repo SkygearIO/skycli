@@ -13,9 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { CLIContext, UserContext } from './types';
+import { CLIContext, UserContext, GlobalConfig } from './types';
 import { Arguments } from './util';
 import { decodeUser, decodeIdentity } from '@skygear/node-client';
+
+const defaultContext = 'default';
+
+export function createGlobalConfig(): GlobalConfig {
+  return {
+    cluster: {},
+    context: {
+      [defaultContext]: {
+        cluster: defaultContext,
+        user: defaultContext
+      }
+    },
+    current_context: defaultContext,
+    user: {}
+  };
+}
 
 export function currentCLIContext(argv: Arguments): CLIContext {
   const globalConfig = argv.globalConfig;
