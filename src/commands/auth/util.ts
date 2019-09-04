@@ -52,3 +52,18 @@ export function askCredentials(argv: Arguments) {
     };
   });
 }
+
+export function askInvitationCode(): Promise<string> {
+  return inquirer
+    .prompt({
+      message: 'Invitation code (Optional):',
+      name: 'invitationCode',
+      type: 'input',
+      validate: () => {
+        return true;
+      }
+    })
+    .then((answers) => {
+      return answers.invitationCode;
+    });
+}

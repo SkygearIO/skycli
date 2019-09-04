@@ -2,14 +2,22 @@ import chalk from 'chalk';
 
 import { Arguments, createCommand } from '../../util';
 import { requireClusterConfig } from '../middleware';
-import { askCredentials } from './util';
+import { askCredentials, askInvitationCode } from './util';
 import { cliContainer } from '../../container';
+import { JSONObject } from '@skygear/node-client';
 
 async function run(argv: Arguments) {
   const answers = await askCredentials(argv);
+  const invitationCode = await askInvitationCode();
+  const metadata: JSONObject = {};
+  if (invitationCode) {
+    metadata['invitation_code'] = invitationCode;
+  }
+
   await cliContainer.container.auth.signup(
     { email: answers.email },
-    answers.password
+    answers.password,
+    { metadata }
   );
   console.log(chalk`Sign up as {green ${answers.email}}.`);
 }
