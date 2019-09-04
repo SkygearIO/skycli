@@ -1,5 +1,6 @@
 import { Arguments, createCommand, getCommandGroupHelpMessage } from '../util';
 import appCreate from './app/create';
+import appList from './app/list';
 import appDeploy from './app/deploy';
 import appScaffold from './app/scaffold';
 import viewUserConfig from './app/viewUserConfig';
@@ -7,6 +8,7 @@ import updateUserConfig from './app/updateUserConfig';
 
 const subCommands = [
   appCreate,
+  appList,
   appScaffold,
   appDeploy,
   viewUserConfig,
