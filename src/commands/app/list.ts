@@ -1,6 +1,4 @@
-import Table, { HorizontalTable } from 'cli-table3';
-
-import { Arguments, createCommand, displayDate } from '../../util';
+import { Arguments, createCommand, displayDate, createTable } from '../../util';
 import { requireClusterConfig, requireUser } from '../middleware';
 import { cliContainer } from '../../container';
 
@@ -10,9 +8,7 @@ async function run(_: Arguments) {
     console.log('No applications');
     return;
   }
-  const table = new Table({
-    head: ['NAME', 'CREATED_AT']
-  }) as HorizontalTable;
+  const table = createTable({ head: ['NAME', 'CREATED_AT'] });
   apps.map((a) => {
     table.push([a.name, displayDate(a.created_at)]);
   });
