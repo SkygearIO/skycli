@@ -5,6 +5,7 @@ import appDeploy from './app/deploy';
 import appScaffold from './app/scaffold';
 import viewUserConfig from './app/viewUserConfig';
 import updateUserConfig from './app/updateUserConfig';
+import addCollaborator from './app/addCollaborator';
 
 const subCommands = [
   appCreate,
@@ -12,7 +13,8 @@ const subCommands = [
   appScaffold,
   appDeploy,
   viewUserConfig,
-  updateUserConfig
+  updateUserConfig,
+  addCollaborator
 ];
 
 function run(_argv: Arguments) {

@@ -155,4 +155,17 @@ export class ControllerContainer<T extends BaseAPIClient> {
       json: payload as any,
     });
   }
+
+  async addCollaborator(appName: string, email: string): Promise<boolean> {
+    return this.fetchAPI("POST", `${this.CONTROLLER_URL}/app/add_collaborator`, {
+      json: {
+        app_name: appName,
+        email: email,
+      },
+    }).then(({ invitation }) => {
+      // false means user is added to the app directly
+      // true means invitation is sent
+      return !!invitation;
+    });
+  }
 }
