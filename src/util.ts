@@ -18,6 +18,7 @@ import { Arguments as YargsArguments, Argv } from 'yargs';
 import { AppConfig, CLIContext, GlobalConfig } from './types';
 import { printError } from './error';
 import { cliContainer } from './container';
+import Table, { HorizontalTable } from 'cli-table3';
 
 export interface Arguments extends YargsArguments {
   debug: boolean;
@@ -93,4 +94,30 @@ For detailed information on this command and its flags, run:
 
 export function displayDate(date: Date): string {
   return date && moment(date).format('YYYY-MM-DD HH:mm:ss Z');
+}
+
+export function createTable(
+  options?: Table.TableConstructorOptions
+): HorizontalTable {
+  return new Table({
+    chars: {
+      top: '',
+      'top-mid': '',
+      'top-left': '',
+      'top-right': '',
+      bottom: '',
+      'bottom-mid': '',
+      'bottom-left': '',
+      'bottom-right': '',
+      left: '',
+      'left-mid': '',
+      mid: '',
+      'mid-mid': '',
+      right: '',
+      'right-mid': '',
+      middle: ' '
+    },
+    style: { 'padding-left': 0, 'padding-right': 2, head: [] },
+    ...options
+  }) as HorizontalTable;
 }

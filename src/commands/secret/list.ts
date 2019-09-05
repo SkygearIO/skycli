@@ -1,7 +1,6 @@
 import chalk from 'chalk';
-import Table, { HorizontalTable } from 'cli-table3';
 
-import { Arguments, createCommand, displayDate } from '../../util';
+import { Arguments, createCommand, displayDate, createTable } from '../../util';
 import { requireApp, requireClusterConfig, requireUser } from '../middleware';
 import { cliContainer } from '../../container';
 
@@ -11,9 +10,8 @@ async function run(argv: Arguments) {
     console.log(chalk`No secrets in app {green ${argv.context.app || ''}}`);
     return;
   }
-  const table = new Table({
-    head: ['NAME', 'CREATED_AT']
-  }) as HorizontalTable;
+
+  const table = createTable({ head: ['NAME', 'CREATED_AT'] });
   secrets.map((s) => {
     table.push([s.name, displayDate(s.created_at)]);
   });
