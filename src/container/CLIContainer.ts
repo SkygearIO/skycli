@@ -1,6 +1,6 @@
 import { ReadStream } from 'fs';
 import fetch, { Response, RequestInit } from 'node-fetch';
-import { BaseAPIClient } from '@skygear/node-client';
+import { BaseAPIClient, decodeError } from '@skygear/node-client';
 
 import { ControllerContainer } from './ControllerContainer';
 import {
@@ -13,7 +13,6 @@ import {
   HookConfig,
   LogEntry
 } from './types';
-import { makeHTTPError } from '../error';
 
 function encodeDeploymentItemConfig(deployment: DeploymentItemConfig): any {
   switch (deployment.type) {
@@ -76,8 +75,8 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
       `${this.CONTROLLER_URL}/example/download/${exampleName}.tar.gz`
     )) as any) as Response;
     if (resp.status !== 200) {
-      const httpError = await makeHTTPError(resp);
-      throw httpError;
+      const body = await resp.text();
+      throw decodeError(body);
     }
     return resp;
   }
@@ -287,8 +286,8 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
       }
     )) as any) as Response;
     if (resp.status !== 200 && resp.status !== 206 && resp.status !== 416) {
-      const httpError = await makeHTTPError(resp);
-      throw httpError;
+      const jsonBody = await resp.json();
+      throw decodeError(jsonBody['error'] || resp.statusText);
     }
 
     return resp;
