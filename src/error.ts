@@ -1,10 +1,6 @@
 import chalk from 'chalk';
 import { Response } from 'node-fetch';
-import { SkygearError } from '@skygear/node-client';
-
-export const ErrorNameInvalidArgument = 'InvalidArgument';
-export const ErrorNamePermissionDenied = 'PermissionDenied';
-export type ErrorName = typeof ErrorNameInvalidArgument;
+import { SkygearErrorName, SkygearError } from '@skygear/node-client';
 
 export class HTTPError extends Error {
   response: Response;
@@ -40,9 +36,9 @@ export function printError(error: any) {
   // skyerr from controller
   if (error instanceof HTTPError && error.json && error.json.error) {
     const skyerr = error.json.error;
-    switch (skyerr.name) {
+    switch (skyerr.name as SkygearErrorName) {
       // invalid argument
-      case ErrorNameInvalidArgument:
+      case 'InvalidArgument':
         s = [skyerr.message, ...(skyerr.info.arguments || [])].join('\n');
         break;
       default:
@@ -51,8 +47,8 @@ export function printError(error: any) {
     }
   } else if (error instanceof SkygearError) {
     // skygear error from sdk
-    switch (error.name) {
-      case ErrorNamePermissionDenied:
+    switch (error.name as SkygearErrorName) {
+      case 'PermissionDenied':
         // maybe webhook error, try getting reason from info
         if (error.info && error.info['errors']) {
           s = (error.info['errors'] as { reason: string }[])
