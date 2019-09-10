@@ -14,39 +14,6 @@ import {
   LogEntry
 } from './types';
 
-function encodeDeploymentItemConfig(deployment: DeploymentItemConfig): any {
-  switch (deployment.type) {
-    case 'http-handler':
-      return {
-        type: deployment.type,
-        path: deployment.path,
-        secrets: deployment.secrets,
-        src: deployment.src,
-        entry: deployment.entry,
-        runtime_environment: deployment.runtime_environment
-      };
-    case 'http-service':
-      return {
-        type: deployment.type,
-        path: deployment.path,
-        secrets: deployment.secrets,
-        port: deployment.port,
-        context: deployment.context,
-        dockerfile: deployment.dockerfile,
-        environment: deployment.environment
-      };
-    default:
-      throw new Error('unexpected type');
-  }
-}
-
-function encodeHook(hook: HookConfig): any {
-  return {
-    event: hook.event,
-    path: hook.path || ''
-  };
-}
-
 function encodeLogEntry(input: any): LogEntry {
   return {
     level: input.level,
@@ -179,18 +146,11 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
     deployments: { [name: string]: DeploymentItemConfig },
     hooks: HookConfig[]
   ): Promise<void> {
-    const encodedDeploymentItemConfigMap: { [key: string]: any } = {};
-    Object.keys(deployments).map((key) => {
-      encodedDeploymentItemConfigMap[key] = encodeDeploymentItemConfig(
-        deployments[key]
-      );
-    });
-    const encodedHooks = hooks.map(encodeHook);
     return this.fetchAPI('POST', '/_controller/deployment/validate', {
       json: {
         app_name: appName,
-        deployments: encodedDeploymentItemConfigMap,
-        hooks: encodedHooks
+        deployments: deployments as any,
+        hooks: hooks as any
       }
     });
   }
@@ -201,19 +161,12 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
     artifactIDs: { [name: string]: string },
     hooks: HookConfig[]
   ): Promise<string> {
-    const encodedDeploymentItemConfigMap: { [key: string]: any } = {};
-    Object.keys(deployments).map((key) => {
-      encodedDeploymentItemConfigMap[key] = encodeDeploymentItemConfig(
-        deployments[key]
-      );
-    });
-    const encodedHooks = hooks.map(encodeHook);
     return this.fetchAPI('POST', `${this.CONTROLLER_URL}/deployment`, {
       json: {
         app_name: appName,
         artifact_ids: artifactIDs,
-        deployments: encodedDeploymentItemConfigMap,
-        hooks: encodedHooks,
+        deployments: deployments as any,
+        hooks: hooks as any,
         sync: true
       }
     }).then(({ deployment }) => {
