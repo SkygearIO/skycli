@@ -1,6 +1,6 @@
-skygear.config({
-  endPoint: 'http://localhost:3001/',
-  apiKey: 'changeme'
+skygear.defaultContainer.configure({
+  endpoint: 'CHANGE_TO_YOUR_APPS_ENDPOINT',
+  apiKey: 'CHANGE_TO_YOUR_APPS_API_KEY'
 });
 
 function goToIndex() {
@@ -15,54 +15,37 @@ function setSignupErrorMsg(msg) {
   $('#signup-error').text(msg);
 }
 
-function signup(email, password, data) {
-  skygear.auth
-    .signup(
-      {
-        email: email
-      },
-      password,
-      data
-    )
-    .then(
-      function(user) {
-        goToWriteBlogs();
-      },
-      function(err) {
-        stopLoading();
-        setSignupErrorMsg(err);
-      }
-    );
+function signup(email, password) {
+  skygear.defaultContainer.auth.signup({ email: email }, password).then(
+    function(user) {
+      goToWriteBlogs();
+    },
+    function(err) {
+      stopLoading();
+      setSignupErrorMsg(err);
+    }
+  );
 }
 
 function login(email, password) {
-  skygear.auth
-    .login(
-      {
-        email: email
-      },
-      password
-    )
-    .then(
-      function(user) {
-        goToWriteBlogs();
-      },
-      function(err) {
-        stopLoading();
-        setSignupErrorMsg(err);
-      }
-    );
+  skygear.defaultContainer.auth.login(email, password).then(
+    function(user) {
+      goToWriteBlogs();
+    },
+    function(err) {
+      stopLoading();
+      setSignupErrorMsg(err);
+    }
+  );
 }
 
 $('#signup-btn').click(function() {
   var email = $('#signupInputEmail').val();
   var password = $('#signupInputPassword').val();
-  var role = $('#signupInputRole').val();
-  var data = { role: role };
   var wantLogin = $('#loginCheck').is(':checked');
   startLoading();
   if (!wantLogin) {
-    signup(email, password, data);
+    signup(email, password);
   } else {
     login(email, password);
   }
@@ -71,7 +54,7 @@ $('#signup-btn').click(function() {
 });
 
 $('#logout-btn').click(function() {
-  skygear.auth.logout().then(function() {
+  skygear.defaultContainer.auth.logout().then(function() {
     goToIndex();
   });
 });
@@ -80,33 +63,50 @@ $('#write-blog-btn').click(function() {
   var title = $('#blogTitleInput').val();
   var content = $('#blogContentTextArea').val();
   var data = {
-    userID: skygear.auth.currentUser.userID,
+    userID: skygear.defaultContainer.auth.currentUser.id,
     title,
     content
   };
 
   startLoading();
-  skygear.lambda('api/write_blog', data).then(function() {
-    stopLoading();
-    $('#write-blog-form').trigger('reset');
-  });
+
+  skygear.defaultContainer
+    .fetch('/api/write_blog', {
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+    .then(function() {
+      stopLoading();
+      $('#write-blog-form').trigger('reset');
+    });
 
   return false;
 });
 
 function fetchBlogs() {
-  skygear.lambda('api/fetch_blogs', {}).then(function(results) {
-    let output = '';
-    if (results) {
-      results.forEach((r) => {
-        output += `<div><p>title: ${r.title}</p><p>content: ${
-          r.content
-        }</p><hr/></div>`;
-      });
-    }
-    stopLoading();
-    $('#demos-section').append(output);
-  });
+  skygear.defaultContainer
+    .fetch('api/fetch_blogs', {
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then((resp) => resp.json())
+    .then(function({ result }) {
+      let output = '';
+      if (result) {
+        result.forEach((r) => {
+          output += `<div><p>title: ${r.title}</p><p>content: ${r.content}</p><hr/></div>`;
+        });
+      }
+      stopLoading();
+      $('#demos-section').append(output);
+    });
 }
 
 function startLoading() {

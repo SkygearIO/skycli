@@ -1,11 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="stylesheet" href="main.css">
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="main.css" />
     <title>skygear next demo</title>
   </head>
   <body>
@@ -13,9 +21,9 @@
       <header>
         <h1>skygear next demo</h1>
       </header>
-      <hr/>
+      <hr />
       <div id="signup-section">
-        <h3>Signup / Login</h3>
+        <h3>Sign Up / Log In</h3>
         <div class="text-center">
           <div class="spinner-border d-none" role="status" id="loading">
             <span class="sr-only">Loading...</span>
@@ -24,25 +32,30 @@
         <form id="signup-form">
           <div class="form-group">
             <label for="signupInputEmail">Email address</label>
-            <input type="email" class="form-control" id="signupInputEmail" placeholder="Enter email">
+            <input
+              type="email"
+              class="form-control"
+              id="signupInputEmail"
+              placeholder="Enter email"
+            />
           </div>
           <div class="form-group">
             <label for="signupInputPassword">Password</label>
-            <input type="password" class="form-control" id="signupInputPassword" placeholder="Password">
-          </div>
-          <div class="form-group">
-            <label for="signupInputRole">Role</label>
-            <select class="form-control" id="signupInputRole">
-              <option>Writer</option>
-              <option>Viewer</option>
-            </select>
+            <input
+              type="password"
+              class="form-control"
+              id="signupInputPassword"
+              placeholder="Password"
+            />
           </div>
           <div class="form-group form-check">
-            <input type="checkbox" class="form-check-input" id="loginCheck">
+            <input type="checkbox" class="form-check-input" id="loginCheck" />
             <label class="form-check-label" for="loginCheck">Login</label>
           </div>
           <div class="form-group">
-            <button type="submit" class="btn btn-primary" id="signup-btn">Submit</button>
+            <button type="submit" class="btn btn-primary" id="signup-btn">
+              Submit
+            </button>
           </div>
           <p id="signup-error"></p>
         </form>
@@ -52,7 +65,7 @@
     <script src="skygear.min.js"></script>
     <script src="main.js"></script>
     <script>
-      var currentUser = skygear.auth.currentUser;
+      var currentUser = skygear.defaultContainer.auth.currentUser;
       if (currentUser) {
         goToWriteBlogs();
       }
