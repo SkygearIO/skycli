@@ -2,11 +2,13 @@ import chalk from 'chalk';
 import fs from 'fs-extra';
 import inquirer from 'inquirer';
 import path from 'path';
-import tar from 'tar';
 
 import { Arguments, createCommand } from '../../util';
 import { requireClusterConfig, requireUser } from '../middleware';
 import { cliContainer } from '../../container';
+
+const gunzip = require('gunzip-maybe');
+const tar = require('tar-fs');
 
 async function selectApp(argv: Arguments): Promise<string> {
   if (argv.app && typeof argv.app === 'string') {
@@ -87,12 +89,8 @@ async function run(argv: Arguments) {
   // save the example to project dir
   await new Promise((resolve, reject) => {
     resp.body
-      .pipe(
-        tar.x({
-          C: projectDir,
-          strip: 1
-        })
-      )
+      .pipe(gunzip())
+      .pipe(tar.extract(projectDir, { strip: true }))
       .on('error', reject)
       .on('finish', resolve);
   });
