@@ -64,3 +64,25 @@ export async function dockerignore(dir: string): Promise<string[]> {
     return pathnames;
   }
 }
+
+// Filter the paths with ignore file
+export async function skyignorePaths(
+  paths: string[],
+  ignoreFile: string
+): Promise<string[]> {
+  const skyignoreFile = await readFile(ignoreFile);
+  const ig = gitignore();
+  ig.add(skyignoreFile.toString());
+  return paths.filter(ig.createFilter());
+}
+
+// Filter the paths with ignore file
+export async function dockerignorePaths(
+  paths: string[],
+  ignoreFile: string
+): Promise<string[]> {
+  const dockerignoreFile = await readFile(ignoreFile);
+  const ig = zeitdockerignore();
+  ig.add(dockerignoreFile.toString());
+  return paths.filter(ig.createFilter());
+}

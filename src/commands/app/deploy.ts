@@ -1,16 +1,21 @@
 import chalk from 'chalk';
 import crypto from 'crypto';
-import fs from 'fs';
+import fs from 'fs-extra';
 import inquirer from 'inquirer';
 import os from 'os';
 import path from 'path';
-import tar from 'tar';
+import zlib from 'zlib';
 
 import { isHTTP404 } from '../../error';
 import { CLIContext } from '../../types';
 import { Arguments, createCommand } from '../../util';
 import requireUser from '../middleware/requireUser';
-import { skyignore, dockerignore } from '../../ignore';
+import {
+  walk,
+  skyignore,
+  skyignorePaths,
+  dockerignorePaths
+} from '../../ignore';
 import { cliContainer } from '../../container';
 import {
   DeploymentStatus,
@@ -21,6 +26,9 @@ import {
   HttpServiceConfig
 } from '../../container/types';
 
+const gunzip = require('gunzip-maybe');
+const tar = require('tar-fs');
+
 function createArchivePath(index: number) {
   return path.join(os.tmpdir(), `skygear-src-${index}.tgz`);
 }
@@ -29,28 +37,9 @@ function createArchiveReadStream(archivePath: string) {
   return fs.createReadStream(archivePath);
 }
 
-async function tarCreate(options: {
-  cwd: string;
-  file: string;
-  paths: string[];
-}): Promise<void> {
-  const opt = {
-    cwd: options.cwd,
-    file: options.file,
-    gzip: true,
-    // set portable to true, so the archive is the same for same content
-    portable: true
-  };
-  await tar.create(opt, options.paths);
-}
-
 function archiveCloudCodeSrc(srcPath: string, archivePath: string) {
   return skyignore(srcPath).then((paths: string[]) => {
-    return tarCreate({
-      cwd: srcPath,
-      file: archivePath,
-      paths
-    });
+    return createTar({ srcPath: paths }, archivePath);
   });
 }
 
@@ -58,7 +47,48 @@ async function archiveMicroserviceSrc(
   config: HttpServiceConfig,
   archivePath: string
 ) {
-  const paths = await dockerignore(config.context);
+  const ignoreFuncMap: {
+    [ignoreFileName: string]: (
+      paths: string[],
+      ignoreFile: string
+    ) => Promise<string[]>;
+  } = {
+    '.dockerignore': dockerignorePaths,
+    '.skyignore': skyignorePaths
+  };
+  const ignoreFilePathMap: {
+    [ignoreFileName: string]: string;
+  } = {};
+
+  // code folders to merge, append template if it is provided
+  const codeFolders = [config.context];
+  if (config.template) {
+    codeFolders.push(createTemplatePath(config.template));
+  }
+
+  const folderToPathsMap: { [folder: string]: string[] } = {};
+  const pathsSet = new Set();
+  // prepare folderToPathsMap and check duplicate
+  for (const folder of codeFolders) {
+    folderToPathsMap[folder] = await walk(folder);
+    for (const p of folderToPathsMap[folder]) {
+      // throw error if file duplicate
+      if (pathsSet.has(p)) {
+        throw Error(
+          `${p} is reserved file, please remove it from folder ${
+            config.context
+          }`
+        );
+      }
+      pathsSet.add(p);
+
+      // check if path match the ingore file name, store the path
+      if (ignoreFuncMap[p]) {
+        ignoreFilePathMap[p] = path.join(folder, p);
+      }
+    }
+  }
+
   // Verify dockerfile exist
   const dockerfile: string = config.dockerfile || 'Dockerfile';
   // path.join("./a/b") === "a/b";
@@ -66,16 +96,66 @@ async function archiveMicroserviceSrc(
   // because the value in paths are all implicit
   // A path is implicit is it is relative and does not start with "./"
   const dockerfilePath = path.join(dockerfile);
-  if (paths.indexOf(dockerfilePath) < 0) {
+  let hasDockerfile = false;
+
+  // filter paths by ignore files
+  for (const folder of Object.keys(folderToPathsMap)) {
+    for (const ignoreFile of Object.keys(ignoreFilePathMap)) {
+      const ignoreFilePath = ignoreFilePathMap[ignoreFile];
+      folderToPathsMap[folder] = await ignoreFuncMap[ignoreFile](
+        folderToPathsMap[folder],
+        ignoreFilePath
+      );
+    }
+
+    hasDockerfile =
+      hasDockerfile || folderToPathsMap[folder].indexOf(dockerfilePath) !== -1;
+  }
+
+  if (!hasDockerfile) {
     throw new Error(
       'expected dockerfile to exists: ' +
         path.join(config.context, dockerfilePath)
     );
   }
-  return tarCreate({
-    cwd: config.context,
-    file: archivePath,
-    paths
+
+  return await createTar(folderToPathsMap, archivePath);
+}
+
+async function createTar(
+  folderToPathsMap: { [folder: string]: string[] },
+  archivePath: string
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const z = zlib.createGzip();
+    const folders = Object.keys(folderToPathsMap);
+    createPack(folders, folderToPathsMap, null, 0)
+      .pipe(z)
+      .pipe(fs.createWriteStream(archivePath))
+      .on('error', reject)
+      .on('finish', resolve);
+  });
+}
+
+function createPack(
+  folders: string[],
+  folderToPathsMap: { [folder: string]: string[] },
+  pack?: any,
+  cur: number = 0
+): any {
+  const folder = folders[cur];
+  const paths = folderToPathsMap[folder];
+  const finalize = cur >= folders.length - 1;
+  return tar.pack(folder, {
+    finalize: finalize,
+    finish: function(partsOfPack: any) {
+      cur += 1;
+      if (!finalize) {
+        createPack(folders, folderToPathsMap, partsOfPack, cur);
+      }
+    },
+    pack: pack,
+    entries: paths
   });
 }
 
@@ -217,6 +297,47 @@ async function confirmIfItemsWillBeRemovedInNewDeployment(
   }
 }
 
+function createTemplatePath(templateName: string) {
+  return path.join(
+    os.tmpdir(),
+    'skygear-templates',
+    encodeURIComponent(templateName)
+  );
+}
+
+async function downloadTemplateIfNeeded(
+  deployments: DeploymentItemsMap,
+  cacheTemplate: boolean = false
+) {
+  const templatesToDownloadSet = new Set<string>();
+  for (const itemName of Object.keys(deployments)) {
+    const d = deployments[itemName];
+    if (d.type === 'http-service' && d.template) {
+      templatesToDownloadSet.add(d.template);
+    }
+  }
+
+  for (const templateName of Array.from(templatesToDownloadSet)) {
+    const templateDir = createTemplatePath(templateName);
+    if (cacheTemplate && fs.existsSync(templateDir)) {
+      // use the cache, skip downloading
+      continue;
+    }
+
+    fs.removeSync(templateDir);
+    fs.ensureDirSync(templateDir);
+
+    const resp = await cliContainer.downloadTemplate(templateName);
+    await new Promise((resolve, reject) => {
+      resp.body
+        .pipe(gunzip())
+        .pipe(tar.extract(templateDir, { strip: true }))
+        .on('error', reject)
+        .on('finish', resolve);
+    });
+  }
+}
+
 function downloadDeployLog(
   context: CLIContext,
   deploymentID: string,
@@ -270,6 +391,8 @@ async function run(argv: Arguments) {
   try {
     const itemNames: string[] = Object.keys(deploymentMap);
     await confirmIfItemsWillBeRemovedInNewDeployment(appName, deploymentMap);
+
+    await downloadTemplateIfNeeded(deploymentMap);
 
     const checksums: Checksum[] = [];
 

@@ -245,4 +245,15 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
 
     return resp;
   }
+
+  async downloadTemplate(template: string): Promise<Response> {
+    const resp = ((await this.container.fetch(
+      `${this.CONTROLLER_URL}/deployment/template/${template}`
+    )) as any) as Response;
+    if (resp.status !== 200) {
+      const body = await resp.text();
+      throw decodeError(body);
+    }
+    return resp;
+  }
 }
