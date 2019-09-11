@@ -10,12 +10,7 @@ import { isHTTP404 } from '../../error';
 import { CLIContext } from '../../types';
 import { Arguments, createCommand } from '../../util';
 import requireUser from '../middleware/requireUser';
-import {
-  walk,
-  skyignore,
-  skyignorePaths,
-  dockerignorePaths
-} from '../../ignore';
+import { walk, dockerignore, dockerignorePaths } from '../../ignore';
 import { cliContainer } from '../../container';
 import {
   DeploymentStatus,
@@ -38,7 +33,7 @@ function createArchiveReadStream(archivePath: string) {
 }
 
 function archiveCloudCodeSrc(srcPath: string, archivePath: string) {
-  return skyignore(srcPath).then((paths: string[]) => {
+  return dockerignore(srcPath, '.skyignore').then((paths: string[]) => {
     return createTar({ srcPath: paths }, archivePath);
   });
 }
@@ -54,7 +49,7 @@ async function archiveMicroserviceSrc(
     ) => Promise<string[]>;
   } = {
     '.dockerignore': dockerignorePaths,
-    '.skyignore': skyignorePaths
+    '.skyignore': dockerignorePaths
   };
   const ignoreFilePathMap: {
     [ignoreFileName: string]: string;
