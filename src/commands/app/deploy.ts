@@ -38,34 +38,44 @@ function archiveCloudCodeSrc(srcPath: string, archivePath: string) {
   });
 }
 
-async function archiveMicroserviceSrc(
+// By reading the microservice deployment config
+// Create map that entries for archive
+// key is the folder path
+// value is array of pathnames that relative to the folder
+export async function createFolderToPathsMapForArchive(
   config: HttpServiceConfig,
-  archivePath: string
-) {
-  const ignoreFuncMap: {
-    [ignoreFileName: string]: (
-      paths: string[],
-      ignoreFile: string
-    ) => Promise<string[]>;
-  } = {
-    '.dockerignore': dockerignorePaths,
-    '.skyignore': dockerignorePaths
-  };
-  const ignoreFilePathMap: {
-    [ignoreFileName: string]: string;
-  } = {};
+  templateFolderPath: string | null = null
+): Promise<{ [folder: string]: string[] }> {
+  const folderToPathsMap: { [folder: string]: string[] } = {};
 
-  // code folders to merge, append template if it is provided
-  const codeFolders = [config.context];
-  if (config.template) {
-    codeFolders.push(createTemplatePath(config.template));
+  // add user code to map
+  // if there is template, use user provided `.skyignore` to ignore files
+  folderToPathsMap[config.context] = templateFolderPath
+    ? await dockerignore(config.context, '.skyignore')
+    : await walk(config.context);
+
+  if (templateFolderPath) {
+    folderToPathsMap[templateFolderPath] = await walk(templateFolderPath);
   }
 
-  const folderToPathsMap: { [folder: string]: string[] } = {};
+  // filter paths by dockeringore
+  // Check files duplicate
+  // Verify dockerfile exist
+  const dockerfile: string = config.dockerfile || 'Dockerfile';
+  // path.join("./a/b") === "a/b";
+  // We need to ensure the path is implicit
+  // because the value in paths are all implicit
+  // A path is implicit is it is relative and does not start with "./"
+  const dockerfilePath = path.join(dockerfile);
   const pathsSet = new Set();
-  // prepare folderToPathsMap and check duplicate
-  for (const folder of codeFolders) {
-    folderToPathsMap[folder] = await walk(folder);
+  let hasDockerfile = false;
+  for (const folder of Object.keys(folderToPathsMap)) {
+    // eslint-disable-next-line no-await-in-loop
+    const filtered = await dockerignorePaths(
+      folderToPathsMap[folder],
+      path.join(templateFolderPath || config.context, '.dockerignore')
+    );
+    folderToPathsMap[folder] = filtered;
     for (const p of folderToPathsMap[folder]) {
       // throw error if file duplicate
       if (pathsSet.has(p)) {
@@ -76,35 +86,8 @@ async function archiveMicroserviceSrc(
         );
       }
       pathsSet.add(p);
-
-      // check if path match the ingore file name, store the path
-      if (ignoreFuncMap[p]) {
-        ignoreFilePathMap[p] = path.join(folder, p);
-      }
+      hasDockerfile = hasDockerfile || p === dockerfilePath;
     }
-  }
-
-  // Verify dockerfile exist
-  const dockerfile: string = config.dockerfile || 'Dockerfile';
-  // path.join("./a/b") === "a/b";
-  // We need to ensure the path is implicit
-  // because the value in paths are all implicit
-  // A path is implicit is it is relative and does not start with "./"
-  const dockerfilePath = path.join(dockerfile);
-  let hasDockerfile = false;
-
-  // filter paths by ignore files
-  for (const folder of Object.keys(folderToPathsMap)) {
-    for (const ignoreFile of Object.keys(ignoreFilePathMap)) {
-      const ignoreFilePath = ignoreFilePathMap[ignoreFile];
-      folderToPathsMap[folder] = await ignoreFuncMap[ignoreFile](
-        folderToPathsMap[folder],
-        ignoreFilePath
-      );
-    }
-
-    hasDockerfile =
-      hasDockerfile || folderToPathsMap[folder].indexOf(dockerfilePath) !== -1;
   }
 
   if (!hasDockerfile) {
@@ -114,7 +97,19 @@ async function archiveMicroserviceSrc(
     );
   }
 
-  return await createTar(folderToPathsMap, archivePath);
+  return folderToPathsMap;
+}
+
+async function archiveMicroserviceSrc(
+  config: HttpServiceConfig,
+  archivePath: string,
+  templateFolderPath: string | null = null
+) {
+  const folderToPathsMap = await createFolderToPathsMapForArchive(
+    config,
+    templateFolderPath
+  );
+  return createTar(folderToPathsMap, archivePath);
 }
 
 async function createTar(
@@ -192,7 +187,11 @@ async function archiveDeploymentItem(
       await archiveCloudCodeSrc(deployment.src, archivePath);
       break;
     case 'http-service':
-      await archiveMicroserviceSrc(deployment, archivePath);
+      await archiveMicroserviceSrc(
+        deployment,
+        archivePath,
+        deployment.template && createTemplatePath(deployment.template)
+      );
       break;
     default:
       throw new Error('unexpected type');
@@ -322,7 +321,10 @@ async function downloadTemplateIfNeeded(
     fs.removeSync(templateDir);
     fs.ensureDirSync(templateDir);
 
+    // eslint-disable-next-line no-await-in-loop
     const resp = await cliContainer.downloadTemplate(templateName);
+
+    // eslint-disable-next-line no-await-in-loop
     await new Promise((resolve, reject) => {
       resp.body
         .pipe(gunzip())

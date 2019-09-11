@@ -58,8 +58,12 @@ export async function dockerignorePaths(
   paths: string[],
   ignoreFilePath: string
 ): Promise<string[]> {
-  const dockerignoreFile = await readFile(ignoreFilePath);
-  const ig = zeitdockerignore();
-  ig.add(dockerignoreFile.toString());
-  return paths.filter(ig.createFilter());
+  try {
+    const dockerignoreFile = await readFile(ignoreFilePath);
+    const ig = zeitdockerignore();
+    ig.add(dockerignoreFile.toString());
+    return paths.filter(ig.createFilter());
+  } catch (e) {
+    return paths;
+  }
 }
