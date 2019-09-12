@@ -100,3 +100,8 @@ export interface Deployment {
   id: string;
   status: DeploymentStatus;
 }
+
+export interface Collaborator {
+  id: string;
+  email: string;
+}
