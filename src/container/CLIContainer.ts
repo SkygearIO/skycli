@@ -251,8 +251,8 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
       `${this.CONTROLLER_URL}/deployment/template/${template}`
     )) as any) as Response;
     if (resp.status !== 200) {
-      const body = await resp.text();
-      throw decodeError(body);
+      const jsonBody = await resp.json();
+      throw decodeError(jsonBody['error'] || resp.statusText);
     }
     return resp;
   }
