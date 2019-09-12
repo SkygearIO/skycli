@@ -6,7 +6,7 @@ import {
   decodeError
 } from '@skygear/node-client';
 
-import { Secret, App, UserConfiguration, Endpoint } from "./types";
+import { Secret, App, UserConfiguration, Endpoint, Collaborator } from "./types";
 
 function decodeApp(app: any): App {
   return {
@@ -156,10 +156,16 @@ export class ControllerContainer<T extends BaseAPIClient> {
     });
   }
 
+  async getCollaborators(appName: string): Promise<Collaborator[]> {
+    return this.fetchAPI(
+      "GET",
+      `${this.CONTROLLER_URL}/app/${appName}/collaborators`
+    ).then(({ collaborators }) => collaborators);
+  }
+
   async addCollaborator(appName: string, email: string): Promise<boolean> {
-    return this.fetchAPI("POST", `${this.CONTROLLER_URL}/app/add_collaborator`, {
+    return this.fetchAPI("POST", `${this.CONTROLLER_URL}/app/${appName}/collaborator`, {
       json: {
-        app_name: appName,
         email: email,
       },
     }).then(({ invitation }) => {
@@ -167,5 +173,12 @@ export class ControllerContainer<T extends BaseAPIClient> {
       // true means invitation is sent
       return !!invitation;
     });
+  }
+
+  async removeCollaborator(appName: string, userID: string): Promise<void> {
+    return this.fetchAPI(
+      "DELETE",
+      `${this.CONTROLLER_URL}/app/${appName}/collaborator/${userID}`
+    );
   }
 }
