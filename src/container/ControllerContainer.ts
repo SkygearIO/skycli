@@ -157,9 +157,8 @@ export class ControllerContainer<T extends BaseAPIClient> {
   }
 
   async addCollaborator(appName: string, email: string): Promise<boolean> {
-    return this.fetchAPI("POST", `${this.CONTROLLER_URL}/app/add_collaborator`, {
+    return this.fetchAPI("POST", `${this.CONTROLLER_URL}/app/${appName}/collaborator`, {
       json: {
-        app_name: appName,
         email: email,
       },
     }).then(({ invitation }) => {
