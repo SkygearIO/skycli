@@ -6,7 +6,8 @@ import {
   decodeUser,
   decodeIdentity,
   User,
-  Identity
+  Identity,
+  ExtraSessionInfoOptions
 } from '@skygear/node-client';
 
 import { CLIContainer } from './CLIContainer';
@@ -70,11 +71,59 @@ class CLIYAMLContainerStorage implements ContainerStorage {
     save(newConfig, ConfigDomain.GlobalDomain);
   }
 
+  async setRefreshToken(namespace: string, refreshToken: string) {
+    const globalConfig = this.loadGlobalConfig();
+    const newConfig = {
+      ...globalConfig,
+      user: {
+        ...globalConfig.user,
+        [namespace]: {
+          ...globalConfig.user[namespace],
+          refresh_token: refreshToken
+        }
+      }
+    };
+    save(newConfig, ConfigDomain.GlobalDomain);
+  }
+
+  async setSessionID(namespace: string, sessionID: string) {
+    const globalConfig = this.loadGlobalConfig();
+    const newConfig = {
+      ...globalConfig,
+      user: {
+        ...globalConfig.user,
+        [namespace]: {
+          ...globalConfig.user[namespace],
+          session_id: sessionID
+        }
+      }
+    };
+    save(newConfig, ConfigDomain.GlobalDomain);
+  }
+
   async setOAuthRedirectAction(
     _namespace: string,
     _oauthRedirectAction: string
   ): Promise<void> {
     throw new Error('Method not implemented.');
+  }
+
+  async setExtraSessionInfoOptions(
+    namespace: string,
+    options: ExtraSessionInfoOptions
+  ) {
+    const globalConfig = this.loadGlobalConfig();
+    const newConfig = {
+      ...globalConfig,
+      user: {
+        ...globalConfig.user,
+        [namespace]: {
+          ...globalConfig.user[namespace],
+          extra_session_info_options: options
+        }
+      }
+    };
+    save(newConfig, ConfigDomain.GlobalDomain);
   }
 
   async getUser(namespace: string): Promise<User | null> {
@@ -103,6 +152,35 @@ class CLIYAMLContainerStorage implements ContainerStorage {
     );
   }
 
+  async getRefreshToken(namespace: string): Promise<string | null> {
+    const globalConfig = this.loadGlobalConfig();
+    return (
+      (globalConfig.user[namespace] &&
+        globalConfig.user[namespace].refresh_token) ||
+      null
+    );
+  }
+
+  async getSessionID(namespace: string): Promise<string | null> {
+    const globalConfig = this.loadGlobalConfig();
+    return (
+      (globalConfig.user[namespace] &&
+        globalConfig.user[namespace].session_id) ||
+      null
+    );
+  }
+
+  async getExtraSessionInfoOptions(
+    namespace: string
+  ): Promise<Partial<ExtraSessionInfoOptions> | null> {
+    const globalConfig = this.loadGlobalConfig();
+    return (
+      (globalConfig.user[namespace] &&
+        globalConfig.user[namespace].extra_session_info_options) ||
+      null
+    );
+  }
+
   async getOAuthRedirectAction(_namespace: string): Promise<string | null> {
     throw new Error('Method not implemented.');
   }
@@ -125,6 +203,20 @@ class CLIYAMLContainerStorage implements ContainerStorage {
     const globalConfig = this.loadGlobalConfig();
     const newConfig = { ...globalConfig };
     delete newConfig.user[namespace].access_token;
+    save(newConfig, ConfigDomain.GlobalDomain);
+  }
+
+  async delRefreshToken(namespace: string) {
+    const globalConfig = this.loadGlobalConfig();
+    const newConfig = { ...globalConfig };
+    delete newConfig.user[namespace].refresh_token;
+    save(newConfig, ConfigDomain.GlobalDomain);
+  }
+
+  async delSessionID(namespace: string) {
+    const globalConfig = this.loadGlobalConfig();
+    const newConfig = { ...globalConfig };
+    delete newConfig.user[namespace].session_id;
     save(newConfig, ConfigDomain.GlobalDomain);
   }
 

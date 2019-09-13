@@ -1,5 +1,10 @@
 import { DeploymentItemConfig, HookConfig } from './container/types';
-import { Identity, User, JSONObject } from '@skygear/node-client';
+import {
+  Identity,
+  User,
+  JSONObject,
+  ExtraSessionInfoOptions
+} from '@skygear/node-client';
 
 export interface ClusterConfig {
   env: string | null;
@@ -11,6 +16,9 @@ export interface ClusterUserConfig {
   identity: JSONObject;
   user: JSONObject;
   access_token: string;
+  refresh_token?: string;
+  session_id?: string;
+  extra_session_info_options?: ExtraSessionInfoOptions;
 }
 export interface ConfigContext {
   cluster: string;
