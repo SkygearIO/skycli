@@ -24,80 +24,56 @@ class CLIYAMLContainerStorage implements ContainerStorage {
     return globalConfig;
   }
 
-  async setUser(namespace: string, user: User): Promise<void> {
-    const e = encodeUser(user);
-    const globalConfig = this.loadGlobalConfig();
-    const newConfig = {
+  private cloneConfigForUserUpdate(
+    globalConfig: GlobalConfig,
+    namespace: string
+  ): GlobalConfig {
+    // deep clone the user config with the given namespace for editing
+    return {
       ...globalConfig,
       user: {
         ...globalConfig.user,
         [namespace]: {
-          ...globalConfig.user[namespace],
-          user: e
+          ...globalConfig.user[namespace]
         }
       }
     };
+  }
+
+  async setUser(namespace: string, user: User): Promise<void> {
+    const e = encodeUser(user);
+    const globalConfig = this.loadGlobalConfig();
+    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
+    newConfig.user[namespace].user = e;
     save(newConfig, ConfigDomain.GlobalDomain);
   }
 
   async setIdentity(namespace: string, identity: Identity): Promise<void> {
     const e = encodeIdentity(identity);
     const globalConfig = this.loadGlobalConfig();
-    const newConfig = {
-      ...globalConfig,
-      user: {
-        ...globalConfig.user,
-        [namespace]: {
-          ...globalConfig.user[namespace],
-          identity: e
-        }
-      }
-    };
+    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
+    newConfig.user[namespace].identity = e;
     save(newConfig, ConfigDomain.GlobalDomain);
   }
 
   async setAccessToken(namespace: string, accessToken: string): Promise<void> {
     const globalConfig = this.loadGlobalConfig();
-    const newConfig = {
-      ...globalConfig,
-      user: {
-        ...globalConfig.user,
-        [namespace]: {
-          ...globalConfig.user[namespace],
-          access_token: accessToken
-        }
-      }
-    };
+    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
+    newConfig.user[namespace].access_token = accessToken;
     save(newConfig, ConfigDomain.GlobalDomain);
   }
 
   async setRefreshToken(namespace: string, refreshToken: string) {
     const globalConfig = this.loadGlobalConfig();
-    const newConfig = {
-      ...globalConfig,
-      user: {
-        ...globalConfig.user,
-        [namespace]: {
-          ...globalConfig.user[namespace],
-          refresh_token: refreshToken
-        }
-      }
-    };
+    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
+    newConfig.user[namespace].refresh_token = refreshToken;
     save(newConfig, ConfigDomain.GlobalDomain);
   }
 
   async setSessionID(namespace: string, sessionID: string) {
     const globalConfig = this.loadGlobalConfig();
-    const newConfig = {
-      ...globalConfig,
-      user: {
-        ...globalConfig.user,
-        [namespace]: {
-          ...globalConfig.user[namespace],
-          session_id: sessionID
-        }
-      }
-    };
+    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
+    newConfig.user[namespace].session_id = sessionID;
     save(newConfig, ConfigDomain.GlobalDomain);
   }
 
@@ -113,16 +89,8 @@ class CLIYAMLContainerStorage implements ContainerStorage {
     options: ExtraSessionInfoOptions
   ) {
     const globalConfig = this.loadGlobalConfig();
-    const newConfig = {
-      ...globalConfig,
-      user: {
-        ...globalConfig.user,
-        [namespace]: {
-          ...globalConfig.user[namespace],
-          extra_session_info_options: options
-        }
-      }
-    };
+    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
+    newConfig.user[namespace].extra_session_info_options = options;
     save(newConfig, ConfigDomain.GlobalDomain);
   }
 
@@ -187,35 +155,35 @@ class CLIYAMLContainerStorage implements ContainerStorage {
 
   async delUser(namespace: string): Promise<void> {
     const globalConfig = this.loadGlobalConfig();
-    const newConfig = { ...globalConfig };
+    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
     delete newConfig.user[namespace].user;
     save(newConfig, ConfigDomain.GlobalDomain);
   }
 
   async delIdentity(namespace: string): Promise<void> {
     const globalConfig = this.loadGlobalConfig();
-    const newConfig = { ...globalConfig };
+    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
     delete newConfig.user[namespace].identity;
     save(newConfig, ConfigDomain.GlobalDomain);
   }
 
   async delAccessToken(namespace: string): Promise<void> {
     const globalConfig = this.loadGlobalConfig();
-    const newConfig = { ...globalConfig };
+    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
     delete newConfig.user[namespace].access_token;
     save(newConfig, ConfigDomain.GlobalDomain);
   }
 
   async delRefreshToken(namespace: string) {
     const globalConfig = this.loadGlobalConfig();
-    const newConfig = { ...globalConfig };
+    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
     delete newConfig.user[namespace].refresh_token;
     save(newConfig, ConfigDomain.GlobalDomain);
   }
 
   async delSessionID(namespace: string) {
     const globalConfig = this.loadGlobalConfig();
-    const newConfig = { ...globalConfig };
+    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
     delete newConfig.user[namespace].session_id;
     save(newConfig, ConfigDomain.GlobalDomain);
   }
