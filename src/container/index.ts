@@ -6,7 +6,8 @@ import {
   decodeUser,
   decodeIdentity,
   User,
-  Identity
+  Identity,
+  ExtraSessionInfoOptions
 } from '@skygear/node-client';
 
 import { CLIContainer } from './CLIContainer';
@@ -23,50 +24,56 @@ class CLIYAMLContainerStorage implements ContainerStorage {
     return globalConfig;
   }
 
-  async setUser(namespace: string, user: User): Promise<void> {
-    const e = encodeUser(user);
-    const globalConfig = this.loadGlobalConfig();
-    const newConfig = {
+  private cloneConfigForUserUpdate(
+    globalConfig: GlobalConfig,
+    namespace: string
+  ): GlobalConfig {
+    // deep clone the user config with the given namespace for editing
+    return {
       ...globalConfig,
       user: {
         ...globalConfig.user,
         [namespace]: {
-          ...globalConfig.user[namespace],
-          user: e
+          ...globalConfig.user[namespace]
         }
       }
     };
+  }
+
+  async setUser(namespace: string, user: User): Promise<void> {
+    const e = encodeUser(user);
+    const globalConfig = this.loadGlobalConfig();
+    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
+    newConfig.user[namespace].user = e;
     save(newConfig, ConfigDomain.GlobalDomain);
   }
 
   async setIdentity(namespace: string, identity: Identity): Promise<void> {
     const e = encodeIdentity(identity);
     const globalConfig = this.loadGlobalConfig();
-    const newConfig = {
-      ...globalConfig,
-      user: {
-        ...globalConfig.user,
-        [namespace]: {
-          ...globalConfig.user[namespace],
-          identity: e
-        }
-      }
-    };
+    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
+    newConfig.user[namespace].identity = e;
     save(newConfig, ConfigDomain.GlobalDomain);
   }
 
   async setAccessToken(namespace: string, accessToken: string): Promise<void> {
     const globalConfig = this.loadGlobalConfig();
-    const newConfig = {
-      ...globalConfig,
-      user: {
-        ...globalConfig.user,
-        [namespace]: {
-          ...globalConfig.user[namespace],
-          access_token: accessToken
-        }
-      }
-    };
+    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
+    newConfig.user[namespace].access_token = accessToken;
+    save(newConfig, ConfigDomain.GlobalDomain);
+  }
+
+  async setRefreshToken(namespace: string, refreshToken: string) {
+    const globalConfig = this.loadGlobalConfig();
+    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
+    newConfig.user[namespace].refresh_token = refreshToken;
+    save(newConfig, ConfigDomain.GlobalDomain);
+  }
+
+  async setSessionID(namespace: string, sessionID: string) {
+    const globalConfig = this.loadGlobalConfig();
+    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
+    newConfig.user[namespace].session_id = sessionID;
     save(newConfig, ConfigDomain.GlobalDomain);
   }
 
@@ -75,6 +82,16 @@ class CLIYAMLContainerStorage implements ContainerStorage {
     _oauthRedirectAction: string
   ): Promise<void> {
     throw new Error('Method not implemented.');
+  }
+
+  async setExtraSessionInfoOptions(
+    namespace: string,
+    options: ExtraSessionInfoOptions
+  ) {
+    const globalConfig = this.loadGlobalConfig();
+    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
+    newConfig.user[namespace].extra_session_info_options = options;
+    save(newConfig, ConfigDomain.GlobalDomain);
   }
 
   async getUser(namespace: string): Promise<User | null> {
@@ -103,28 +120,71 @@ class CLIYAMLContainerStorage implements ContainerStorage {
     );
   }
 
+  async getRefreshToken(namespace: string): Promise<string | null> {
+    const globalConfig = this.loadGlobalConfig();
+    return (
+      (globalConfig.user[namespace] &&
+        globalConfig.user[namespace].refresh_token) ||
+      null
+    );
+  }
+
+  async getSessionID(namespace: string): Promise<string | null> {
+    const globalConfig = this.loadGlobalConfig();
+    return (
+      (globalConfig.user[namespace] &&
+        globalConfig.user[namespace].session_id) ||
+      null
+    );
+  }
+
+  async getExtraSessionInfoOptions(
+    namespace: string
+  ): Promise<Partial<ExtraSessionInfoOptions> | null> {
+    const globalConfig = this.loadGlobalConfig();
+    return (
+      (globalConfig.user[namespace] &&
+        globalConfig.user[namespace].extra_session_info_options) ||
+      null
+    );
+  }
+
   async getOAuthRedirectAction(_namespace: string): Promise<string | null> {
     throw new Error('Method not implemented.');
   }
 
   async delUser(namespace: string): Promise<void> {
     const globalConfig = this.loadGlobalConfig();
-    const newConfig = { ...globalConfig };
+    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
     delete newConfig.user[namespace].user;
     save(newConfig, ConfigDomain.GlobalDomain);
   }
 
   async delIdentity(namespace: string): Promise<void> {
     const globalConfig = this.loadGlobalConfig();
-    const newConfig = { ...globalConfig };
+    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
     delete newConfig.user[namespace].identity;
     save(newConfig, ConfigDomain.GlobalDomain);
   }
 
   async delAccessToken(namespace: string): Promise<void> {
     const globalConfig = this.loadGlobalConfig();
-    const newConfig = { ...globalConfig };
+    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
     delete newConfig.user[namespace].access_token;
+    save(newConfig, ConfigDomain.GlobalDomain);
+  }
+
+  async delRefreshToken(namespace: string) {
+    const globalConfig = this.loadGlobalConfig();
+    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
+    delete newConfig.user[namespace].refresh_token;
+    save(newConfig, ConfigDomain.GlobalDomain);
+  }
+
+  async delSessionID(namespace: string) {
+    const globalConfig = this.loadGlobalConfig();
+    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
+    delete newConfig.user[namespace].session_id;
     save(newConfig, ConfigDomain.GlobalDomain);
   }
 
