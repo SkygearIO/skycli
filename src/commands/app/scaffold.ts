@@ -2,13 +2,13 @@ import chalk from 'chalk';
 import fs from 'fs-extra';
 import inquirer from 'inquirer';
 import path from 'path';
+import * as tar from 'tar-fs';
 
 import { Arguments, createCommand } from '../../util';
 import { requireClusterConfig, requireUser } from '../middleware';
 import { cliContainer } from '../../container';
 
 const gunzip = require('gunzip-maybe');
-const tar = require('tar-fs');
 
 async function selectApp(argv: Arguments): Promise<string> {
   if (argv.app && typeof argv.app === 'string') {

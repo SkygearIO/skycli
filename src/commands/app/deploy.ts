@@ -5,6 +5,7 @@ import inquirer from 'inquirer';
 import os from 'os';
 import path from 'path';
 import zlib from 'zlib';
+import * as tar from 'tar-fs';
 
 import { isHTTP404 } from '../../error';
 import { CLIContext } from '../../types';
@@ -22,7 +23,6 @@ import {
 } from '../../container/types';
 
 const gunzip = require('gunzip-maybe');
-const tar = require('tar-fs');
 
 function createArchivePath(index: number) {
   return path.join(os.tmpdir(), `skygear-src-${index}.tgz`);
