@@ -1,16 +1,17 @@
 import chalk from 'chalk';
 import crypto from 'crypto';
-import fs from 'fs';
+import fs from 'fs-extra';
 import inquirer from 'inquirer';
 import os from 'os';
 import path from 'path';
-import tar from 'tar';
+import zlib from 'zlib';
+import * as tar from 'tar-fs';
 
 import { isHTTP404 } from '../../error';
 import { CLIContext } from '../../types';
 import { Arguments, createCommand } from '../../util';
 import requireUser from '../middleware/requireUser';
-import { skyignore, dockerignore } from '../../ignore';
+import { walk, dockerignore, dockerignorePaths } from '../../ignore';
 import { cliContainer } from '../../container';
 import {
   DeploymentStatus,
@@ -21,6 +22,8 @@ import {
   HttpServiceConfig
 } from '../../container/types';
 
+const gunzip = require('gunzip-maybe');
+
 function createArchivePath(index: number) {
   return path.join(os.tmpdir(), `skygear-src-${index}.tgz`);
 }
@@ -29,36 +32,34 @@ function createArchiveReadStream(archivePath: string) {
   return fs.createReadStream(archivePath);
 }
 
-async function tarCreate(options: {
-  cwd: string;
-  file: string;
-  paths: string[];
-}): Promise<void> {
-  const opt = {
-    cwd: options.cwd,
-    file: options.file,
-    gzip: true,
-    // set portable to true, so the archive is the same for same content
-    portable: true
-  };
-  await tar.create(opt, options.paths);
-}
-
 function archiveCloudCodeSrc(srcPath: string, archivePath: string) {
-  return skyignore(srcPath).then((paths: string[]) => {
-    return tarCreate({
-      cwd: srcPath,
-      file: archivePath,
-      paths
-    });
+  return dockerignore(srcPath, '.skyignore').then((paths: string[]) => {
+    return createTar({ srcPath: paths }, archivePath);
   });
 }
 
-async function archiveMicroserviceSrc(
+// By reading the microservice deployment config
+// Create map that entries for archive
+// key is the folder path
+// value is array of pathnames that relative to the folder
+export async function createFolderToPathsMapForArchive(
   config: HttpServiceConfig,
-  archivePath: string
-) {
-  const paths = await dockerignore(config.context);
+  templateFolderPath: string | null = null
+): Promise<{ [folder: string]: string[] }> {
+  const folderToPathsMap: { [folder: string]: string[] } = {};
+
+  // add user code to map
+  // if there is template, use user provided `.skyignore` to ignore files
+  folderToPathsMap[config.context] = templateFolderPath
+    ? await dockerignore(config.context, '.skyignore')
+    : await walk(config.context);
+
+  if (templateFolderPath) {
+    folderToPathsMap[templateFolderPath] = await walk(templateFolderPath);
+  }
+
+  // filter paths by dockeringore
+  // Check files duplicate
   // Verify dockerfile exist
   const dockerfile: string = config.dockerfile || 'Dockerfile';
   // path.join("./a/b") === "a/b";
@@ -66,16 +67,85 @@ async function archiveMicroserviceSrc(
   // because the value in paths are all implicit
   // A path is implicit is it is relative and does not start with "./"
   const dockerfilePath = path.join(dockerfile);
-  if (paths.indexOf(dockerfilePath) < 0) {
+  const pathsSet = new Set();
+  let hasDockerfile = false;
+  for (const folder of Object.keys(folderToPathsMap)) {
+    // eslint-disable-next-line no-await-in-loop
+    const filtered = await dockerignorePaths(
+      folderToPathsMap[folder],
+      path.join(templateFolderPath || config.context, '.dockerignore')
+    );
+    folderToPathsMap[folder] = filtered;
+    for (const p of folderToPathsMap[folder]) {
+      // throw error if file duplicate
+      if (pathsSet.has(p)) {
+        throw Error(
+          `${p} is reserved file, please remove it from folder ${
+            config.context
+          }`
+        );
+      }
+      pathsSet.add(p);
+      hasDockerfile = hasDockerfile || p === dockerfilePath;
+    }
+  }
+
+  if (!hasDockerfile) {
     throw new Error(
       'expected dockerfile to exists: ' +
         path.join(config.context, dockerfilePath)
     );
   }
-  return tarCreate({
-    cwd: config.context,
-    file: archivePath,
-    paths
+
+  return folderToPathsMap;
+}
+
+async function archiveMicroserviceSrc(
+  config: HttpServiceConfig,
+  archivePath: string,
+  templateFolderPath: string | null = null
+) {
+  const folderToPathsMap = await createFolderToPathsMapForArchive(
+    config,
+    templateFolderPath
+  );
+  return createTar(folderToPathsMap, archivePath);
+}
+
+async function createTar(
+  folderToPathsMap: { [folder: string]: string[] },
+  archivePath: string
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const z = zlib.createGzip();
+    const folders = Object.keys(folderToPathsMap);
+    createPack(folders, folderToPathsMap, null, 0)
+      .pipe(z)
+      .pipe(fs.createWriteStream(archivePath))
+      .on('error', reject)
+      .on('finish', resolve);
+  });
+}
+
+function createPack(
+  folders: string[],
+  folderToPathsMap: { [folder: string]: string[] },
+  pack?: any,
+  cur: number = 0
+): any {
+  const folder = folders[cur];
+  const paths = folderToPathsMap[folder];
+  const finalize = cur >= folders.length - 1;
+  return tar.pack(folder, {
+    finalize: finalize,
+    finish: function(partsOfPack: any) {
+      cur += 1;
+      if (!finalize) {
+        createPack(folders, folderToPathsMap, partsOfPack, cur);
+      }
+    },
+    pack: pack,
+    entries: paths
   });
 }
 
@@ -117,7 +187,11 @@ async function archiveDeploymentItem(
       await archiveCloudCodeSrc(deployment.src, archivePath);
       break;
     case 'http-service':
-      await archiveMicroserviceSrc(deployment, archivePath);
+      await archiveMicroserviceSrc(
+        deployment,
+        archivePath,
+        deployment.template && createTemplatePath(deployment.template)
+      );
       break;
     default:
       throw new Error('unexpected type');
@@ -217,6 +291,50 @@ async function confirmIfItemsWillBeRemovedInNewDeployment(
   }
 }
 
+function createTemplatePath(templateName: string) {
+  return path.join(
+    os.tmpdir(),
+    'skygear-templates',
+    encodeURIComponent(templateName)
+  );
+}
+
+async function downloadTemplateIfNeeded(
+  deployments: DeploymentItemsMap,
+  cacheTemplate: boolean = false
+) {
+  const templatesToDownloadSet = new Set<string>();
+  for (const itemName of Object.keys(deployments)) {
+    const d = deployments[itemName];
+    if (d.type === 'http-service' && d.template) {
+      templatesToDownloadSet.add(d.template);
+    }
+  }
+
+  for (const templateName of Array.from(templatesToDownloadSet)) {
+    const templateDir = createTemplatePath(templateName);
+    if (cacheTemplate && fs.existsSync(templateDir)) {
+      // use the cache, skip downloading
+      continue;
+    }
+
+    fs.removeSync(templateDir);
+    fs.ensureDirSync(templateDir);
+
+    // eslint-disable-next-line no-await-in-loop
+    const resp = await cliContainer.downloadTemplate(templateName);
+
+    // eslint-disable-next-line no-await-in-loop
+    await new Promise((resolve, reject) => {
+      resp.body
+        .pipe(gunzip())
+        .pipe(tar.extract(templateDir, { strip: true }))
+        .on('error', reject)
+        .on('finish', resolve);
+    });
+  }
+}
+
 function downloadDeployLog(
   context: CLIContext,
   deploymentID: string,
@@ -270,6 +388,8 @@ async function run(argv: Arguments) {
   try {
     const itemNames: string[] = Object.keys(deploymentMap);
     await confirmIfItemsWillBeRemovedInNewDeployment(appName, deploymentMap);
+
+    await downloadTemplateIfNeeded(deploymentMap);
 
     const checksums: Checksum[] = [];
 

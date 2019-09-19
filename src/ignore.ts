@@ -5,7 +5,6 @@ import {
 } from 'fs';
 import { promisify } from 'util';
 import { join, relative } from 'path';
-import gitignore from 'ignore';
 import zeitdockerignore from '@zeit/dockerignore';
 
 const readdir = promisify(readdirCB);
@@ -37,30 +36,34 @@ export async function walk(dir: string): Promise<string[]> {
   return output.map((pathname) => relative(dir, pathname));
 }
 
-// Same as walk except that if .skyignore is found
+// Same as walk except that if .dockerignore is found
 // at the top-level, it is respected.
-export async function skyignore(dir: string): Promise<string[]> {
+export async function dockerignore(
+  dir: string,
+  ignoreFile: string = '.dockerignore'
+): Promise<string[]> {
   const pathnames = await walk(dir);
   try {
-    const skyignoreFile = await readFile(join(dir, '.skyignore'));
-    const ig = gitignore();
-    ig.add(skyignoreFile.toString());
+    const dockerignoreFile = await readFile(join(dir, ignoreFile));
+    const ig = zeitdockerignore();
+    ig.add(dockerignoreFile.toString());
     return pathnames.filter(ig.createFilter());
   } catch (e) {
     return pathnames;
   }
 }
 
-// Same as walk except that if .dockerignore is found
-// at the top-level, it is respected.
-export async function dockerignore(dir: string): Promise<string[]> {
-  const pathnames = await walk(dir);
+// Filter the paths with ignore file
+export async function dockerignorePaths(
+  paths: string[],
+  ignoreFilePath: string
+): Promise<string[]> {
   try {
-    const dockerignoreFile = await readFile(join(dir, '.dockerignore'));
+    const dockerignoreFile = await readFile(ignoreFilePath);
     const ig = zeitdockerignore();
     ig.add(dockerignoreFile.toString());
-    return pathnames.filter(ig.createFilter());
+    return paths.filter(ig.createFilter());
   } catch (e) {
-    return pathnames;
+    return paths;
   }
 }

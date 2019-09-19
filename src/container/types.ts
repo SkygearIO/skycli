@@ -51,6 +51,8 @@ export interface HttpServiceConfig {
   dockerfile?: string;
   secrets: string[];
   environment: { [name: string]: string };
+  command?: string[];
+  template?: string;
 }
 
 export interface HookConfig {
