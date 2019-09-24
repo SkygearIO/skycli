@@ -1,4 +1,4 @@
-import { ReadStream } from 'fs';
+import fs from 'fs-extra';
 import fetch, { Response, RequestInit } from 'node-fetch';
 import { BaseAPIClient, decodeError } from '@skygear/node-client';
 
@@ -13,6 +13,8 @@ import {
   HookConfig,
   LogEntry
 } from './types';
+
+const FormData = require('form-data');
 
 function encodeLogEntry(input: any): LogEntry {
   return {
@@ -93,9 +95,9 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
   async uploadArtifact(
     req: PresignedRequest,
     checksumMD5: string,
-    stream: ReadStream
+    archivePath: string
   ): Promise<void> {
-    const headers: { [name: string]: string } = req.headers
+    const headers: { [name: string]: string } = (req.headers || [])
       .map((header) => header.split(':'))
       .reduce((acc, curr) => ({ ...acc, [curr[0]]: curr[1] }), {});
 
@@ -103,24 +105,42 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
       method: req.method
     };
 
+    const stats = await fs.stat(archivePath);
+    const fileSizeInBytes = stats.size;
+
+    const stream = fs.createReadStream(archivePath);
+
     headers['Content-MD5'] = checksumMD5;
-    opt.headers = headers;
 
     if (req.method === 'PUT') {
+      headers['Content-Length'] = `${fileSizeInBytes}`;
       // From https://github.com/bitinn/node-fetch#post-data-using-a-file-stream,
       // stream from fs.createReadStream should work.
       //
       // But the type definition does not match, so force type cast here.
       // tslint:disable-next-line: no-any
       opt.body = stream as any;
+    } else if (req.method === 'POST') {
+      const formData = new FormData();
+      formData.append('file', stream, {
+        knownLength: fileSizeInBytes
+      });
+
+      const fields = req.fields || {};
+      for (const key of Object.keys(fields)) {
+        formData.append(key, fields[key]);
+      }
+      opt.body = formData;
     } else {
       throw new Error(
         `uploadArtifact with method "${req.method}" not implemented`
       );
     }
 
+    opt.headers = headers;
+
     return fetch(req.url, opt).then((resp) => {
-      if (resp.status !== 200) {
+      if (resp.status !== 200 && resp.status !== 204) {
         throw new Error(`Fail to upload archive, ${resp.body.read()}`);
       }
     });

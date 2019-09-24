@@ -418,12 +418,12 @@ async function run(argv: Arguments) {
     for (let i = 0; i < checksums.length; i++) {
       const checksum = checksums[i];
       const upload = uploads[i];
-      const stream = createArchiveReadStream(createArchivePath(i));
+      const archivePath = createArchivePath(i);
       // eslint-disable-next-line no-await-in-loop
       await cliContainer.uploadArtifact(
         upload.uploadRequest,
         checksum.md5,
-        stream
+        archivePath
       );
       const currentProgress = i + 1;
       console.log(`Archive uploaded (${currentProgress}/${checksums.length})`);
