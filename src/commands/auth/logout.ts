@@ -36,6 +36,6 @@ async function run(argv: Arguments) {
 
 export default createCommand({
   command: 'logout',
-  describe: 'Log out Skygear cluster user',
+  describe: 'Log out developer',
   handler: run
 });

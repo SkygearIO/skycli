@@ -14,11 +14,11 @@ async function run(argv: Arguments) {
 export default createCommand({
   builder: (yargs) => {
     return yargs.middleware(requireClusterConfig).option('email', {
-      desc: 'Login as email',
+      desc: 'Login with email',
       type: 'string'
     });
   },
   command: 'login',
-  describe: 'Login Skygear cluster user',
+  describe: 'Login developer',
   handler: run
 });

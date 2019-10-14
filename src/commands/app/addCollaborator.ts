@@ -16,7 +16,7 @@ async function run(argv: Arguments) {
   if (invited) {
     console.log(chalk`{green Success!} Invitation sent.`);
   } else {
-    console.log(chalk`{green Success!} Added user as collaborator.`);
+    console.log(chalk`{green Success!} Added developer as collaborator.`);
   }
 }
 
@@ -29,10 +29,10 @@ export default createCommand({
       .demandOption(['email'])
       .option('email', {
         type: 'string',
-        describe: `User's email`
+        describe: `Developer's email`
       });
   },
   command: 'add-collaborator [email]',
-  describe: 'Add user as collaborator by email',
+  describe: 'Add developer as collaborator by email',
   handler: run
 });

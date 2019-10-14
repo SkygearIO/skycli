@@ -5,7 +5,7 @@ import { cliContainer } from '../../container';
 async function run(_: Arguments) {
   const apps = await cliContainer.getApps();
   if (apps.length === 0) {
-    console.log('No applications');
+    console.log('No apps');
     return;
   }
   const table = createTable({ head: ['NAME', 'CREATED_AT'] });
@@ -20,6 +20,6 @@ export default createCommand({
     return yargs.middleware(requireClusterConfig).middleware(requireUser);
   },
   command: 'list',
-  describe: 'List applications',
+  describe: 'List Skygear apps',
   handler: run
 });

@@ -7,9 +7,9 @@ function requireClusterConfig(argv: Arguments): Promise<void> {
     return Promise.resolve();
   }
 
-  return Promise.reject(chalk`{red ERROR:} Missing cluster server endpoint.
+  return Promise.reject(chalk`{red ERROR:} Missing cluster API endpoint.
 To setup, please run:
-    skycli config set-cluster-server`);
+    skycli config set-cluster`);
 }
 
 export default (requireClusterConfig as any) as MiddlewareFunction;

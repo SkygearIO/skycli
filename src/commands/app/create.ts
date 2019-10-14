@@ -33,9 +33,9 @@ function confirmScaffoldApp() {
   return inquirer.prompt([
     {
       message:
-        'Do you want to setup the project folder now? ' +
+        'Do you want to scaffold your app now? ' +
         'Or you can do it later by `skycli app scaffold` command.\n' +
-        'Setup now?',
+        'Scaffold now?',
       name: 'scaffoldNow',
       type: 'confirm'
     }
@@ -63,19 +63,17 @@ async function run(argv: Arguments) {
 
   console.log(chalk`Your API endpoint: {green ${endpoint}}.`);
   console.log(
-    chalk`Your Client API Key: {green ${
-      firstClient ? firstClient.api_key : ''
-    }}.`
+    chalk`Your API Key: {green ${firstClient ? firstClient.api_key : ''}}.`
   );
-  console.log(
-    chalk`Your Master API Key: {green ${userConfig.master_key || ''}}.`
-  );
+  console.log(chalk`Your Master Key: {green ${userConfig.master_key || ''}}.`);
 
   console.log('Created app successfully! \n');
 
   const answers = await confirmScaffoldApp();
   if (!answers.scaffoldNow) {
-    console.log(chalk`\nTo setup later, please run:\n    skycli app scaffold`);
+    console.log(
+      chalk`\nTo scaffold later, please run:\n    skycli app scaffold`
+    );
     return;
   }
 
@@ -92,11 +90,11 @@ export default createCommand({
       .middleware(requireClusterConfig)
       .middleware(requireUser)
       .option('app', {
-        desc: 'Application name',
+        desc: 'App name',
         type: 'string'
       });
   },
   command: 'create',
-  describe: 'Create skygear application',
+  describe: 'Create Skygear app',
   handler: run
 });
