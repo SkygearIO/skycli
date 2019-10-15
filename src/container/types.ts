@@ -4,6 +4,7 @@ export interface App {
   last_deployment_id?: string;
   created_at: Date;
   updated_at: Date;
+  endpoints: string[];
 }
 
 export type Endpoint = string;

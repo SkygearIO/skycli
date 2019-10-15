@@ -15,6 +15,7 @@ function decodeApp(app: any): App {
     last_deployment_id: app.last_deployment_id,
     created_at: new Date(app.created_at),
     updated_at: new Date(app.updated_at),
+    endpoints: app.endpoints,
   };
 }
 

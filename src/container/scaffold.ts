@@ -21,6 +21,21 @@ export interface TemplateVersionCheckResult {
   latestVersion: string | undefined;
 }
 
+interface TemplatePlaceholderLocations {
+  [placeholder: string]: string[];
+}
+interface TemplateDescriptor {
+  replaceAppName?: TemplatePlaceholderLocations;
+  replaceAPIEndpoint?: TemplatePlaceholderLocations;
+  replaceAPIKey?: TemplatePlaceholderLocations;
+}
+
+export interface TemplateContext {
+  appName: string;
+  apiEndpoint: string;
+  apiKey: string;
+}
+
 export async function checkTemplateVersion(): Promise<
   TemplateVersionCheckResult
 > {
@@ -65,8 +80,39 @@ export function listTemplates(): ScaffoldingTemplate[] {
 
 export function instantiateTemplate(
   template: ScaffoldingTemplate,
-  path: string
+  destPath: string,
+  context: TemplateContext
 ) {
   const templateDir = join(templatesDir, template.path);
-  fs.copySync(templateDir, path);
+  fs.copySync(templateDir, destPath);
+
+  const templateDescPath = join(destPath, '.template.json');
+  if (!fs.existsSync(templateDescPath)) {
+    return;
+  }
+
+  const templateDesc: TemplateDescriptor = fs.readJSONSync(templateDescPath);
+  const applyTemplate = (locs: TemplatePlaceholderLocations, value: string) => {
+    for (const placeholder of Object.keys(locs)) {
+      const regex = RegExp(placeholder, 'g');
+      const paths = locs[placeholder].map((path) => join(destPath, path));
+      for (const path of paths) {
+        let content = fs.readFileSync(path).toString();
+        content = content.replace(regex, value);
+        fs.writeFileSync(path, content);
+      }
+    }
+  };
+
+  if (templateDesc.replaceAppName) {
+    applyTemplate(templateDesc.replaceAppName, context.appName);
+  }
+  if (templateDesc.replaceAPIEndpoint) {
+    applyTemplate(templateDesc.replaceAPIEndpoint, context.apiEndpoint);
+  }
+  if (templateDesc.replaceAPIKey) {
+    applyTemplate(templateDesc.replaceAPIKey, context.apiKey);
+  }
+
+  fs.unlinkSync(templateDescPath);
 }

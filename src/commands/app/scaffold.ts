@@ -13,18 +13,21 @@ import {
   ScaffoldingTemplate,
   instantiateTemplate
 } from '../../container/scaffold';
+import { App } from '../../container/types';
 
-async function selectApp(argv: Arguments): Promise<string> {
+async function selectApp(argv: Arguments): Promise<App> {
+  const apps = await cliContainer.getApps();
+
   if (argv.app && typeof argv.app === 'string') {
-    return argv.app;
+    const app = apps.find((app) => app.name === argv.app);
+    if (!app) {
+      throw new Error('App not found.');
+    }
   }
 
-  console.log('\nFetching list of your apps...');
-  const apps = await cliContainer.getApps();
-  const appsName = apps.map((a) => a.name);
   const answers = await inquirer.prompt([
     {
-      choices: appsName,
+      choices: apps.map((app) => ({ name: app.name, value: app })),
       message: 'Select an app to be associated with the directory:',
       name: 'app',
       type: 'list'
@@ -105,16 +108,22 @@ async function run(argv: Arguments) {
     return;
   }
 
-  const appName = await selectApp(argv);
+  const app = await selectApp(argv);
+  const config = await cliContainer.getUserConfiguration(app.name);
   const template = await selectTemplate();
 
   fs.emptyDirSync(projectDir);
-  instantiateTemplate(template, projectDir);
+  const firstClient = config.clients[Object.keys(config.clients)[0]];
+  instantiateTemplate(template, projectDir, {
+    appName: app.name,
+    apiEndpoint: app.endpoints[0],
+    apiKey: firstClient.api_key
+  });
 
   console.log(
     chalk`{green Success!} Initialized {green "${
       template.name
-    }"} template for {green "${appName}"} in {green "${projectDir}"}.`
+    }"} template for {green "${app.name}"} in {green "${projectDir}"}.`
   );
 }
 

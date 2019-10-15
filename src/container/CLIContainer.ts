@@ -33,23 +33,6 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
     );
   }
 
-  async getExamples(): Promise<string[]> {
-    return this.fetchAPI('GET', `${this.CONTROLLER_URL}/examples`).then(
-      ({ examples }) => examples.map((e: any) => e.path)
-    );
-  }
-
-  async downloadExample(exampleName: string): Promise<Response> {
-    const resp = ((await this.container.fetch(
-      `${this.CONTROLLER_URL}/example/download/${exampleName}.tar.gz`
-    )) as any) as Response;
-    if (resp.status !== 200) {
-      const body = await resp.text();
-      throw decodeError(body);
-    }
-    return resp;
-  }
-
   async getDeployment(deploymentID: string): Promise<Deployment> {
     return this.fetchAPI('GET', `/_controller/deployment/${deploymentID}`).then(
       ({ deployment }) => deployment
