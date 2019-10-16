@@ -19,6 +19,7 @@ export interface ClusterUserConfig {
   refresh_token?: string;
   session_id?: string;
   extra_session_info_options?: ExtraSessionInfoOptions;
+  mfa_bearer_token?: string;
 }
 export interface ConfigContext {
   cluster: string;
