@@ -7,24 +7,24 @@ import { Arguments, createCommand } from '../../util';
 import { cliContainer } from '../../container';
 
 const apiKeyPrompt: inquirer.Question = {
-  message: 'Cluster api key:',
+  message: 'Cluster API key:',
   name: 'apiKey',
   type: 'input',
   validate: (input) => {
     if (input.trim() === '') {
-      return 'Cluster api key is required.';
+      return 'Cluster API key is required.';
     }
     return true;
   }
 };
 
 const urlPrompt: inquirer.Question = {
-  message: 'Cluster server endpoint:',
+  message: 'Cluster endpoint:',
   name: 'endpoint',
   type: 'input',
   validate: (input) => {
     if (input.trim() === '') {
-      return 'Cluster server endpoint is required.';
+      return 'Cluster API endpoint is required.';
     }
     return true;
   }
@@ -39,14 +39,14 @@ function askClusterServer(argv: Arguments) {
 
   if (server.endpoint) {
     console.log(
-      chalk`Setup cluster server endpoint as {green ${server.endpoint}}.`
+      chalk`Setup cluster API endpoint as {green ${server.endpoint}}.`
     );
   } else {
     prompts.push(urlPrompt);
   }
 
   if (server.apiKey) {
-    console.log(chalk`Setup cluster api key as {green ${server.apiKey}}.`);
+    console.log(chalk`Setup cluster API key as {green ${server.apiKey}}.`);
   } else {
     prompts.push(apiKeyPrompt);
   }
@@ -81,22 +81,22 @@ async function run(argv: Arguments) {
     env: env
   };
   config.save(newGlobalConfig, config.ConfigDomain.GlobalDomain);
-  console.log(chalk`Running Skygear cluster at {green ${endpoint}}.`);
+  console.log(chalk`Connected to Skygear cluster at {green ${endpoint}}.`);
 }
 
 export default createCommand({
   builder: (yargs) => {
     return yargs
       .option('endpoint', {
-        desc: 'Cluster controller api endpoint.',
+        desc: 'Cluster API endpoint.',
         type: 'string'
       })
       .option('api-key', {
-        desc: 'Cluster controller api key.',
+        desc: 'Cluster API key.',
         type: 'string'
       });
   },
-  command: 'set-cluster-server',
-  describe: 'Setup cluster endpoint url',
+  command: 'set-cluster',
+  describe: 'Connect to Skygear cluster',
   handler: run
 });

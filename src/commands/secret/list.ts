@@ -26,6 +26,6 @@ export default createCommand({
       .middleware(requireApp);
   },
   command: 'list',
-  describe: 'List skygear application secret',
+  describe: 'List app secret',
   handler: run
 });

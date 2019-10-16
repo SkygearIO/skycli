@@ -21,11 +21,11 @@ async function run(argv: Arguments) {
     }
   }
   if (!userID) {
-    throw new Error('User is not a collaborator.');
+    throw new Error('Developer is not a collaborator.');
   }
 
   await cliContainer.removeCollaborator(appName, userID);
-  console.log(chalk`{green Success!} Removed user from collaborators.`);
+  console.log(chalk`{green Success!} Removed developer from collaborators.`);
 }
 
 export default createCommand({
@@ -37,10 +37,10 @@ export default createCommand({
       .demandOption(['email'])
       .option('email', {
         type: 'string',
-        describe: `User's email`
+        describe: `Developer's email`
       });
   },
   command: 'remove-collaborator [email]',
-  describe: 'Remove user from collaborators by email',
+  describe: 'Remove developer from collaborators by email',
   handler: run
 });

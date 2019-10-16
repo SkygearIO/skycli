@@ -478,11 +478,11 @@ async function run(argv: Arguments) {
 export default createCommand({
   builder: (yargs) => {
     return yargs.middleware(requireUser).option('app', {
-      desc: 'Application name',
+      desc: 'App name',
       type: 'string'
     });
   },
   command: 'deploy [name]',
-  describe: 'Deploy skygear application',
+  describe: 'Deploy Skygear app',
   handler: run
 });

@@ -38,6 +38,6 @@ export default createCommand({
       });
   },
   command: 'delete [name]',
-  describe: 'Delete application secret',
+  describe: 'Delete app secret',
   handler: run
 });

@@ -15,13 +15,13 @@ async function selectApp(argv: Arguments): Promise<string> {
     return argv.app;
   }
 
-  console.log('\nFetching the list of your apps...');
+  console.log('\nFetching list of your apps...');
   const apps = await cliContainer.getApps();
   const appsName = apps.map((a) => a.name);
   const answers = await inquirer.prompt([
     {
       choices: appsName,
-      message: 'Select an app to associate with the directory:',
+      message: 'Select an app to be associated with the directory:',
       name: 'app',
       type: 'list'
     }
@@ -31,25 +31,25 @@ async function selectApp(argv: Arguments): Promise<string> {
 }
 
 async function selectExample(): Promise<string> {
-  console.log('\nFetching examples...');
+  console.log('\nFetching scaffolding templates...');
   const examples = await cliContainer.getExamples();
   const answers = await inquirer.prompt([
     {
       choices: examples,
-      message: 'Select example:',
-      name: 'example',
+      message: 'Select scaffolding template:',
+      name: 'template',
       type: 'list'
     }
   ]);
 
-  return answers.example;
+  return answers.template;
 }
 
 function confirmProjectDirectory(projectDir: string) {
   return inquirer.prompt([
     {
       message:
-        "You're about to initialze a Skygear Project in this " +
+        "You're about to initialze a Skygear app in this " +
         `directory: ${projectDir}\n` +
         'Confirm?',
       name: 'proceed',
@@ -83,7 +83,7 @@ async function run(argv: Arguments) {
 
   const appName = await selectApp(argv);
   const examplePath = await selectExample();
-  console.log('\nFetching js-example and initializing..');
+  console.log('\nFetching scaffolding templates and initializing..');
 
   const resp = await cliContainer.downloadExample(examplePath);
   // save the example to project dir
@@ -110,11 +110,11 @@ export default createCommand({
       .middleware(requireUser)
       .default('dest', '.')
       .option('app', {
-        desc: 'Application name',
+        desc: 'App name',
         type: 'string'
       });
   },
   command: 'scaffold [dest]',
-  describe: 'Scaffold skygear application',
+  describe: 'Scaffold Skygear app',
   handler: run
 });

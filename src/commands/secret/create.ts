@@ -40,6 +40,6 @@ export default createCommand({
       });
   },
   command: 'create [name] [value]',
-  describe: 'Create application secret',
+  describe: 'Create app secret',
   handler: run
 });

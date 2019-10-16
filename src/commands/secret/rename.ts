@@ -43,6 +43,6 @@ export default createCommand({
       });
   },
   command: 'rename [old-name] [new-name]',
-  describe: 'Rename application secret',
+  describe: 'Rename app secret',
   handler: run
 });
