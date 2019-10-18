@@ -191,23 +191,33 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
       nextCur: number;
     } = await new Promise((resolve, reject) => {
       let count = 0;
+      let buffer = '';
+      const consumeBuffer = () => {
+        const lastDelimiterIndex = buffer.lastIndexOf('\n');
+        const jsons = buffer.slice(0, lastDelimiterIndex);
+        buffer = buffer.slice(lastDelimiterIndex);
+
+        for (let json of jsons.split('\n')) {
+          json = json.trim();
+          if (!json) continue;
+          const log = encodeLogEntry(JSON.parse(json));
+          onData(log);
+        }
+      };
+
       resp.body
         .on('data', (data) => {
           count += data.length;
-          data
-            .toString('utf-8')
-            .split('\r\n')
-            .map((logJSON: string) => {
-              if (logJSON) {
-                const log = encodeLogEntry(JSON.parse(logJSON));
-                onData(log);
-              }
-            });
+          buffer += data.toString('utf-8');
+          consumeBuffer();
         })
         .on('error', (err) => {
           reject(err);
         })
         .on('end', () => {
+          buffer += '\n';
+          consumeBuffer();
+
           const contentLength = resp.headers.get('content-length');
           const needReconnect = !contentLength;
           resolve({
