@@ -18,12 +18,12 @@ import * as yaml from 'js-yaml';
 import { Dictionary, PropertyPath } from 'lodash';
 import _get from 'lodash/get';
 import _set from 'lodash/set';
-import * as os from 'os';
 import path from 'path';
 import untildify from 'untildify';
 
 import { AppConfig, GlobalConfig } from './types';
 import { createGlobalConfig } from './configUtil';
+import { configPath } from './path';
 
 const currentConfigVersion = 1;
 
@@ -33,8 +33,7 @@ export enum ConfigDomain {
 }
 
 const configPaths: { [domain: string]: string } = {
-  global: `${process.env.XDG_CONFIG_HOME ||
-    os.homedir() + '/.config'}/skycli/config`,
+  global: configPath('config'),
   project: './skygear.yaml'
 };
 

@@ -2,7 +2,6 @@ import chalk from 'chalk';
 import crypto from 'crypto';
 import fs from 'fs-extra';
 import inquirer from 'inquirer';
-import os from 'os';
 import path from 'path';
 import zlib from 'zlib';
 import * as tar from 'tar-fs';
@@ -21,11 +20,12 @@ import {
   DeploymentItemConfig,
   HttpServiceConfig
 } from '../../container/types';
+import { tempPath } from '../../path';
 
 const gunzip = require('gunzip-maybe');
 
 function createArchivePath(index: number) {
-  return path.join(os.tmpdir(), `skygear-src-${index}.tgz`);
+  return tempPath(`skygear-src-${index}.tgz`);
 }
 
 function createArchiveReadStream(archivePath: string) {
@@ -292,11 +292,7 @@ async function confirmIfItemsWillBeRemovedInNewDeployment(
 }
 
 function createTemplatePath(templateName: string) {
-  return path.join(
-    os.tmpdir(),
-    'skygear-templates',
-    encodeURIComponent(templateName)
-  );
+  return tempPath('skygear-templates', encodeURIComponent(templateName));
 }
 
 async function downloadTemplateIfNeeded(
@@ -398,6 +394,7 @@ async function run(argv: Arguments) {
       const name = itemNames[i];
       const deployment = deploymentMap[name];
       const archivePath = createArchivePath(i);
+      fs.ensureFileSync(archivePath);
       // eslint-disable-next-line no-await-in-loop
       const checksum = await archiveDeploymentItem(
         name,

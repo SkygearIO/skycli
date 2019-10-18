@@ -7,7 +7,8 @@ import {
   decodeIdentity,
   User,
   Identity,
-  ExtraSessionInfoOptions
+  ExtraSessionInfoOptions,
+  AuthenticationSession
 } from '@skygear/node-client';
 
 import { CLIContainer } from './CLIContainer';
@@ -94,6 +95,20 @@ class CLIYAMLContainerStorage implements ContainerStorage {
     save(newConfig, ConfigDomain.GlobalDomain);
   }
 
+  async setAuthenticationSession(
+    _namespace: string,
+    _authenticationSession: AuthenticationSession
+  ) {
+    // Do not persist authentication session.
+  }
+
+  async setMFABearerToken(namespace: string, mfaBearerToken: string) {
+    const globalConfig = this.loadGlobalConfig();
+    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
+    newConfig.user[namespace].mfa_bearer_token = mfaBearerToken;
+    save(newConfig, ConfigDomain.GlobalDomain);
+  }
+
   async getUser(namespace: string): Promise<User | null> {
     const globalConfig = this.loadGlobalConfig();
     const d = globalConfig.user[namespace] && globalConfig.user[namespace].user;
@@ -153,6 +168,22 @@ class CLIYAMLContainerStorage implements ContainerStorage {
     throw new Error('Method not implemented.');
   }
 
+  async getAuthenticationSession(
+    _namespace: string
+  ): Promise<AuthenticationSession | null> {
+    // Authentication session is not persisted.
+    return null;
+  }
+
+  async getMFABearerToken(namespace: string): Promise<string | null> {
+    const globalConfig = this.loadGlobalConfig();
+    return (
+      (globalConfig.user[namespace] &&
+        globalConfig.user[namespace].mfa_bearer_token) ||
+      null
+    );
+  }
+
   async delUser(namespace: string): Promise<void> {
     const globalConfig = this.loadGlobalConfig();
     const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
@@ -190,6 +221,17 @@ class CLIYAMLContainerStorage implements ContainerStorage {
 
   async delOAuthRedirectAction(_namespace: string): Promise<void> {
     throw new Error('Method not implemented.');
+  }
+
+  async delAuthenticationSession(_namespace: string) {
+    // Authentication session is not persisted.
+  }
+
+  async delMFABearerToken(namespace: string) {
+    const globalConfig = this.loadGlobalConfig();
+    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
+    delete newConfig.user[namespace].mfa_bearer_token;
+    save(newConfig, ConfigDomain.GlobalDomain);
   }
 }
 
