@@ -1,3 +1,15 @@
+## 2.0.0-alpha.3 (2019-10-24)
+
+### Other notes
+
+- Fix skygear sdk version
+- Update scaffolding template and config file path
+
+### Bug Fixes
+
+- Buffer build log JSON properly
+- Display API key of first client and make wording consistent
+
 ## 2.0.0-alpha.2 (2019-10-09)
 
 ### Features
