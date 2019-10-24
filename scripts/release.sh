@@ -17,11 +17,6 @@ if [ -z "$GITHUB_TOKEN" ]; then
   exit 1
 fi
 
-if [ -z "$KEY_ID" ]; then
-    >&2 echo "KEY_ID is required."
-    exit 1
-fi
-
 if [ -e "new-release" ]; then
   echo "Making github release and release commit..."
 else
@@ -41,7 +36,7 @@ npm --no-git-tag-version version "$SKYGEAR_VERSION"
 touch NEWCHANGELOG && cat new-release > NEWCHANGELOG && echo "" >> NEWCHANGELOG && cat CHANGELOG.md >> NEWCHANGELOG && mv NEWCHANGELOG CHANGELOG.md
 git add CHANGELOG.md package.json package-lock.json
 git commit -m "Update CHANGELOG for v$SKYGEAR_VERSION"
-git tag -a v"$SKYGEAR_VERSION" -s -u $KEY_ID -m "Release v$SKYGEAR_VERSION"
+git tag -a v"$SKYGEAR_VERSION" -s -m "Release v$SKYGEAR_VERSION"
 git push git@github.com:SkygearIO/skycli.git "$GIT_BRANCH"
 git push git@github.com:SkygearIO/skycli.git v"$SKYGEAR_VERSION"
 
