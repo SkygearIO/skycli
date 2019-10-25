@@ -6,6 +6,40 @@ import { createGlobalConfig } from '../../configUtil';
 import { Arguments, createCommand } from '../../util';
 import { cliContainer } from '../../container';
 
+interface ClusterOption {
+  name: string;
+  apiKey: string;
+  endpoint: string;
+  debug: boolean;
+}
+
+const clusterOptions: ClusterOption[] = [
+  {
+    name: 'skygeario',
+    apiKey: 'da0a05897b92ae954e281c31f95e5ce8',
+    endpoint: 'https://controller.skygear.dev',
+    debug: false
+  },
+  {
+    name: 'skygeario staging',
+    apiKey: '61fc82a7fa9cd4ba1a28bd1111df86e0',
+    endpoint: 'https://controller.staging.skygear.dev',
+    debug: true
+  },
+  {
+    name: 'skygeario dev',
+    apiKey: '3ac91f63e599eafce8632420613754cb',
+    endpoint: 'https://controller.dev.skygearapis.com',
+    debug: true
+  },
+  {
+    name: 'Connect to my own cluster',
+    apiKey: '',
+    endpoint: '',
+    debug: false
+  }
+];
+
 const apiKeyPrompt: inquirer.Question = {
   message: 'Cluster API key:',
   name: 'apiKey',
@@ -30,12 +64,32 @@ const urlPrompt: inquirer.Question = {
   }
 };
 
-function askClusterServer(argv: Arguments) {
+async function selectCluster(argv: Arguments) {
+  const answers = await inquirer.prompt([
+    {
+      choices: clusterOptions
+        .filter((o) => !o.debug || argv.debug)
+        .map((t) => ({ name: t.name, value: t })),
+      message: 'Select a cluster you want to connect to:',
+      name: 'cluster',
+      type: 'list'
+    }
+  ]);
+  return answers.cluster;
+}
+
+async function askClusterServer(argv: Arguments) {
   const prompts = [];
   const server = {
     apiKey: argv['api-key'] as string,
     endpoint: argv.endpoint as string
   };
+
+  if (!server.endpoint && !server.apiKey) {
+    const selected = await selectCluster(argv);
+    server.apiKey = selected.apiKey;
+    server.endpoint = selected.endpoint;
+  }
 
   if (server.endpoint) {
     console.log(
