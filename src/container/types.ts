@@ -54,10 +54,15 @@ export interface HttpServiceConfig {
   port: number;
   context: string;
   dockerfile?: string;
-  secrets: string[];
-  environment: { [name: string]: string };
+  environment?: Environment[];
   command?: string[];
   template?: string;
+}
+
+export interface Environment {
+  name?: string;
+  value?: string;
+  secret?: string;
 }
 
 export interface HookConfig {

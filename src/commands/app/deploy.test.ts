@@ -6,9 +6,7 @@ test('createFolderToPathsMapForArchive with template', async () => {
       type: 'http-service',
       context: 'fixture/deploy/user_code',
       path: '',
-      port: 8000,
-      secrets: [],
-      environment: {}
+      port: 8000
     },
     'fixture/deploy/template'
   );
@@ -31,9 +29,7 @@ test('createFolderToPathsMapForArchive should not provide .dockerignore with tem
         type: 'http-service',
         context: 'fixture/deploy/user_code_with_dockerignore',
         path: '',
-        port: 8000,
-        secrets: [],
-        environment: {}
+        port: 8000
       },
       'fixture/deploy/template'
     )
@@ -49,8 +45,6 @@ test('createFolderToPathsMapForArchive without template', async () => {
       context: 'fixture/deploy/user_code_with_dockerignore',
       path: '',
       port: 8000,
-      secrets: [],
-      environment: {},
       dockerfile: 'src/Dockerfile'
     },
     null
