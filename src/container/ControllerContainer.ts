@@ -6,7 +6,7 @@ import {
   decodeError
 } from '@skygear/node-client';
 
-import { Secret, App, UserConfiguration, Endpoint, Collaborator } from "./types";
+import { Secret, App, UserConfiguration, Endpoint, Collaborator, SecretType } from "./types";
 
 function decodeApp(app: any): App {
   return {
@@ -68,6 +68,7 @@ export class ControllerContainer<T extends BaseAPIClient> {
       return secrets.map((s: any) => {
         return {
           name: s.name,
+          type: s.type,
           created_at: new Date(s.created_at),
           updated_at: new Date(s.updated_at),
         };
@@ -78,13 +79,15 @@ export class ControllerContainer<T extends BaseAPIClient> {
   async createSecret(
     appName: string,
     secretName: string,
-    secretValue: string
+    secretValue: string,
+    secretType: string,
   ): Promise<void> {
     return this.fetchAPI("POST", `${this.CONTROLLER_URL}/secret`, {
       json: {
         app_name: appName,
         secret_name: secretName,
         secret_value: secretValue,
+        secret_type: secretType,
       },
     });
   }
