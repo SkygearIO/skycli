@@ -89,20 +89,6 @@ export class ControllerContainer<T extends BaseAPIClient> {
     });
   }
 
-  async renameSecret(
-    appName: string,
-    oldSecretName: string,
-    newSecretName: string
-  ): Promise<void> {
-    return this.fetchAPI("POST", `${this.CONTROLLER_URL}/secret/rename`, {
-      json: {
-        app_name: appName,
-        new_secret_name: newSecretName,
-        old_secret_name: oldSecretName,
-      },
-    });
-  }
-
   async deleteSecret(appName: string, secretName: string): Promise<void> {
     return this.fetchAPI("DELETE", `${this.CONTROLLER_URL}/secret`, {
       query: [["app_name", appName], ["secret_name", secretName]],
