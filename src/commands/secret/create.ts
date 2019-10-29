@@ -2,7 +2,6 @@ import chalk from 'chalk';
 
 import { Arguments, createCommand } from '../../util';
 import { requireApp, requireClusterConfig, requireUser } from '../middleware';
-import { validateSecretName } from './util';
 import { cliContainer } from '../../container';
 
 async function run(argv: Arguments) {
@@ -23,12 +22,6 @@ export default createCommand({
       .middleware(requireUser)
       .middleware(requireApp)
       .demandOption(['name', 'value'])
-      .check((argv) => {
-        if (!validateSecretName(argv.name as string)) {
-          return 'Invalid secret name, only capital letters, numbers and underscore are allowed';
-        }
-        return true;
-      })
       .option('name', {
         desc:
           'Secret name, only capital letters, numbers and underscore are allowed',
