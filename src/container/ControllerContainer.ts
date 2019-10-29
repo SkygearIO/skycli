@@ -6,7 +6,7 @@ import {
   decodeError
 } from '@skygear/node-client';
 
-import { Secret, App, UserConfiguration, Endpoint, Collaborator, SecretType } from "./types";
+import { Secret, App, UserConfiguration, Endpoint, Collaborator } from "./types";
 
 function decodeApp(app: any): App {
   return {
