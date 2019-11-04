@@ -9,8 +9,11 @@ export interface App {
 
 export type Endpoint = string;
 
+export type SecretType = 'opaque' | 'dockerconfigjson';
+
 export interface Secret {
   name: string;
+  type: SecretType;
   created_at: Date;
   updated_at: Date;
 }

@@ -68,6 +68,7 @@ export class ControllerContainer<T extends BaseAPIClient> {
       return secrets.map((s: any) => {
         return {
           name: s.name,
+          type: s.type,
           created_at: new Date(s.created_at),
           updated_at: new Date(s.updated_at),
         };
@@ -78,27 +79,15 @@ export class ControllerContainer<T extends BaseAPIClient> {
   async createSecret(
     appName: string,
     secretName: string,
-    secretValue: string
+    secretValue: string,
+    secretType: string,
   ): Promise<void> {
     return this.fetchAPI("POST", `${this.CONTROLLER_URL}/secret`, {
       json: {
         app_name: appName,
         secret_name: secretName,
         secret_value: secretValue,
-      },
-    });
-  }
-
-  async renameSecret(
-    appName: string,
-    oldSecretName: string,
-    newSecretName: string
-  ): Promise<void> {
-    return this.fetchAPI("POST", `${this.CONTROLLER_URL}/secret/rename`, {
-      json: {
-        app_name: appName,
-        new_secret_name: newSecretName,
-        old_secret_name: oldSecretName,
+        secret_type: secretType,
       },
     });
   }

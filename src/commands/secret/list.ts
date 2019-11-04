@@ -11,9 +11,9 @@ async function run(argv: Arguments) {
     return;
   }
 
-  const table = createTable({ head: ['NAME', 'CREATED_AT'] });
+  const table = createTable({ head: ['NAME', 'TYPE', 'CREATED_AT'] });
   secrets.map((s) => {
-    table.push([s.name, displayDate(s.created_at)]);
+    table.push([s.name, s.type, displayDate(s.created_at)]);
   });
   console.log(table.toString());
 }
