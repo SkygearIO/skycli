@@ -4,12 +4,11 @@ import { Arguments, createCommand } from '../../util';
 import { requireClusterConfig } from '../middleware';
 import { askCredentials, askInvitationCode } from './util';
 import { cliContainer } from '../../container';
-import { JSONObject } from '@skygear/node-client';
 
 async function run(argv: Arguments) {
   const answers = await askCredentials(argv);
   const invitationCode = await askInvitationCode();
-  const metadata: JSONObject = {};
+  const metadata: any = {};
   if (invitationCode) {
     metadata['invitation_code'] = invitationCode;
   }
