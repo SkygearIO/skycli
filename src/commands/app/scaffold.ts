@@ -1,37 +1,37 @@
-import chalk from 'chalk';
-import fs from 'fs-extra';
-import inquirer from 'inquirer';
-import path from 'path';
+import chalk from "chalk";
+import fs from "fs-extra";
+import inquirer from "inquirer";
+import path from "path";
 
-import { Arguments, createCommand } from '../../util';
-import { requireClusterConfig, requireUser } from '../middleware';
-import { cliContainer } from '../../container';
+import { Arguments, createCommand } from "../../util";
+import { requireClusterConfig, requireUser } from "../middleware";
+import { cliContainer } from "../../container";
 import {
   checkTemplateVersion,
   updateTemplates,
   listTemplates,
   ScaffoldingTemplate,
-  instantiateTemplate
-} from '../../container/scaffold';
-import { App } from '../../container/types';
+  instantiateTemplate,
+} from "../../container/scaffold";
+import { App } from "../../container/types";
 
 async function selectApp(argv: Arguments): Promise<App> {
   const apps = await cliContainer.getApps();
 
-  if (argv.app && typeof argv.app === 'string') {
-    const app = apps.find((app) => app.name === argv.app);
+  if (argv.app && typeof argv.app === "string") {
+    const app = apps.find(app => app.name === argv.app);
     if (!app) {
-      throw new Error('App not found.');
+      throw new Error("App not found.");
     }
   }
 
   const answers = await inquirer.prompt([
     {
-      choices: apps.map((app) => ({ name: app.name, value: app })),
-      message: 'Select an app to be associated with the directory:',
-      name: 'app',
-      type: 'list'
-    }
+      choices: apps.map(app => ({ name: app.name, value: app })),
+      message: "Select an app to be associated with the directory:",
+      name: "app",
+      type: "list",
+    },
   ]);
 
   return answers.app;
@@ -42,7 +42,7 @@ async function selectTemplate(): Promise<ScaffoldingTemplate> {
   let localVersion = currentVersion;
 
   if (latestVersion && currentVersion !== latestVersion) {
-    console.log('Updating templates...');
+    console.log("Updating templates...");
     try {
       await updateTemplates(latestVersion);
       localVersion = latestVersion;
@@ -58,12 +58,12 @@ async function selectTemplate(): Promise<ScaffoldingTemplate> {
 
   const answers = await inquirer.prompt([
     {
-      choices: templates.map((t) => ({ name: t.name, value: t })),
+      choices: templates.map(t => ({ name: t.name, value: t })),
 
-      message: 'Select template:',
-      name: 'template',
-      type: 'list'
-    }
+      message: "Select template:",
+      name: "template",
+      type: "list",
+    },
   ]);
   return answers.template;
 }
@@ -74,10 +74,10 @@ async function confirmProjectDirectory(projectDir: string): Promise<boolean> {
       message:
         "You're about to initialze a Skygear app in this " +
         `directory: ${projectDir}\n` +
-        'Confirm?',
-      name: 'proceed',
-      type: 'confirm'
-    }
+        "Confirm?",
+      name: "proceed",
+      type: "confirm",
+    },
   ]);
 
   let proceed = Boolean(answers.proceed);
@@ -90,9 +90,9 @@ async function confirmProjectDirectory(projectDir: string): Promise<boolean> {
     const answers = await inquirer.prompt([
       {
         message: `All files in ${projectDir} would be DELETED. Confirm?`,
-        name: 'proceed',
-        type: 'confirm'
-      }
+        name: "proceed",
+        type: "confirm",
+      },
     ]);
     proceed = Boolean(answers.proceed);
   }
@@ -117,7 +117,7 @@ async function run(argv: Arguments) {
   instantiateTemplate(template, projectDir, {
     appName: app.name,
     apiEndpoint: app.endpoints[0],
-    apiKey: firstClient.api_key
+    apiKey: firstClient.api_key,
   });
 
   console.log(
@@ -128,17 +128,17 @@ async function run(argv: Arguments) {
 }
 
 export default createCommand({
-  builder: (yargs) => {
+  builder: yargs => {
     return yargs
       .middleware(requireClusterConfig)
       .middleware(requireUser)
-      .default('dest', '.')
-      .option('app', {
-        desc: 'App name',
-        type: 'string'
+      .default("dest", ".")
+      .option("app", {
+        desc: "App name",
+        type: "string",
       });
   },
-  command: 'scaffold [dest]',
-  describe: 'Scaffold Skygear app',
-  handler: run
+  command: "scaffold [dest]",
+  describe: "Scaffold Skygear app",
+  handler: run,
 });

@@ -1,28 +1,28 @@
-import chalk from 'chalk';
-import crypto from 'crypto';
-import fs from 'fs-extra';
-import inquirer from 'inquirer';
-import path from 'path';
-import zlib from 'zlib';
-import * as tar from 'tar-fs';
+import chalk from "chalk";
+import crypto from "crypto";
+import fs from "fs-extra";
+import inquirer from "inquirer";
+import path from "path";
+import zlib from "zlib";
+import * as tar from "tar-fs";
 
-import { isHTTP404 } from '../../error';
-import { CLIContext } from '../../types';
-import { Arguments, createCommand } from '../../util';
-import requireUser from '../middleware/requireUser';
-import { walk, dockerignore, dockerignorePaths } from '../../ignore';
-import { cliContainer } from '../../container';
+import { isHTTP404 } from "../../error";
+import { CLIContext } from "../../types";
+import { Arguments, createCommand } from "../../util";
+import requireUser from "../middleware/requireUser";
+import { walk, dockerignore, dockerignorePaths } from "../../ignore";
+import { cliContainer } from "../../container";
 import {
   DeploymentStatus,
   Checksum,
   LogEntry,
   DeploymentItemsMap,
   DeploymentItemConfig,
-  HttpServiceConfig
-} from '../../container/types';
-import { tempPath } from '../../path';
+  HttpServiceConfig,
+} from "../../container/types";
+import { tempPath } from "../../path";
 
-const gunzip = require('gunzip-maybe');
+const gunzip = require("gunzip-maybe");
 
 function createArchivePath(index: number) {
   return tempPath(`skygear-src-${index}.tgz`);
@@ -33,7 +33,7 @@ function createArchiveReadStream(archivePath: string) {
 }
 
 function archiveCloudCodeSrc(srcPath: string, archivePath: string) {
-  return dockerignore(srcPath, '.skyignore').then((paths: string[]) => {
+  return dockerignore(srcPath, ".skyignore").then((paths: string[]) => {
     return createTar({ srcPath: paths }, archivePath);
   });
 }
@@ -51,7 +51,7 @@ export async function createFolderToPathsMapForArchive(
   // add user code to map
   // if there is template, use user provided `.skyignore` to ignore files
   folderToPathsMap[config.context] = templateFolderPath
-    ? await dockerignore(config.context, '.skyignore')
+    ? await dockerignore(config.context, ".skyignore")
     : await walk(config.context);
 
   if (templateFolderPath) {
@@ -61,7 +61,7 @@ export async function createFolderToPathsMapForArchive(
   // filter paths by dockeringore
   // Check files duplicate
   // Verify dockerfile exist
-  const dockerfile: string = config.dockerfile || 'Dockerfile';
+  const dockerfile: string = config.dockerfile || "Dockerfile";
   // path.join("./a/b") === "a/b";
   // We need to ensure the path is implicit
   // because the value in paths are all implicit
@@ -73,7 +73,7 @@ export async function createFolderToPathsMapForArchive(
     // eslint-disable-next-line no-await-in-loop
     const filtered = await dockerignorePaths(
       folderToPathsMap[folder],
-      path.join(templateFolderPath || config.context, '.dockerignore')
+      path.join(templateFolderPath || config.context, ".dockerignore")
     );
     folderToPathsMap[folder] = filtered;
     for (const p of folderToPathsMap[folder]) {
@@ -92,7 +92,7 @@ export async function createFolderToPathsMapForArchive(
 
   if (!hasDockerfile) {
     throw new Error(
-      'expected dockerfile to exists: ' +
+      "expected dockerfile to exists: " +
         path.join(config.context, dockerfilePath)
     );
   }
@@ -122,8 +122,8 @@ async function createTar(
     createPack(folders, folderToPathsMap, null, 0)
       .pipe(z)
       .pipe(fs.createWriteStream(archivePath))
-      .on('error', reject)
-      .on('finish', resolve);
+      .on("error", reject)
+      .on("finish", resolve);
   });
 }
 
@@ -145,29 +145,29 @@ function createPack(
       }
     },
     pack: pack,
-    entries: paths
+    entries: paths,
   });
 }
 
 function getChecksum(archivePath: string): Promise<Checksum> {
-  const md5 = crypto.createHash('md5');
-  const sha256 = crypto.createHash('sha256');
+  const md5 = crypto.createHash("md5");
+  const sha256 = crypto.createHash("sha256");
   return new Promise((resolve, reject) => {
     try {
       const stream = createArchiveReadStream(archivePath);
-      stream.on('data', (data) => {
-        md5.update(data, 'utf8');
-        sha256.update(data, 'utf8');
+      stream.on("data", data => {
+        md5.update(data, "utf8");
+        sha256.update(data, "utf8");
       });
 
-      stream.on('end', () => {
+      stream.on("end", () => {
         resolve({
-          md5: md5.digest('base64'),
-          sha256: sha256.digest('base64')
+          md5: md5.digest("base64"),
+          sha256: sha256.digest("base64"),
         });
       });
 
-      stream.on('error', (err: Error) => {
+      stream.on("error", (err: Error) => {
         reject(err);
       });
     } catch (error) {
@@ -183,10 +183,10 @@ async function archiveDeploymentItem(
 ): Promise<Checksum> {
   console.log(chalk`Archiving cloud code: {green ${name}}`);
   switch (deployment.type) {
-    case 'http-handler':
+    case "http-handler":
       await archiveCloudCodeSrc(deployment.src, archivePath);
       break;
-    case 'http-service':
+    case "http-service":
       await archiveMicroserviceSrc(
         deployment,
         archivePath,
@@ -194,7 +194,7 @@ async function archiveDeploymentItem(
       );
       break;
     default:
-      throw new Error('unexpected type');
+      throw new Error("unexpected type");
   }
   const checksum = await getChecksum(archivePath);
   console.log(`Archive checksum md5: ${checksum.md5}`);
@@ -217,7 +217,7 @@ function waitForDeploymentStatusImpl(
   reject: any
 ) {
   cliContainer.getDeployment(deploymentID).then(
-    (result) => {
+    result => {
       if (
         result.status === DeploymentStatus.Running ||
         result.status === DeploymentStatus.DeployFailed
@@ -235,7 +235,7 @@ function waitForDeploymentStatusImpl(
         waitForDeploymentStatusImpl(context, deploymentID, resolve, reject);
       }, 3000);
     },
-    (err) => {
+    err => {
       reject(err);
     }
   );
@@ -279,20 +279,20 @@ async function confirmIfItemsWillBeRemovedInNewDeployment(
       {
         message: `Item(s) ${itemsWillBeRemoved
           .map(applyItemColor)
-          .join(', ')} will be removed in this deployment. Confirm?`,
-        name: 'proceed',
-        type: 'confirm'
-      }
+          .join(", ")} will be removed in this deployment. Confirm?`,
+        name: "proceed",
+        type: "confirm",
+      },
     ]);
 
     if (!answers.proceed) {
-      throw new Error('cancelled');
+      throw new Error("cancelled");
     }
   }
 }
 
 function createTemplatePath(templateName: string) {
-  return tempPath('skygear-templates', encodeURIComponent(templateName));
+  return tempPath("skygear-templates", encodeURIComponent(templateName));
 }
 
 async function downloadTemplateIfNeeded(
@@ -302,7 +302,7 @@ async function downloadTemplateIfNeeded(
   const templatesToDownloadSet = new Set<string>();
   for (const itemName of Object.keys(deployments)) {
     const d = deployments[itemName];
-    if (d.type === 'http-service' && d.template) {
+    if (d.type === "http-service" && d.template) {
       templatesToDownloadSet.add(d.template);
     }
   }
@@ -325,8 +325,8 @@ async function downloadTemplateIfNeeded(
       resp.body
         .pipe(gunzip())
         .pipe(tar.extract(templateDir, { strip: true }))
-        .on('error', reject)
-        .on('finish', resolve);
+        .on("error", reject)
+        .on("finish", resolve);
     });
   }
 }
@@ -353,7 +353,7 @@ function downloadDeployLogImpl(
   cliContainer
     .downloadDeployLog(deploymentID, onLogReceive)
     .then(resolve)
-    .catch((err) => {
+    .catch(err => {
       // retry when the log is not found, wait for the deployment start
       if (isHTTP404(err)) {
         if (context.debug) {
@@ -377,7 +377,7 @@ function downloadDeployLogImpl(
 async function run(argv: Arguments) {
   const deploymentMap = argv.appConfig.deployments || {};
   const hooks = argv.appConfig.hooks || [];
-  const appName = argv.context.app || '';
+  const appName = argv.context.app || "";
 
   await cliContainer.validateDeployment(appName, deploymentMap, hooks);
 
@@ -447,7 +447,7 @@ async function run(argv: Arguments) {
     );
 
     console.log(chalk`Wait for deployment: {green ${deploymentID}}`);
-    await downloadDeployLog(argv.context, deploymentID, (log) => {
+    await downloadDeployLog(argv.context, deploymentID, log => {
       if (log.message) {
         console.log(log.message);
       }
@@ -463,9 +463,9 @@ async function run(argv: Arguments) {
       console.log(chalk`Deployment completed`);
       return;
     }
-    throw new Error('Deployment failed');
+    throw new Error("Deployment failed");
   } catch (error) {
-    if (error.message === 'cancelled') {
+    if (error.message === "cancelled") {
       return;
     }
     throw error;
@@ -473,13 +473,13 @@ async function run(argv: Arguments) {
 }
 
 export default createCommand({
-  builder: (yargs) => {
-    return yargs.middleware(requireUser).option('app', {
-      desc: 'App name',
-      type: 'string'
+  builder: yargs => {
+    return yargs.middleware(requireUser).option("app", {
+      desc: "App name",
+      type: "string",
     });
   },
-  command: 'deploy [name]',
-  describe: 'Deploy Skygear app',
-  handler: run
+  command: "deploy [name]",
+  describe: "Deploy Skygear app",
+  handler: run,
 });

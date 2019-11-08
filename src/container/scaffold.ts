@@ -1,14 +1,14 @@
-import fs from 'fs-extra';
-import { dataPath } from '../path';
-import fetch from 'node-fetch';
-import * as tar from 'tar-fs';
-import gunzip from 'gunzip-maybe';
-import { join } from 'path';
+import fs from "fs-extra";
+import { dataPath } from "../path";
+import fetch from "node-fetch";
+import * as tar from "tar-fs";
+import gunzip from "gunzip-maybe";
+import { join } from "path";
 
-const templateGitHubRepo = 'skygear-demo/cloud-examples';
+const templateGitHubRepo = "skygear-demo/cloud-examples";
 
-const versionFilePath = dataPath('templates-version');
-const templatesDir = dataPath('templates');
+const versionFilePath = dataPath("templates-version");
+const templatesDir = dataPath("templates");
 
 export interface ScaffoldingTemplate {
   name: string;
@@ -58,7 +58,7 @@ export async function updateTemplates(version: string): Promise<void> {
   const tarballURL = `https://api.github.com/repos/${templateGitHubRepo}/tarball/${version}`;
   const resp = await fetch(tarballURL);
   if (resp.status !== 200) {
-    throw new Error('Failed to fetch templates tarball');
+    throw new Error("Failed to fetch templates tarball");
   }
 
   fs.removeSync(templatesDir);
@@ -66,15 +66,15 @@ export async function updateTemplates(version: string): Promise<void> {
     resp.body
       .pipe(gunzip())
       .pipe(tar.extract(templatesDir, { strip: true }))
-      .on('error', reject)
-      .on('finish', resolve);
+      .on("error", reject)
+      .on("finish", resolve);
   });
 
   fs.writeFileSync(versionFilePath, version);
 }
 
 export function listTemplates(): ScaffoldingTemplate[] {
-  const templateJSONPath = join(templatesDir, 'templates.json');
+  const templateJSONPath = join(templatesDir, "templates.json");
   return fs.readJSONSync(templateJSONPath);
 }
 
@@ -86,7 +86,7 @@ export function instantiateTemplate(
   const templateDir = join(templatesDir, template.path);
   fs.copySync(templateDir, destPath);
 
-  const templateDescPath = join(destPath, '.template.json');
+  const templateDescPath = join(destPath, ".template.json");
   if (!fs.existsSync(templateDescPath)) {
     return;
   }
@@ -94,8 +94,8 @@ export function instantiateTemplate(
   const templateDesc: TemplateDescriptor = fs.readJSONSync(templateDescPath);
   const applyTemplate = (locs: TemplatePlaceholderLocations, value: string) => {
     for (const placeholder of Object.keys(locs)) {
-      const regex = RegExp(placeholder, 'g');
-      const paths = locs[placeholder].map((path) => join(destPath, path));
+      const regex = RegExp(placeholder, "g");
+      const paths = locs[placeholder].map(path => join(destPath, path));
       for (const path of paths) {
         let content = fs.readFileSync(path).toString();
         content = content.replace(regex, value);

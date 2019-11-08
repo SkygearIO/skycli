@@ -1,15 +1,15 @@
-import chalk from 'chalk';
+import chalk from "chalk";
 
-import { Arguments, createCommand } from '../../util';
-import { requireApp, requireClusterConfig, requireUser } from '../middleware';
-import { cliContainer } from '../../container';
+import { Arguments, createCommand } from "../../util";
+import { requireApp, requireClusterConfig, requireUser } from "../middleware";
+import { cliContainer } from "../../container";
 
 async function run(argv: Arguments) {
-  const appName = argv.context.app || '';
+  const appName = argv.context.app || "";
   const email = argv.email as string;
 
   if (!email) {
-    throw new Error('Email is required.');
+    throw new Error("Email is required.");
   }
 
   const collaborators = await cliContainer.getCollaborators(appName);
@@ -21,7 +21,7 @@ async function run(argv: Arguments) {
     }
   }
   if (!userID) {
-    throw new Error('Developer is not a collaborator.');
+    throw new Error("Developer is not a collaborator.");
   }
 
   await cliContainer.removeCollaborator(appName, userID);
@@ -29,18 +29,18 @@ async function run(argv: Arguments) {
 }
 
 export default createCommand({
-  builder: (yargs) => {
+  builder: yargs => {
     return yargs
       .middleware(requireClusterConfig)
       .middleware(requireUser)
       .middleware(requireApp)
-      .demandOption(['email'])
-      .option('email', {
-        type: 'string',
-        describe: `Developer's email`
+      .demandOption(["email"])
+      .option("email", {
+        type: "string",
+        describe: `Developer's email`,
       });
   },
-  command: 'remove-collaborator [email]',
-  describe: 'Remove developer from collaborators by email',
-  handler: run
+  command: "remove-collaborator [email]",
+  describe: "Remove developer from collaborators by email",
+  handler: run,
 });

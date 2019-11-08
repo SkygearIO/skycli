@@ -1,17 +1,17 @@
-import chalk from 'chalk';
-import inquirer from 'inquirer';
+import chalk from "chalk";
+import inquirer from "inquirer";
 
-import { Arguments, createCommand } from '../../util';
-import { requireApp, requireClusterConfig, requireUser } from '../middleware';
-import { cliContainer } from '../../container';
+import { Arguments, createCommand } from "../../util";
+import { requireApp, requireClusterConfig, requireUser } from "../middleware";
+import { cliContainer } from "../../container";
 
 function confirm(secretName: string) {
   return inquirer.prompt([
     {
       message: `Are you sure to delete secret ${secretName}?`,
-      name: 'proceed',
-      type: 'confirm'
-    }
+      name: "proceed",
+      type: "confirm",
+    },
   ]);
 }
 
@@ -21,23 +21,23 @@ async function run(argv: Arguments) {
   if (!answers.proceed) {
     return;
   }
-  await cliContainer.deleteSecret(argv.context.app || '', secretName);
+  await cliContainer.deleteSecret(argv.context.app || "", secretName);
   console.log(chalk`{green Success!} Deleted secret ${secretName}`);
 }
 
 export default createCommand({
-  builder: (yargs) => {
+  builder: yargs => {
     return yargs
       .middleware(requireClusterConfig)
       .middleware(requireUser)
       .middleware(requireApp)
-      .demandOption('name')
-      .option('name', {
-        desc: 'Secret name',
-        type: 'string'
+      .demandOption("name")
+      .option("name", {
+        desc: "Secret name",
+        type: "string",
       });
   },
-  command: 'delete [name]',
-  describe: 'Delete app secret',
-  handler: run
+  command: "delete [name]",
+  describe: "Delete app secret",
+  handler: run,
 });

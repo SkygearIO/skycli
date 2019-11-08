@@ -8,13 +8,13 @@ import {
   User,
   Identity,
   ExtraSessionInfoOptions,
-  AuthenticationSession
-} from '@skygear/node-client';
+  AuthenticationSession,
+} from "@skygear/node-client";
 
-import { CLIContainer } from './CLIContainer';
-import { save, load, ConfigDomain } from '../config';
-import { GlobalConfig } from '../types';
-import { createGlobalConfig } from '../configUtil';
+import { CLIContainer } from "./CLIContainer";
+import { save, load, ConfigDomain } from "../config";
+import { GlobalConfig } from "../types";
+import { createGlobalConfig } from "../configUtil";
 
 class CLIYAMLContainerStorage implements ContainerStorage {
   private loadGlobalConfig(): GlobalConfig {
@@ -35,9 +35,9 @@ class CLIYAMLContainerStorage implements ContainerStorage {
       user: {
         ...globalConfig.user,
         [namespace]: {
-          ...globalConfig.user[namespace]
-        }
-      }
+          ...globalConfig.user[namespace],
+        },
+      },
     };
   }
 
@@ -82,7 +82,7 @@ class CLIYAMLContainerStorage implements ContainerStorage {
     _namespace: string,
     _oauthRedirectAction: string
   ): Promise<void> {
-    throw new Error('Method not implemented.');
+    throw new Error("Method not implemented.");
   }
 
   async setExtraSessionInfoOptions(
@@ -165,7 +165,7 @@ class CLIYAMLContainerStorage implements ContainerStorage {
   }
 
   async getOAuthRedirectAction(_namespace: string): Promise<string | null> {
-    throw new Error('Method not implemented.');
+    throw new Error("Method not implemented.");
   }
 
   async getAuthenticationSession(
@@ -220,7 +220,7 @@ class CLIYAMLContainerStorage implements ContainerStorage {
   }
 
   async delOAuthRedirectAction(_namespace: string): Promise<void> {
-    throw new Error('Method not implemented.');
+    throw new Error("Method not implemented.");
   }
 
   async delAuthenticationSession(_namespace: string) {
@@ -237,6 +237,6 @@ class CLIYAMLContainerStorage implements ContainerStorage {
 
 export const cliContainer = new CLIContainer(
   new NodeContainer({
-    storage: new CLIYAMLContainerStorage()
+    storage: new CLIYAMLContainerStorage(),
   })
 );

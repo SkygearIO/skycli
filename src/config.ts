@@ -13,34 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import fs from 'fs-extra';
-import * as yaml from 'js-yaml';
-import { Dictionary, PropertyPath } from 'lodash';
-import _get from 'lodash/get';
-import _set from 'lodash/set';
-import path from 'path';
-import untildify from 'untildify';
+import fs from "fs-extra";
+import * as yaml from "js-yaml";
+import { Dictionary, PropertyPath } from "lodash";
+import _get from "lodash/get";
+import _set from "lodash/set";
+import path from "path";
+import untildify from "untildify";
 
-import { AppConfig, GlobalConfig } from './types';
-import { createGlobalConfig } from './configUtil';
-import { configPath } from './path';
+import { AppConfig, GlobalConfig } from "./types";
+import { createGlobalConfig } from "./configUtil";
+import { configPath } from "./path";
 
 const currentConfigVersion = 1;
 
 export enum ConfigDomain {
-  GlobalDomain = 'global',
-  ProjectDomain = 'project'
+  GlobalDomain = "global",
+  ProjectDomain = "project",
 }
 
 const configPaths: { [domain: string]: string } = {
-  global: configPath('config'),
-  project: './skygear.yaml'
+  global: configPath("config"),
+  project: "./skygear.yaml",
 };
 
 // tslint:disable-next-line:no-any
 function migrate(configObject: Dictionary<any>) {
   const migrated = Object.assign({}, configObject);
-  if (typeof migrated.version === 'undefined') {
+  if (typeof migrated.version === "undefined") {
     migrated.version = currentConfigVersion;
   }
 
@@ -72,7 +72,7 @@ export function load(domain: ConfigDomain = ConfigDomain.GlobalDomain) {
 
   const configPath = findConfig(domain);
   if (configPath) {
-    content = yaml.safeLoad(fs.readFileSync(configPath, 'utf-8'));
+    content = yaml.safeLoad(fs.readFileSync(configPath, "utf-8"));
   }
 
   return content;
@@ -120,8 +120,8 @@ export function loadConfig() {
   const appConfig = migrate(load(ConfigDomain.ProjectDomain)) as AppConfig;
   return {
     appConfig,
-    globalConfig
+    globalConfig,
   };
 }
 
-export const developerMode = process.env.SKYCLI_DEVELOPER_MODE === '1';
+export const developerMode = process.env.SKYCLI_DEVELOPER_MODE === "1";
