@@ -3,10 +3,16 @@ import {
   BaseAPIClient,
   JSONObject,
   encodeQuery,
-  decodeError
-} from '@skygear/node-client';
+  decodeError,
+} from "@skygear/node-client";
 
-import { Secret, App, UserConfiguration, Endpoint, Collaborator } from "./types";
+import {
+  Secret,
+  App,
+  UserConfiguration,
+  Endpoint,
+  Collaborator,
+} from "./types";
 
 function decodeApp(app: any): App {
   return {
@@ -80,7 +86,7 @@ export class ControllerContainer<T extends BaseAPIClient> {
     appName: string,
     secretName: string,
     secretValue: string,
-    secretType: string,
+    secretType: string
   ): Promise<void> {
     return this.fetchAPI("POST", `${this.CONTROLLER_URL}/secret`, {
       json: {
@@ -154,11 +160,15 @@ export class ControllerContainer<T extends BaseAPIClient> {
   }
 
   async addCollaborator(appName: string, email: string): Promise<boolean> {
-    return this.fetchAPI("POST", `${this.CONTROLLER_URL}/app/${appName}/collaborator`, {
-      json: {
-        email: email,
-      },
-    }).then(({ invitation }) => {
+    return this.fetchAPI(
+      "POST",
+      `${this.CONTROLLER_URL}/app/${appName}/collaborator`,
+      {
+        json: {
+          email: email,
+        },
+      }
+    ).then(({ invitation }) => {
       // false means user is added to the app directly
       // true means invitation is sent
       return !!invitation;
