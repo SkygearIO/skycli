@@ -22,10 +22,8 @@ export async function walk(dir: string): Promise<string[]> {
     if (filePath == null) {
       continue;
     }
-    // eslint-disable-next-line no-await-in-loop
     const stats = await lstat(filePath);
     if (stats.isDirectory()) {
-      // eslint-disable-next-line no-await-in-loop
       const basenames = await readdir(filePath);
       const filePaths = basenames.map(basename => join(filePath, basename));
       input = input.concat(filePaths);

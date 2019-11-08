@@ -2,6 +2,7 @@
   "extends": ["@oursky"],
   "rules": {
     "no-console": 0,
-    "prefer-promise-reject-errors": 0
+    "prefer-promise-reject-errors": 0,
+    "no-await-in-loop": 0
   }
 }
