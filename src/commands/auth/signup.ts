@@ -18,7 +18,11 @@ async function run(argv: Arguments) {
     answers.password,
     { metadata }
   );
-  console.log(chalk`Sign up as {green ${answers.email}}.`);
+  console.log(
+    chalk`Sign up as {green ${
+      answers.email
+    }}. To use the account, please check your email inbox and click the link in the email to complete verification.`
+  );
 }
 
 export default createCommand({
