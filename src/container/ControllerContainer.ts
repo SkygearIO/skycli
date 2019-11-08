@@ -12,6 +12,7 @@ import {
   UserConfiguration,
   Endpoint,
   Collaborator,
+  SignedTemplateItem,
 } from "./types";
 
 function decodeApp(app: any): App {
@@ -180,5 +181,13 @@ export class ControllerContainer<T extends BaseAPIClient> {
       "DELETE",
       `${this.CONTROLLER_URL}/app/${appName}/collaborator/${userID}`
     );
+  }
+
+  async getTemplates(appName: string): Promise<SignedTemplateItem[]> {
+    return this.fetchAPI("GET", `${this.CONTROLLER_URL}/template`, {
+      query: [["app_name", appName]],
+    }).then(({ templates }) => {
+      return templates;
+    });
   }
 }
