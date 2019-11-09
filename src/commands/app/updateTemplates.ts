@@ -12,6 +12,7 @@ import {
   RemoteTemplateItem,
 } from "../../container/types";
 import { contentMD5OfFilePath } from "../../contentmd5";
+import { findEqualReference, printTemplateItems } from "./templateHelper";
 
 async function collectTemplatePaths(
   filePath: string,
@@ -81,14 +82,14 @@ export function diff(
   const unchanged: RemoteTemplateItem[] = [];
 
   for (const target of local) {
-    const found = find(remote, target);
+    const found = findEqualReference(remote, target);
     if (!found) {
       added.push(target);
     }
   }
 
   for (const target of remote) {
-    const found = find(local, target);
+    const found = findEqualReference(local, target);
     if (!found) {
       removed.push(target);
     } else {
@@ -104,54 +105,6 @@ export function diff(
   return { added, removed, updated, unchanged };
 }
 
-function isEqualReference(a: TemplateItem, b: TemplateItem): boolean {
-  return (
-    a.type === b.type && a.key === b.key && a.language_tag === b.language_tag
-  );
-}
-
-function find<T1 extends TemplateItem, T2 extends TemplateItem>(
-  items: T1[],
-  target: T2
-): T1 | null {
-  for (const item of items) {
-    if (isEqualReference(item, target)) {
-      return item;
-    }
-  }
-  return null;
-}
-
-function printTemplateItems(
-  templateItems: TemplateItem[],
-  title: string,
-  templateDir: string
-) {
-  if (templateItems.length <= 0) {
-    return;
-  }
-  console.log(title);
-  for (const item of templateItems) {
-    console.log("\t" + templateItemToLocalTemplatePath(item, templateDir));
-  }
-  console.log();
-}
-
-function templateItemToLocalTemplatePath(
-  templateItem: TemplateItem,
-  templateDir: string
-): string {
-  const parts = [];
-
-  if (templateItem.key) {
-    parts.push(templateItem.key);
-  }
-
-  parts.push(templateItem.type);
-
-  return join(templateDir, parts.join("/"));
-}
-
 async function reuseAndUploadTemplateItems(
   local: LocalTemplateItem[],
   unchanged: RemoteTemplateItem[]
@@ -159,7 +112,7 @@ async function reuseAndUploadTemplateItems(
   const output = [];
 
   for (const item of local) {
-    const found = find(unchanged, item);
+    const found = findEqualReference(unchanged, item);
     if (found) {
       output.push({
         ...item,
