@@ -124,12 +124,16 @@ export interface Collaborator {
 
 export interface TemplateItem {
   type: string;
-  uri: string;
   content_md5: string;
+  uri?: string;
   language_tag?: string;
   key?: string;
 }
 
-export interface SignedTemplateItem extends TemplateItem {
+export interface RemoteTemplateItem extends TemplateItem {
   url: string;
+}
+
+export interface LocalTemplateItem extends TemplateItem {
+  filePath: string;
 }
