@@ -1,3 +1,18 @@
+## 2.0.0-alpha.4 (2019-11-13)
+
+### Features
+
+- Update secret commands
+- Update microservice environment payload
+- Support setting custom cluster server
+
+### Other notes
+
+- Update signup copywriting to ask for email verification
+- Update SDK
+- Update staging and production api key
+- Remove examples
+
 ## 2.0.0-alpha.3 (2019-10-24)
 
 ### Other notes
