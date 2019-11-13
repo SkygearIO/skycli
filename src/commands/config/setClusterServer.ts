@@ -16,13 +16,13 @@ interface ClusterOption {
 const clusterOptions: ClusterOption[] = [
   {
     name: "skygeario",
-    apiKey: "da0a05897b92ae954e281c31f95e5ce8",
+    apiKey: "sq3GcUp0QVRTYPwBpnLcQi3jHK7SJFfF",
     endpoint: "https://controller.skygear.dev",
     debug: false,
   },
   {
     name: "skygeario staging",
-    apiKey: "61fc82a7fa9cd4ba1a28bd1111df86e0",
+    apiKey: "nA1nZ2vemgjJFD99n36QoGNObG5myWXO",
     endpoint: "https://controller.staging.skygear.dev",
     debug: true,
   },
