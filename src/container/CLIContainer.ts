@@ -1,8 +1,8 @@
-import fs from 'fs-extra';
-import fetch, { Response, RequestInit } from 'node-fetch';
-import { BaseAPIClient, decodeError } from '@skygear/node-client';
+import fs from "fs-extra";
+import fetch, { Response, RequestInit } from "node-fetch";
+import { BaseAPIClient, decodeError } from "@skygear/node-client";
 
-import { ControllerContainer } from './ControllerContainer';
+import { ControllerContainer } from "./ControllerContainer";
 import {
   Deployment,
   DeploymentItemsMap,
@@ -11,16 +11,16 @@ import {
   PresignedRequest,
   DeploymentItemConfig,
   HookConfig,
-  LogEntry
-} from './types';
+  LogEntry,
+} from "./types";
 
-const FormData = require('form-data');
+const FormData = require("form-data");
 
 function encodeLogEntry(input: any): LogEntry {
   return {
     level: input.level,
     message: input.message,
-    timestamp: input.timestamp && new Date(input.timestamp)
+    timestamp: input.timestamp && new Date(input.timestamp),
   };
 }
 
@@ -28,20 +28,20 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
   T
 > {
   async getClusterEnv(): Promise<string> {
-    return this.fetchAPI('GET', `${this.CONTROLLER_URL}/config`).then(
+    return this.fetchAPI("GET", `${this.CONTROLLER_URL}/config`).then(
       ({ env }) => env
     );
   }
 
   async getDeployment(deploymentID: string): Promise<Deployment> {
-    return this.fetchAPI('GET', `/_controller/deployment/${deploymentID}`).then(
+    return this.fetchAPI("GET", `/_controller/deployment/${deploymentID}`).then(
       ({ deployment }) => deployment
     );
   }
 
   async getDeploymentItems(deploymentID: string): Promise<DeploymentItemsMap> {
     return this.fetchAPI(
-      'GET',
+      "GET",
       `${this.CONTROLLER_URL}/deployment/${deploymentID}/items`
     ).then(({ deployments }) => deployments);
   }
@@ -50,16 +50,16 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
     appName: string,
     checksums: Checksum[]
   ): Promise<CreateArtifactUploadResponse[]> {
-    return this.fetchAPI('POST', `${this.CONTROLLER_URL}/artifact_upload`, {
+    return this.fetchAPI("POST", `${this.CONTROLLER_URL}/artifact_upload`, {
       json: {
         app_name: appName,
-        upload_requests: checksums.map((checksum) => {
+        upload_requests: checksums.map(checksum => {
           return {
             checksum_md5: checksum.md5,
-            checksum_sha256: checksum.sha256
+            checksum_sha256: checksum.sha256,
           };
-        })
-      }
+        }),
+      },
     }).then(({ upload_requests }) => {
       return upload_requests.map((r: any) => {
         return {
@@ -68,8 +68,8 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
             fields: r.upload_request.fields,
             headers: r.upload_request.headers,
             method: r.upload_request.method,
-            url: r.upload_request.url
-          }
+            url: r.upload_request.url,
+          },
         };
       });
     });
@@ -81,11 +81,11 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
     archivePath: string
   ): Promise<void> {
     const headers: { [name: string]: string } = (req.headers || [])
-      .map((header) => header.split(':'))
+      .map(header => header.split(":"))
       .reduce((acc, curr) => ({ ...acc, [curr[0]]: curr[1] }), {});
 
     const opt: RequestInit = {
-      method: req.method
+      method: req.method,
     };
 
     const stats = await fs.stat(archivePath);
@@ -93,20 +93,20 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
 
     const stream = fs.createReadStream(archivePath);
 
-    headers['Content-MD5'] = checksumMD5;
+    headers["Content-MD5"] = checksumMD5;
 
-    if (req.method === 'PUT') {
-      headers['Content-Length'] = `${fileSizeInBytes}`;
+    if (req.method === "PUT") {
+      headers["Content-Length"] = `${fileSizeInBytes}`;
       // From https://github.com/bitinn/node-fetch#post-data-using-a-file-stream,
       // stream from fs.createReadStream should work.
       //
       // But the type definition does not match, so force type cast here.
       // tslint:disable-next-line: no-any
       opt.body = stream as any;
-    } else if (req.method === 'POST') {
+    } else if (req.method === "POST") {
       const formData = new FormData();
-      formData.append('file', stream, {
-        knownLength: fileSizeInBytes
+      formData.append("file", stream, {
+        knownLength: fileSizeInBytes,
       });
 
       const fields = req.fields || {};
@@ -122,7 +122,7 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
 
     opt.headers = headers;
 
-    return fetch(req.url, opt).then((resp) => {
+    return fetch(req.url, opt).then(resp => {
       if (resp.status !== 200 && resp.status !== 204) {
         throw new Error(`Fail to upload archive, ${resp.body.read()}`);
       }
@@ -134,11 +134,11 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
     appName: string,
     artifactRequest: string[]
   ): Promise<string[]> {
-    return this.fetchAPI('POST', `${this.CONTROLLER_URL}/artifact`, {
+    return this.fetchAPI("POST", `${this.CONTROLLER_URL}/artifact`, {
       json: {
         app_name: appName,
-        artifact_requests: artifactRequest
-      }
+        artifact_requests: artifactRequest,
+      },
     }).then(({ artifacts }) => {
       return artifacts.map((a: { id: string }) => a.id);
     });
@@ -149,12 +149,12 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
     deployments: { [name: string]: DeploymentItemConfig },
     hooks: HookConfig[]
   ): Promise<void> {
-    return this.fetchAPI('POST', '/_controller/deployment/validate', {
+    return this.fetchAPI("POST", "/_controller/deployment/validate", {
       json: {
         app_name: appName,
         deployments: deployments as any,
-        hooks: hooks as any
-      }
+        hooks: hooks as any,
+      },
     });
   }
 
@@ -164,14 +164,14 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
     artifactIDs: { [name: string]: string },
     hooks: HookConfig[]
   ): Promise<string> {
-    return this.fetchAPI('POST', `${this.CONTROLLER_URL}/deployment`, {
+    return this.fetchAPI("POST", `${this.CONTROLLER_URL}/deployment`, {
       json: {
         app_name: appName,
         artifact_ids: artifactIDs,
         deployments: deployments as any,
         hooks: hooks as any,
-        sync: true
-      }
+        sync: true,
+      },
     }).then(({ deployment }) => {
       return deployment.id;
     });
@@ -191,13 +191,13 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
       nextCur: number;
     } = await new Promise((resolve, reject) => {
       let count = 0;
-      let buffer = '';
+      let buffer = "";
       const consumeBuffer = () => {
-        const lastDelimiterIndex = buffer.lastIndexOf('\n');
+        const lastDelimiterIndex = buffer.lastIndexOf("\n");
         const jsons = buffer.slice(0, lastDelimiterIndex);
         buffer = buffer.slice(lastDelimiterIndex);
 
-        for (let json of jsons.split('\n')) {
+        for (let json of jsons.split("\n")) {
           json = json.trim();
           if (!json) continue;
           const log = encodeLogEntry(JSON.parse(json));
@@ -206,23 +206,23 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
       };
 
       resp.body
-        .on('data', (data) => {
+        .on("data", data => {
           count += data.length;
-          buffer += data.toString('utf-8');
+          buffer += data.toString("utf-8");
           consumeBuffer();
         })
-        .on('error', (err) => {
+        .on("error", err => {
           reject(err);
         })
-        .on('end', () => {
-          buffer += '\n';
+        .on("end", () => {
+          buffer += "\n";
           consumeBuffer();
 
-          const contentLength = resp.headers.get('content-length');
+          const contentLength = resp.headers.get("content-length");
           const needReconnect = !contentLength;
           resolve({
             needReconnect,
-            nextCur: cur + count
+            nextCur: cur + count,
           });
         });
     });
@@ -239,21 +239,22 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
     const resp = ((await this.container.fetch(
       `${this.CONTROLLER_URL}/log/download`,
       {
-        method: 'POST',
+        method: "POST",
         headers: {
-          Range: `bytes=${cur}-`
+          Range: `bytes=${cur}-`,
+          "content-type": "application/json",
         },
-        mode: 'cors',
-        credentials: 'include',
+        mode: "cors",
+        credentials: "include",
         body: JSON.stringify({
           deployment_id: deploymentID,
-          type: 'deploy'
-        })
+          type: "deploy",
+        }),
       }
     )) as any) as Response;
     if (resp.status !== 200 && resp.status !== 206 && resp.status !== 416) {
       const jsonBody = await resp.json();
-      throw decodeError(jsonBody['error'] || resp.statusText);
+      throw decodeError(jsonBody["error"] || resp.statusText);
     }
 
     return resp;
@@ -265,7 +266,7 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
     )) as any) as Response;
     if (resp.status !== 200) {
       const jsonBody = await resp.json();
-      throw decodeError(jsonBody['error'] || resp.statusText);
+      throw decodeError(jsonBody["error"] || resp.statusText);
     }
     return resp;
   }

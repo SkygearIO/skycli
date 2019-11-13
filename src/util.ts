@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import moment from 'moment';
-import { Arguments as YargsArguments, Argv } from 'yargs';
-import { AppConfig, CLIContext, GlobalConfig } from './types';
-import { printError } from './error';
-import { cliContainer } from './container';
-import Table, { HorizontalTable } from 'cli-table3';
+import moment from "moment";
+import { Arguments as YargsArguments, Argv } from "yargs";
+import { AppConfig, CLIContext, GlobalConfig } from "./types";
+import { printError } from "./error";
+import { cliContainer } from "./container";
+import Table, { HorizontalTable } from "cli-table3";
 
 export interface Arguments extends YargsArguments {
   debug: boolean;
@@ -43,7 +43,7 @@ export interface CommandModule {
 }
 
 export function createCommand(
-  module: Pick<CommandModule, Exclude<keyof CommandModule, 'execute'>>
+  module: Pick<CommandModule, Exclude<keyof CommandModule, "execute">>
 ) {
   return Object.assign({}, module, {
     execute: module.handler,
@@ -52,17 +52,17 @@ export function createCommand(
       const clusterConfig = argv.context && argv.context.cluster;
       cliContainer.container
         .configure({
-          endpoint: (clusterConfig && clusterConfig.endpoint) || '',
-          apiKey: (clusterConfig && clusterConfig.api_key) || ''
+          endpoint: (clusterConfig && clusterConfig.endpoint) || "",
+          apiKey: (clusterConfig && clusterConfig.api_key) || "",
         })
         .then(() => {
           return module.handler(argv);
         })
-        .catch((e) => {
+        .catch(e => {
           printError(e);
           process.exit(1);
         });
-    }
+    },
   });
 }
 
@@ -75,16 +75,16 @@ export function getCommandGroupHelpMessage(
   subCommands: CommandModule[]
 ) {
   const cmdsText = subCommands
-    .map((cmd) => {
-      if (typeof cmd.command === 'string') {
-        return cmd.command.split(' ');
+    .map(cmd => {
+      if (typeof cmd.command === "string") {
+        return cmd.command.split(" ");
       } else if (cmd.command == null) {
-        return [''];
+        return [""];
       }
       return cmd.command;
     })
-    .map((cmd) => cmd[0])
-    .join(' | ');
+    .map(cmd => cmd[0])
+    .join(" | ");
   return `Usage: skycli ${command} [action]
   action maybe           ${cmdsText}
 
@@ -93,7 +93,7 @@ For detailed information on this command and its flags, run:
 }
 
 export function displayDate(date: Date): string {
-  return date && moment(date).format('YYYY-MM-DD HH:mm:ss Z');
+  return date && moment(date).format("YYYY-MM-DD HH:mm:ss Z");
 }
 
 export function createTable(
@@ -101,23 +101,23 @@ export function createTable(
 ): HorizontalTable {
   return new Table({
     chars: {
-      top: '',
-      'top-mid': '',
-      'top-left': '',
-      'top-right': '',
-      bottom: '',
-      'bottom-mid': '',
-      'bottom-left': '',
-      'bottom-right': '',
-      left: '',
-      'left-mid': '',
-      mid: '',
-      'mid-mid': '',
-      right: '',
-      'right-mid': '',
-      middle: ' '
+      top: "",
+      "top-mid": "",
+      "top-left": "",
+      "top-right": "",
+      bottom: "",
+      "bottom-mid": "",
+      "bottom-left": "",
+      "bottom-right": "",
+      left: "",
+      "left-mid": "",
+      mid: "",
+      "mid-mid": "",
+      right: "",
+      "right-mid": "",
+      middle: " ",
     },
-    style: { 'padding-left': 0, 'padding-right': 2, head: [] },
-    ...options
+    style: { "padding-left": 0, "padding-right": 2, head: [] },
+    ...options,
   }) as HorizontalTable;
 }

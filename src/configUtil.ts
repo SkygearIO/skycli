@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { CLIContext, UserContext, GlobalConfig } from './types';
-import { Arguments } from './util';
-import { decodeUser, decodeIdentity } from '@skygear/node-client';
+import { CLIContext, UserContext, GlobalConfig } from "./types";
+import { Arguments } from "./util";
+import { decodeUser, decodeIdentity } from "@skygear/node-client";
 
-const defaultContext = 'default';
+const defaultContext = "default";
 
 export function createGlobalConfig(): GlobalConfig {
   return {
@@ -25,11 +25,11 @@ export function createGlobalConfig(): GlobalConfig {
     context: {
       [defaultContext]: {
         cluster: defaultContext,
-        user: defaultContext
-      }
+        user: defaultContext,
+      },
     },
     current_context: defaultContext,
-    user: {}
+    user: {},
   };
 }
 
@@ -54,7 +54,7 @@ export function currentCLIContext(argv: Arguments): CLIContext {
       clusterUserConfig.access_token && {
         user: decodeUser(clusterUserConfig.user),
         identity: decodeIdentity(clusterUserConfig.identity),
-        access_token: clusterUserConfig.access_token
+        access_token: clusterUserConfig.access_token,
       }) ||
     null;
 
@@ -63,6 +63,6 @@ export function currentCLIContext(argv: Arguments): CLIContext {
     cluster: globalConfig.cluster && globalConfig.cluster[clusterContextKey],
     debug: !!argv.debug,
     user: userContext,
-    verbose: !!argv.verbose
+    verbose: !!argv.verbose,
   };
 }

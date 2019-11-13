@@ -9,7 +9,7 @@ export interface App {
 
 export type Endpoint = string;
 
-export type SecretType = 'opaque' | 'dockerconfigjson';
+export type SecretType = "opaque" | "dockerconfigjson";
 
 export interface Secret {
   name: string;
@@ -43,7 +43,7 @@ export interface ForgotPasswordConfiguration {
 }
 
 export interface HttpHandlerConfig {
-  type: 'http-handler';
+  type: "http-handler";
   path: string;
   runtime_environment: string;
   entry: string;
@@ -52,7 +52,7 @@ export interface HttpHandlerConfig {
 }
 
 export interface HttpServiceConfig {
-  type: 'http-service';
+  type: "http-service";
   path: string;
   port: number;
   context: string;
@@ -104,12 +104,12 @@ export interface LogEntry {
 }
 
 export enum DeploymentStatus {
-  Pending = 'Pending',
-  Running = 'Running',
-  DeployFailed = 'DeployFailed',
-  Stopping = 'Stopping',
-  StopFailed = 'StopFailed',
-  Stopped = 'Stopped'
+  Pending = "Pending",
+  Running = "Running",
+  DeployFailed = "DeployFailed",
+  Stopping = "Stopping",
+  StopFailed = "StopFailed",
+  Stopped = "Stopped",
 }
 export interface Deployment {
   id: string;

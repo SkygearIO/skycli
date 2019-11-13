@@ -1,9 +1,9 @@
-import chalk from 'chalk';
+import chalk from "chalk";
 
-import { Arguments, createCommand } from '../../util';
-import { requireClusterConfig } from '../middleware';
-import { askCredentials } from './util';
-import { cliContainer } from '../../container';
+import { Arguments, createCommand } from "../../util";
+import { requireClusterConfig } from "../middleware";
+import { askCredentials } from "./util";
+import { cliContainer } from "../../container";
 
 async function run(argv: Arguments) {
   const answers = await askCredentials(argv);
@@ -12,13 +12,13 @@ async function run(argv: Arguments) {
 }
 
 export default createCommand({
-  builder: (yargs) => {
-    return yargs.middleware(requireClusterConfig).option('email', {
-      desc: 'Login with email',
-      type: 'string'
+  builder: yargs => {
+    return yargs.middleware(requireClusterConfig).option("email", {
+      desc: "Login with email",
+      type: "string",
     });
   },
-  command: 'login',
-  describe: 'Login developer',
-  handler: run
+  command: "login",
+  describe: "Login developer",
+  handler: run,
 });

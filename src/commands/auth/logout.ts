@@ -1,8 +1,8 @@
-import chalk from 'chalk';
-import inquirer from 'inquirer';
+import chalk from "chalk";
+import inquirer from "inquirer";
 
-import { Arguments, createCommand } from '../../util';
-import { cliContainer } from '../../container';
+import { Arguments, createCommand } from "../../util";
+import { cliContainer } from "../../container";
 
 async function run(argv: Arguments) {
   const userContext = argv.context.user;
@@ -13,21 +13,21 @@ async function run(argv: Arguments) {
 
   try {
     const email =
-      ('loginID' in userContext.identity && userContext.identity.loginID) || '';
+      ("loginID" in userContext.identity && userContext.identity.loginID) || "";
     const answers = await inquirer.prompt([
       {
         message: `Log out as ${email}?`,
-        name: 'confirm',
-        type: 'confirm'
-      }
+        name: "confirm",
+        type: "confirm",
+      },
     ]);
     if (!answers.confirm) {
-      throw new Error('cancelled');
+      throw new Error("cancelled");
     }
     await cliContainer.container.auth.logout();
-    console.log(chalk.green('Successfully logged out.'));
+    console.log(chalk.green("Successfully logged out."));
   } catch (error) {
-    if (error.message === 'cancelled') {
+    if (error.message === "cancelled") {
       return;
     }
     throw error;
@@ -35,7 +35,7 @@ async function run(argv: Arguments) {
 }
 
 export default createCommand({
-  command: 'logout',
-  describe: 'Log out developer',
-  handler: run
+  command: "logout",
+  describe: "Log out developer",
+  handler: run,
 });

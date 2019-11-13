@@ -1,8 +1,8 @@
-import chalk from 'chalk';
-import { SkygearErrorNames, SkygearError } from '@skygear/node-client';
+import chalk from "chalk";
+import { SkygearErrorNames, SkygearError } from "@skygear/node-client";
 
 export function printError(error: any) {
-  let s = '';
+  let s = "";
   if (error instanceof SkygearError) {
     // TODO(error): Pretty-print SkygearError.
     // For now, we leverage the fact that SkygearError is well-defined JSON and
@@ -11,12 +11,12 @@ export function printError(error: any) {
       name: error.name,
       reason: error.reason,
       message: error.message,
-      info: error.info
+      info: error.info,
     };
     s = JSON.stringify(errorJSON, null, 2);
   } else if (error instanceof Error) {
     s = error.message;
-  } else if (typeof error === 'object') {
+  } else if (typeof error === "object") {
     try {
       s = JSON.stringify(error, null, 2);
     } catch {

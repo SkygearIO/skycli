@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { createCommand } from '../util';
+import { createCommand } from "../util";
 
-import pkg from '../../package.json';
+import pkg from "../../package.json";
 
 function printVersion() {
   console.log(pkg.version);
@@ -23,7 +23,7 @@ function printVersion() {
 }
 
 module.exports = createCommand({
-  command: 'version',
-  describe: 'Print version',
-  handler: printVersion
+  command: "version",
+  describe: "Print version",
+  handler: printVersion,
 });

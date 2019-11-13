@@ -1,16 +1,16 @@
-import chalk from 'chalk';
+import chalk from "chalk";
 
-import { Arguments, createCommand } from '../../util';
-import { requireClusterConfig } from '../middleware';
-import { askCredentials, askInvitationCode } from './util';
-import { cliContainer } from '../../container';
+import { Arguments, createCommand } from "../../util";
+import { requireClusterConfig } from "../middleware";
+import { askCredentials, askInvitationCode } from "./util";
+import { cliContainer } from "../../container";
 
 async function run(argv: Arguments) {
   const answers = await askCredentials(argv);
   const invitationCode = await askInvitationCode();
   const metadata: any = {};
   if (invitationCode) {
-    metadata['invitation_code'] = invitationCode;
+    metadata["invitation_code"] = invitationCode;
   }
 
   await cliContainer.container.auth.signup(
@@ -26,13 +26,13 @@ async function run(argv: Arguments) {
 }
 
 export default createCommand({
-  builder: (yargs) => {
-    return yargs.middleware(requireClusterConfig).option('email', {
-      desc: 'Sign up with email',
-      type: 'string'
+  builder: yargs => {
+    return yargs.middleware(requireClusterConfig).option("email", {
+      desc: "Sign up with email",
+      type: "string",
     });
   },
-  command: 'signup',
-  describe: 'Sign up developer',
-  handler: run
+  command: "signup",
+  describe: "Sign up developer",
+  handler: run,
 });

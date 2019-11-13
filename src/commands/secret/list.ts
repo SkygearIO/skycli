@@ -1,31 +1,31 @@
-import chalk from 'chalk';
+import chalk from "chalk";
 
-import { Arguments, createCommand, displayDate, createTable } from '../../util';
-import { requireApp, requireClusterConfig, requireUser } from '../middleware';
-import { cliContainer } from '../../container';
+import { Arguments, createCommand, displayDate, createTable } from "../../util";
+import { requireApp, requireClusterConfig, requireUser } from "../middleware";
+import { cliContainer } from "../../container";
 
 async function run(argv: Arguments) {
-  const secrets = await cliContainer.getSecrets(argv.context.app || '');
+  const secrets = await cliContainer.getSecrets(argv.context.app || "");
   if (secrets.length === 0) {
-    console.log(chalk`No secrets in app {green ${argv.context.app || ''}}`);
+    console.log(chalk`No secrets in app {green ${argv.context.app || ""}}`);
     return;
   }
 
-  const table = createTable({ head: ['NAME', 'TYPE', 'CREATED_AT'] });
-  secrets.map((s) => {
+  const table = createTable({ head: ["NAME", "TYPE", "CREATED_AT"] });
+  secrets.map(s => {
     table.push([s.name, s.type, displayDate(s.created_at)]);
   });
   console.log(table.toString());
 }
 
 export default createCommand({
-  builder: (yargs) => {
+  builder: yargs => {
     return yargs
       .middleware(requireClusterConfig)
       .middleware(requireUser)
       .middleware(requireApp);
   },
-  command: 'list',
-  describe: 'List app secret',
-  handler: run
+  command: "list",
+  describe: "List app secret",
+  handler: run,
 });

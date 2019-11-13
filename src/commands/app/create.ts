@@ -1,30 +1,30 @@
-import chalk from 'chalk';
-import inquirer from 'inquirer';
+import chalk from "chalk";
+import inquirer from "inquirer";
 
-import { Arguments, createCommand } from '../../util';
-import { requireClusterConfig, requireUser } from '../middleware';
-import AppScaffoldCommand from './scaffold';
-import { cliContainer } from '../../container';
+import { Arguments, createCommand } from "../../util";
+import { requireClusterConfig, requireUser } from "../middleware";
+import AppScaffoldCommand from "./scaffold";
+import { cliContainer } from "../../container";
 
 const appNamePrompt: inquirer.Question = {
-  message: 'What is your app name?',
-  name: 'app',
-  type: 'input',
-  validate: (input) => {
-    if (input.trim() === '') {
-      return 'App name is required.';
+  message: "What is your app name?",
+  name: "app",
+  type: "input",
+  validate: input => {
+    if (input.trim() === "") {
+      return "App name is required.";
     }
     if (!input.match(/^[A-Za-z0-9]+$/i)) {
-      return 'Invalid app name, only alphabetical letters and numbers are allowed.';
+      return "Invalid app name, only alphabetical letters and numbers are allowed.";
     }
     return true;
-  }
+  },
 };
 
 function ask() {
-  return inquirer.prompt([appNamePrompt]).then((answers) => {
+  return inquirer.prompt([appNamePrompt]).then(answers => {
     return {
-      ...answers
+      ...answers,
     };
   });
 }
@@ -33,12 +33,12 @@ function confirmScaffoldApp() {
   return inquirer.prompt([
     {
       message:
-        'Do you want to scaffold your app now? ' +
-        'Or you can do it later by `skycli app scaffold` command.\n' +
-        'Scaffold now?',
-      name: 'scaffoldNow',
-      type: 'confirm'
-    }
+        "Do you want to scaffold your app now? " +
+        "Or you can do it later by `skycli app scaffold` command.\n" +
+        "Scaffold now?",
+      name: "scaffoldNow",
+      type: "confirm",
+    },
   ]);
 }
 
@@ -54,7 +54,7 @@ async function run(argv: Arguments) {
   }
 
   console.log(chalk`App name: {green ${appName}}.`);
-  console.log('Creating app...');
+  console.log("Creating app...");
 
   const payload = await cliContainer.createApp(appName);
   const userConfig = payload[1];
@@ -63,11 +63,11 @@ async function run(argv: Arguments) {
 
   console.log(chalk`Your API endpoint: {green ${endpoint}}.`);
   console.log(
-    chalk`Your API Key: {green ${firstClient ? firstClient.api_key : ''}}.`
+    chalk`Your API Key: {green ${firstClient ? firstClient.api_key : ""}}.`
   );
-  console.log(chalk`Your Master Key: {green ${userConfig.master_key || ''}}.`);
+  console.log(chalk`Your Master Key: {green ${userConfig.master_key || ""}}.`);
 
-  console.log('Created app successfully! \n');
+  console.log("Created app successfully! \n");
 
   const answers = await confirmScaffoldApp();
   if (!answers.scaffoldNow) {
@@ -80,21 +80,21 @@ async function run(argv: Arguments) {
   return AppScaffoldCommand.execute({
     ...argv,
     app: appName,
-    dest: '.'
+    dest: ".",
   });
 }
 
 export default createCommand({
-  builder: (yargs) => {
+  builder: yargs => {
     return yargs
       .middleware(requireClusterConfig)
       .middleware(requireUser)
-      .option('app', {
-        desc: 'App name',
-        type: 'string'
+      .option("app", {
+        desc: "App name",
+        type: "string",
       });
   },
-  command: 'create',
-  describe: 'Create Skygear app',
-  handler: run
+  command: "create",
+  describe: "Create Skygear app",
+  handler: run,
 });
