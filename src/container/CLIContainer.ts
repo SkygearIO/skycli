@@ -242,6 +242,7 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
         method: "POST",
         headers: {
           Range: `bytes=${cur}-`,
+          "content-type": "application/json",
         },
         mode: "cors",
         credentials: "include",
