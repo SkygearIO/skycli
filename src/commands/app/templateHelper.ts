@@ -14,7 +14,7 @@ export function templateItemToLocalTemplatePath(
 
   parts.push(templateItem.type);
 
-  return join(templateDir, parts.join("/"));
+  return join(templateDir, ...parts);
 }
 
 export function isEqualReference(a: TemplateItem, b: TemplateItem): boolean {

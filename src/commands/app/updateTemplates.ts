@@ -1,4 +1,4 @@
-import { join, relative } from "path";
+import { join, relative, sep } from "path";
 
 import inquirer from "inquirer";
 import fs from "fs-extra";
@@ -42,7 +42,7 @@ async function localTemplatePathToLocalTemplateItem(
   // TODO(template): we do not support language tag nor key validation now.
   let type = "";
   let key;
-  const keyType = relative(templateDir, templatePath).split("/");
+  const keyType = relative(templateDir, templatePath).split(sep);
   switch (keyType.length) {
     case 1:
       type = keyType[0];
