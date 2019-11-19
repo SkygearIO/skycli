@@ -283,14 +283,13 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
     if (mediaType != null) {
       headers["content-type"] = mediaType;
     }
-    const { size } = await fs.stat(filePath);
     const buffer = fs.readFileSync(filePath);
     const asset_name = await ((this.container as any) as NodeContainer<
       NodeAPIClient
     >).asset.upload(buffer, {
       access: "private",
       prefix: "template-",
-      size,
+      size: buffer.length,
       headers,
     });
 
