@@ -13,6 +13,7 @@ import requireUser from "../middleware/requireUser";
 import { walk, dockerignore, dockerignorePaths } from "../../ignore";
 import { cliContainer } from "../../container";
 import {
+  Artifact,
   DeploymentStatus,
   Checksum,
   LogEntry,
@@ -400,33 +401,22 @@ async function run(argv: Arguments) {
       checksums.push(checksum);
     }
 
-    // create artifact upload
-    const uploads = await cliContainer.createArtifactUploads(
-      appName,
-      checksums
-    );
-
     // upload artifact
-    const artifactRequests: string[] = [];
+    const artifacts: Artifact[] = [];
     for (let i = 0; i < checksums.length; i++) {
-      const checksum = checksums[i];
-      const upload = uploads[i];
       const archivePath = createArchivePath(i);
-      await cliContainer.uploadArtifact(
-        upload.uploadRequest,
-        checksum.md5,
-        archivePath
-      );
+      const assetName = await cliContainer.uploadArtifact(archivePath);
       const currentProgress = i + 1;
       console.log(`Archive uploaded (${currentProgress}/${checksums.length})`);
-      artifactRequests.push(upload.artifactRequest);
+      artifacts.push({
+        checksum_md5: checksums[i].md5,
+        checksum_sha256: checksums[i].sha256,
+        asset_name: assetName,
+      });
     }
 
     // create artifacts
-    const artifactIDs = await cliContainer.createArtifacts(
-      appName,
-      artifactRequests
-    );
+    const artifactIDs = await cliContainer.createArtifacts(appName, artifacts);
     const artifactIDMap: { [name: string]: string } = {};
     for (let i = 0; i < itemNames.length; i++) {
       const name = itemNames[i];

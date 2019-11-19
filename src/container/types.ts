@@ -85,16 +85,10 @@ export interface Checksum {
   md5: string;
 }
 
-export interface PresignedRequest {
-  method: string;
-  url: string;
-  fields: { [name: string]: string };
-  headers: string[];
-}
-
-export interface CreateArtifactUploadResponse {
-  uploadRequest: PresignedRequest;
-  artifactRequest: string;
+export interface Artifact {
+  checksum_sha256: string;
+  checksum_md5: string;
+  asset_name: string;
 }
 
 export interface LogEntry {

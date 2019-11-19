@@ -1,6 +1,6 @@
 import mime from "mime";
 import fs from "fs-extra";
-import fetch, { Response, RequestInit } from "node-fetch";
+import { Response } from "node-fetch";
 import {
   BaseAPIClient,
   decodeError,
@@ -12,15 +12,11 @@ import { ControllerContainer } from "./ControllerContainer";
 import {
   Deployment,
   DeploymentItemsMap,
-  CreateArtifactUploadResponse,
-  Checksum,
-  PresignedRequest,
   DeploymentItemConfig,
   HookConfig,
   LogEntry,
+  Artifact,
 } from "./types";
-
-const FormData = require("form-data");
 
 function encodeLogEntry(input: any): LogEntry {
   return {
@@ -52,98 +48,32 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
     ).then(({ deployments }) => deployments);
   }
 
-  async createArtifactUploads(
-    appName: string,
-    checksums: Checksum[]
-  ): Promise<CreateArtifactUploadResponse[]> {
-    return this.fetchAPI("POST", `${this.CONTROLLER_URL}/artifact_upload`, {
-      json: {
-        app_name: appName,
-        upload_requests: checksums.map(checksum => {
-          return {
-            checksum_md5: checksum.md5,
-            checksum_sha256: checksum.sha256,
-          };
-        }),
-      },
-    }).then(({ upload_requests }) => {
-      return upload_requests.map((r: any) => {
-        return {
-          artifactRequest: r.artifact_request,
-          uploadRequest: {
-            fields: r.upload_request.fields,
-            headers: r.upload_request.headers,
-            method: r.upload_request.method,
-            url: r.upload_request.url,
-          },
-        };
-      });
-    });
-  }
-
-  async uploadArtifact(
-    req: PresignedRequest,
-    checksumMD5: string,
-    archivePath: string
-  ): Promise<void> {
-    const headers: { [name: string]: string } = (req.headers || [])
-      .map(header => header.split(":"))
-      .reduce((acc, curr) => ({ ...acc, [curr[0]]: curr[1] }), {});
-
-    const opt: RequestInit = {
-      method: req.method,
-    };
-
+  async uploadArtifact(archivePath: string): Promise<string> {
     const stats = await fs.stat(archivePath);
     const fileSizeInBytes = stats.size;
 
     const stream = fs.createReadStream(archivePath);
-
-    headers["Content-MD5"] = checksumMD5;
-
-    if (req.method === "PUT") {
-      headers["Content-Length"] = `${fileSizeInBytes}`;
-      // From https://github.com/bitinn/node-fetch#post-data-using-a-file-stream,
-      // stream from fs.createReadStream should work.
-      //
-      // But the type definition does not match, so force type cast here.
-      // tslint:disable-next-line: no-any
-      opt.body = stream as any;
-    } else if (req.method === "POST") {
-      const formData = new FormData();
-      formData.append("file", stream, {
-        knownLength: fileSizeInBytes,
-      });
-
-      const fields = req.fields || {};
-      for (const key of Object.keys(fields)) {
-        formData.append(key, fields[key]);
-      }
-      opt.body = formData;
-    } else {
-      throw new Error(
-        `uploadArtifact with method "${req.method}" not implemented`
-      );
-    }
-
-    opt.headers = headers;
-
-    return fetch(req.url, opt).then(resp => {
-      if (resp.status !== 200 && resp.status !== 204) {
-        throw new Error(`Fail to upload archive, ${resp.body.read()}`);
-      }
+    return ((this.container as any) as NodeContainer<
+      NodeAPIClient
+    >).asset.upload(stream, {
+      access: "private",
+      prefix: "artifact-",
+      size: fileSizeInBytes,
+      headers: {
+        "content-type": "application/gzip",
+      },
     });
   }
 
   // createArtifact returns artifact id if success
   async createArtifacts(
     appName: string,
-    artifactRequest: string[]
+    artifacts: Artifact[]
   ): Promise<string[]> {
     return this.fetchAPI("POST", `${this.CONTROLLER_URL}/artifact`, {
       json: {
         app_name: appName,
-        artifact_requests: artifactRequest,
+        artifacts: artifacts,
       },
     }).then(({ artifacts }) => {
       return artifacts.map((a: { id: string }) => a.id);
