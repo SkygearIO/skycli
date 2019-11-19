@@ -55,12 +55,8 @@ async function run(argv: Arguments) {
   for (const i of remoteTemplates) {
     const p = templateItemToLocalTemplatePath(i, templateDir);
     const resp = await fetch(i.url);
-    await new Promise((resolve, reject) => {
-      const dest = fs.createWriteStream(p);
-      resp.body.pipe(dest);
-      resp.body.on("end", resolve);
-      dest.on("error", reject);
-    });
+    const buf = await resp.buffer();
+    await fs.writeFile(p, buf);
     console.log(`Downloaded template to ${p}`);
   }
 }
