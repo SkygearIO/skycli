@@ -8,6 +8,9 @@ import updateUserConfig from "./app/updateUserConfig";
 import addCollaborator from "./app/addCollaborator";
 import listCollaborator from "./app/listCollaborator";
 import removeCollaboartor from "./app/removeCollaboartor";
+import listTemplates from "./app/listTemplates";
+import updateTemplates from "./app/updateTemplates";
+import downloadTemplates from "./app/downloadTemplates";
 
 const subCommands = [
   appCreate,
@@ -19,6 +22,9 @@ const subCommands = [
   addCollaborator,
   removeCollaboartor,
   listCollaborator,
+  listTemplates,
+  updateTemplates,
+  downloadTemplates,
 ];
 
 function run(_argv: Arguments) {

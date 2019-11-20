@@ -1,6 +1,12 @@
+import mime from "mime";
 import fs from "fs-extra";
 import fetch, { Response, RequestInit } from "node-fetch";
-import { BaseAPIClient, decodeError } from "@skygear/node-client";
+import {
+  BaseAPIClient,
+  decodeError,
+  NodeContainer,
+  NodeAPIClient,
+} from "@skygear/node-client";
 
 import { ControllerContainer } from "./ControllerContainer";
 import {
@@ -269,5 +275,24 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
       throw decodeError(jsonBody["error"] || resp.statusText);
     }
     return resp;
+  }
+
+  async uploadTemplate(filePath: string): Promise<string> {
+    const headers: { [name: string]: string } = {};
+    const mediaType = mime.getType(filePath);
+    if (mediaType != null) {
+      headers["content-type"] = mediaType;
+    }
+    const buffer = fs.readFileSync(filePath);
+    const asset_name = await ((this.container as any) as NodeContainer<
+      NodeAPIClient
+    >).asset.upload(buffer, {
+      access: "private",
+      prefix: "template-",
+      size: buffer.length,
+      headers,
+    });
+
+    return `asset-gear:///${asset_name}`;
   }
 }

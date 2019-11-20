@@ -12,6 +12,8 @@ import {
   UserConfiguration,
   Endpoint,
   Collaborator,
+  RemoteTemplateItem,
+  TemplateItem,
 } from "./types";
 
 function decodeApp(app: any): App {
@@ -34,7 +36,7 @@ export class ControllerContainer<T extends BaseAPIClient> {
   }
 
   protected async fetchAPI(
-    method: "GET" | "POST" | "DELETE",
+    method: "GET" | "POST" | "DELETE" | "PUT",
     path: string,
     options: { json?: JSONObject; query?: [string, string][] } = {}
   ) {
@@ -180,5 +182,25 @@ export class ControllerContainer<T extends BaseAPIClient> {
       "DELETE",
       `${this.CONTROLLER_URL}/app/${appName}/collaborator/${userID}`
     );
+  }
+
+  async getTemplates(appName: string): Promise<RemoteTemplateItem[]> {
+    return this.fetchAPI("GET", `${this.CONTROLLER_URL}/template`, {
+      query: [["app_name", appName]],
+    }).then(({ templates }) => {
+      return templates;
+    });
+  }
+
+  async putTemplates(
+    appName: string,
+    templateItems: TemplateItem[]
+  ): Promise<void> {
+    return this.fetchAPI("PUT", `${this.CONTROLLER_URL}/template`, {
+      json: {
+        app_name: appName,
+        template_items: templateItems,
+      },
+    });
   }
 }

@@ -70,7 +70,6 @@ export async function createFolderToPathsMapForArchive(
   const pathsSet = new Set();
   let hasDockerfile = false;
   for (const folder of Object.keys(folderToPathsMap)) {
-    // eslint-disable-next-line no-await-in-loop
     const filtered = await dockerignorePaths(
       folderToPathsMap[folder],
       path.join(templateFolderPath || config.context, ".dockerignore")
@@ -317,10 +316,8 @@ async function downloadTemplateIfNeeded(
     fs.removeSync(templateDir);
     fs.ensureDirSync(templateDir);
 
-    // eslint-disable-next-line no-await-in-loop
     const resp = await cliContainer.downloadTemplate(templateName);
 
-    // eslint-disable-next-line no-await-in-loop
     await new Promise((resolve, reject) => {
       resp.body
         .pipe(gunzip())
@@ -395,7 +392,6 @@ async function run(argv: Arguments) {
       const deployment = deploymentMap[name];
       const archivePath = createArchivePath(i);
       fs.ensureFileSync(archivePath);
-      // eslint-disable-next-line no-await-in-loop
       const checksum = await archiveDeploymentItem(
         name,
         deployment,
@@ -416,7 +412,6 @@ async function run(argv: Arguments) {
       const checksum = checksums[i];
       const upload = uploads[i];
       const archivePath = createArchivePath(i);
-      // eslint-disable-next-line no-await-in-loop
       await cliContainer.uploadArtifact(
         upload.uploadRequest,
         checksum.md5,

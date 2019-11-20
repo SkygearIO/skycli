@@ -111,6 +111,7 @@ export enum DeploymentStatus {
   StopFailed = "StopFailed",
   Stopped = "Stopped",
 }
+
 export interface Deployment {
   id: string;
   status: DeploymentStatus;
@@ -119,4 +120,20 @@ export interface Deployment {
 export interface Collaborator {
   id: string;
   email: string;
+}
+
+export interface TemplateItem {
+  type: string;
+  content_md5: string;
+  uri?: string;
+  language_tag?: string;
+  key?: string;
+}
+
+export interface RemoteTemplateItem extends TemplateItem {
+  url: string;
+}
+
+export interface LocalTemplateItem extends TemplateItem {
+  filePath: string;
 }
