@@ -114,9 +114,7 @@ async function askClusterServer(argv: Arguments) {
     prompts.push(urlPrompt);
   }
 
-  if (server.apiKey) {
-    console.log(chalk`Setup cluster API key as {green ${server.apiKey}}.`);
-  } else {
+  if (!server.apiKey) {
     prompts.push(apiKeyPrompt);
   }
 
