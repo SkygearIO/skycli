@@ -1,3 +1,10 @@
+## 2.0.0-alpha.5 (2019-11-20)
+
+### Features
+
+- Add template commands
+- Allow providing password & setting cluster using parameters
+
 ## 2.0.0-alpha.4 (2019-11-13)
 
 ### Features
