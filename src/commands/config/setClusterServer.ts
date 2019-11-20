@@ -7,6 +7,7 @@ import { Arguments, createCommand } from "../../util";
 import { cliContainer } from "../../container";
 
 interface ClusterOption {
+  id: string;
   name: string;
   apiKey: string;
   endpoint: string;
@@ -15,24 +16,28 @@ interface ClusterOption {
 
 const clusterOptions: ClusterOption[] = [
   {
+    id: "skygeario",
     name: "skygeario",
     apiKey: "sq3GcUp0QVRTYPwBpnLcQi3jHK7SJFfF",
     endpoint: "https://controller.skygear.dev",
     debug: false,
   },
   {
+    id: "skygeario-staging",
     name: "skygeario staging",
     apiKey: "nA1nZ2vemgjJFD99n36QoGNObG5myWXO",
     endpoint: "https://controller.staging.skygear.dev",
     debug: true,
   },
   {
+    id: "skygeario-dev",
     name: "skygeario dev",
     apiKey: "3ac91f63e599eafce8632420613754cb",
     endpoint: "https://controller.dev.skygearapis.com",
     debug: true,
   },
   {
+    id: "custom",
     name: "Connect to my own cluster",
     apiKey: "",
     endpoint: "",
@@ -83,10 +88,20 @@ async function askClusterServer(argv: Arguments) {
   const server = {
     apiKey: argv["api-key"] as string,
     endpoint: argv.endpoint as string,
+    cluster: argv.cluster as string,
   };
 
   if (!server.endpoint && !server.apiKey) {
-    const selected = await selectCluster(argv);
+    let selected: ClusterOption | undefined;
+    if (server.cluster) {
+      selected = clusterOptions.find(obj => obj.id === server.cluster);
+    } else {
+      selected = await selectCluster(argv);
+    }
+    if (!selected) {
+      throw new Error("Cluster not found");
+    }
+
     server.apiKey = selected.apiKey;
     server.endpoint = selected.endpoint;
   }
@@ -99,9 +114,7 @@ async function askClusterServer(argv: Arguments) {
     prompts.push(urlPrompt);
   }
 
-  if (server.apiKey) {
-    console.log(chalk`Setup cluster API key as {green ${server.apiKey}}.`);
-  } else {
+  if (!server.apiKey) {
     prompts.push(apiKeyPrompt);
   }
 
@@ -140,6 +153,9 @@ async function run(argv: Arguments) {
 
 export default createCommand({
   builder: yargs => {
+    const choices = clusterOptions
+      .filter(o => !o.debug || yargs.argv.debug)
+      .map(t => t.id);
     return yargs
       .option("endpoint", {
         desc: "Cluster API endpoint.",
@@ -148,6 +164,11 @@ export default createCommand({
       .option("api-key", {
         desc: "Cluster API key.",
         type: "string",
+      })
+      .option("cluster", {
+        desc: "Cluster type.",
+        type: "string",
+        choices: choices,
       });
   },
   command: "set-cluster",
