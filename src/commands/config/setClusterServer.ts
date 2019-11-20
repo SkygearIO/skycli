@@ -153,6 +153,9 @@ async function run(argv: Arguments) {
 
 export default createCommand({
   builder: yargs => {
+    const choices = clusterOptions
+      .filter(o => !o.debug || yargs.argv.debug)
+      .map(t => t.id);
     return yargs
       .option("endpoint", {
         desc: "Cluster API endpoint.",
@@ -163,8 +166,9 @@ export default createCommand({
         type: "string",
       })
       .option("cluster", {
-        desc: "Cluster type. Options: skygeario, custom.",
+        desc: "Cluster type.",
         type: "string",
+        choices: choices,
       });
   },
   command: "set-cluster",
