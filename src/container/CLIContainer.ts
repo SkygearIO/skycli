@@ -30,21 +30,28 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
   T
 > {
   async getClusterEnv(): Promise<string> {
-    return this.fetchAPI("GET", `${this.CONTROLLER_URL}/config`).then(
+    return this.fetchAPI("GET", `${this.CONTROLLER_URL}/configs`).then(
       ({ env }) => env
     );
   }
 
-  async getDeployment(deploymentID: string): Promise<Deployment> {
-    return this.fetchAPI("GET", `/_controller/deployment/${deploymentID}`).then(
-      ({ deployment }) => deployment
-    );
-  }
-
-  async getDeploymentItems(deploymentID: string): Promise<DeploymentItemsMap> {
+  async getDeployment(
+    appName: string,
+    deploymentID: string
+  ): Promise<Deployment> {
     return this.fetchAPI(
       "GET",
-      `${this.CONTROLLER_URL}/deployment/${deploymentID}/items`
+      `${this.CONTROLLER_URL}/apps/${appName}/deployments/${deploymentID}`
+    ).then(({ deployment }) => deployment);
+  }
+
+  async getDeploymentItems(
+    appName: string,
+    deploymentID: string
+  ): Promise<DeploymentItemsMap> {
+    return this.fetchAPI(
+      "GET",
+      `${this.CONTROLLER_URL}/apps/${appName}/deployments/${deploymentID}/items`
     ).then(({ deployments }) => deployments);
   }
 
@@ -70,12 +77,15 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
     appName: string,
     artifacts: Artifact[]
   ): Promise<string[]> {
-    return this.fetchAPI("POST", `${this.CONTROLLER_URL}/artifact`, {
-      json: {
-        app_name: appName,
-        artifacts: artifacts,
-      },
-    }).then(({ artifacts }) => {
+    return this.fetchAPI(
+      "POST",
+      `${this.CONTROLLER_URL}/apps/${appName}/artifacts`,
+      {
+        json: {
+          artifacts: artifacts,
+        },
+      }
+    ).then(({ artifacts }) => {
       return artifacts.map((a: { id: string }) => a.id);
     });
   }
@@ -85,13 +95,16 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
     deployments: { [name: string]: DeploymentItemConfig },
     hooks: HookConfig[]
   ): Promise<void> {
-    return this.fetchAPI("POST", "/_controller/deployment/validate", {
-      json: {
-        app_name: appName,
-        deployments: deployments as any,
-        hooks: hooks as any,
-      },
-    });
+    return this.fetchAPI(
+      "POST",
+      `${this.CONTROLLER_URL}/apps/${appName}/deployment_validations`,
+      {
+        json: {
+          deployments: deployments as any,
+          hooks: hooks as any,
+        },
+      }
+    );
   }
 
   async createDeployment(
@@ -100,25 +113,29 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
     artifactIDs: { [name: string]: string },
     hooks: HookConfig[]
   ): Promise<string> {
-    return this.fetchAPI("POST", `${this.CONTROLLER_URL}/deployment`, {
-      json: {
-        app_name: appName,
-        artifact_ids: artifactIDs,
-        deployments: deployments as any,
-        hooks: hooks as any,
-        sync: true,
-      },
-    }).then(({ deployment }) => {
+    return this.fetchAPI(
+      "POST",
+      `${this.CONTROLLER_URL}/apps/${appName}/deployments`,
+      {
+        json: {
+          artifact_ids: artifactIDs,
+          deployments: deployments as any,
+          hooks: hooks as any,
+          sync: true,
+        },
+      }
+    ).then(({ deployment }) => {
       return deployment.id;
     });
   }
 
   async downloadDeployLog(
+    appName: string,
     deploymentID: string,
     onData: (log: LogEntry) => void,
     cur: number = 0
   ): Promise<void> {
-    const resp = await this.sendDownloadLogRequest(deploymentID, cur);
+    const resp = await this.sendDownloadLogRequest(appName, deploymentID, cur);
     if (resp.status === 416) {
       return;
     }
@@ -164,16 +181,22 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
     });
 
     if (result.needReconnect) {
-      return this.downloadDeployLog(deploymentID, onData, result.nextCur);
+      return this.downloadDeployLog(
+        appName,
+        deploymentID,
+        onData,
+        result.nextCur
+      );
     }
   }
 
   async sendDownloadLogRequest(
+    appName: string,
     deploymentID: string,
     cur: number
   ): Promise<Response> {
     const resp = ((await this.container.fetch(
-      `${this.CONTROLLER_URL}/log/download`,
+      `${this.CONTROLLER_URL}/apps/${appName}/deployments/${deploymentID}/logs`,
       {
         method: "POST",
         headers: {
@@ -183,7 +206,6 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
         mode: "cors",
         credentials: "include",
         body: JSON.stringify({
-          deployment_id: deploymentID,
           type: "deploy",
         }),
       }
@@ -198,7 +220,7 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
 
   async downloadTemplate(template: string): Promise<Response> {
     const resp = ((await this.container.fetch(
-      `${this.CONTROLLER_URL}/deployment/template/${template}`
+      `${this.CONTROLLER_URL}/deployment_templates/${template}`
     )) as any) as Response;
     if (resp.status !== 200) {
       const jsonBody = await resp.json();

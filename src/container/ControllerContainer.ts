@@ -70,9 +70,10 @@ export class ControllerContainer<T extends BaseAPIClient> {
   }
 
   async getSecrets(appName: string): Promise<Secret[]> {
-    return this.fetchAPI("GET", `${this.CONTROLLER_URL}/secrets`, {
-      query: [["app_name", appName]],
-    }).then(({ secrets }) => {
+    return this.fetchAPI(
+      "GET",
+      `${this.CONTROLLER_URL}/apps/${appName}/secrets`
+    ).then(({ secrets }) => {
       return secrets.map((s: any) => {
         return {
           name: s.name,
@@ -90,24 +91,28 @@ export class ControllerContainer<T extends BaseAPIClient> {
     secretValue: string,
     secretType: string
   ): Promise<void> {
-    return this.fetchAPI("POST", `${this.CONTROLLER_URL}/secret`, {
-      json: {
-        app_name: appName,
-        secret_name: secretName,
-        secret_value: secretValue,
-        secret_type: secretType,
-      },
-    });
+    return this.fetchAPI(
+      "POST",
+      `${this.CONTROLLER_URL}/apps/${appName}/secrets`,
+      {
+        json: {
+          secret_name: secretName,
+          secret_value: secretValue,
+          secret_type: secretType,
+        },
+      }
+    );
   }
 
   async deleteSecret(appName: string, secretName: string): Promise<void> {
-    return this.fetchAPI("DELETE", `${this.CONTROLLER_URL}/secret`, {
-      query: [["app_name", appName], ["secret_name", secretName]],
-    });
+    return this.fetchAPI(
+      "DELETE",
+      `${this.CONTROLLER_URL}/apps/${appName}/secrets/${secretName}`
+    );
   }
 
   async createApp(name: string): Promise<[App, UserConfiguration, Endpoint]> {
-    return this.fetchAPI("POST", `${this.CONTROLLER_URL}/app`, {
+    return this.fetchAPI("POST", `${this.CONTROLLER_URL}/apps`, {
       json: { name },
     }).then(({ app, tenant_config, endpoint }) => {
       return [decodeApp(app), tenant_config.user_config, endpoint] as [
@@ -127,15 +132,16 @@ export class ControllerContainer<T extends BaseAPIClient> {
   }
 
   async getAppByName(appName: string): Promise<App> {
-    return this.fetchAPI("GET", `/_controller/app/${appName}`).then(({ app }) =>
-      decodeApp(app)
+    return this.fetchAPI("GET", `${this.CONTROLLER_URL}/apps/${appName}`).then(
+      ({ app }) => decodeApp(app)
     );
   }
 
   async getUserConfiguration(appName: string): Promise<UserConfiguration> {
-    return this.fetchAPI("GET", `${this.CONTROLLER_URL}/userconfig`, {
-      query: [["app_name", appName]],
-    }).then(({ user_config }) => {
+    return this.fetchAPI(
+      "GET",
+      `${this.CONTROLLER_URL}/apps/${appName}/userconfigs`
+    ).then(({ user_config }) => {
       return user_config;
     });
   }
@@ -145,26 +151,29 @@ export class ControllerContainer<T extends BaseAPIClient> {
     userConfig: UserConfiguration
   ): Promise<void> {
     const payload = {
-      app_name: appName,
       user_config: userConfig,
     };
-    return this.fetchAPI("POST", `${this.CONTROLLER_URL}/userconfig/set`, {
-      // FIXME: JSONObject has problem with ?
-      json: payload as any,
-    });
+    return this.fetchAPI(
+      "POST",
+      `${this.CONTROLLER_URL}/apps/${appName}/userconfigs`,
+      {
+        // FIXME: JSONObject has problem with ?
+        json: payload as any,
+      }
+    );
   }
 
   async getCollaborators(appName: string): Promise<Collaborator[]> {
     return this.fetchAPI(
       "GET",
-      `${this.CONTROLLER_URL}/app/${appName}/collaborators`
+      `${this.CONTROLLER_URL}/apps/${appName}/collaborators`
     ).then(({ collaborators }) => collaborators);
   }
 
   async addCollaborator(appName: string, email: string): Promise<boolean> {
     return this.fetchAPI(
       "POST",
-      `${this.CONTROLLER_URL}/app/${appName}/collaborator`,
+      `${this.CONTROLLER_URL}/apps/${appName}/collaborators`,
       {
         json: {
           email: email,
@@ -180,14 +189,15 @@ export class ControllerContainer<T extends BaseAPIClient> {
   async removeCollaborator(appName: string, userID: string): Promise<void> {
     return this.fetchAPI(
       "DELETE",
-      `${this.CONTROLLER_URL}/app/${appName}/collaborator/${userID}`
+      `${this.CONTROLLER_URL}/apps/${appName}/collaborators/${userID}`
     );
   }
 
   async getTemplates(appName: string): Promise<RemoteTemplateItem[]> {
-    return this.fetchAPI("GET", `${this.CONTROLLER_URL}/template`, {
-      query: [["app_name", appName]],
-    }).then(({ templates }) => {
+    return this.fetchAPI(
+      "GET",
+      `${this.CONTROLLER_URL}/apps/${appName}/templates`
+    ).then(({ templates }) => {
       return templates;
     });
   }
@@ -196,11 +206,15 @@ export class ControllerContainer<T extends BaseAPIClient> {
     appName: string,
     templateItems: TemplateItem[]
   ): Promise<void> {
-    return this.fetchAPI("PUT", `${this.CONTROLLER_URL}/template`, {
-      json: {
-        app_name: appName,
-        template_items: templateItems,
-      },
-    });
+    return this.fetchAPI(
+      "PUT",
+      `${this.CONTROLLER_URL}/apps/${appName}/templates`,
+      {
+        json: {
+          app_name: appName,
+          template_items: templateItems,
+        },
+      }
+    );
   }
 }

@@ -216,7 +216,9 @@ function waitForDeploymentStatusImpl(
   // tslint:disable-next-line:no-any
   reject: any
 ) {
-  cliContainer.getDeployment(deploymentID).then(
+  // context.app is ensured by the middleware
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  cliContainer.getDeployment(context.app!, deploymentID).then(
     result => {
       if (
         result.status === DeploymentStatus.Running ||
@@ -257,6 +259,7 @@ async function confirmIfItemsWillBeRemovedInNewDeployment(
 
   // get deployment items and show prompt if needed
   const existingDeployments = await cliContainer.getDeploymentItems(
+    appName,
     app.last_deployment_id
   );
 
@@ -349,7 +352,9 @@ function downloadDeployLogImpl(
   reject: any
 ) {
   cliContainer
-    .downloadDeployLog(deploymentID, onLogReceive)
+    // context.app is ensured by the middleware
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    .downloadDeployLog(context.app!, deploymentID, onLogReceive)
     .then(resolve)
     .catch(err => {
       // retry when the log is not found, wait for the deployment start
