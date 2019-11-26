@@ -211,9 +211,7 @@ function waitForDeploymentStatus(context: CLIContext, cloudCodeID: string) {
 function waitForDeploymentStatusImpl(
   context: CLIContext,
   deploymentID: string,
-  // tslint:disable-next-line:no-any
   resolve: any,
-  // tslint:disable-next-line:no-any
   reject: any
 ) {
   // context.app is ensured by the middleware
@@ -346,9 +344,7 @@ function downloadDeployLogImpl(
   context: CLIContext,
   deploymentID: string,
   onLogReceive: (log: LogEntry) => void,
-  // tslint:disable-next-line:no-any
   resolve: any,
-  // tslint:disable-next-line:no-any
   reject: any
 ) {
   cliContainer

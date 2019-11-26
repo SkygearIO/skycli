@@ -157,8 +157,7 @@ export class ControllerContainer<T extends BaseAPIClient> {
       "POST",
       `${this.CONTROLLER_URL}/apps/${appName}/userconfigs`,
       {
-        // FIXME: JSONObject has problem with ?
-        json: payload as any,
+        json: payload,
       }
     );
   }
