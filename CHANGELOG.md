@@ -1,3 +1,10 @@
+## 2.0.0-alpha.6 (2019-11-26)
+
+### Breaking Changes
+
+- Update controller API endpoints
+- Update artifact upload with asset gear
+
 ## 2.0.0-alpha.5 (2019-11-20)
 
 ### Features
