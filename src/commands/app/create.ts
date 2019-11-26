@@ -14,9 +14,6 @@ const appNamePrompt: inquirer.Question = {
     if (input.trim() === "") {
       return "App name is required.";
     }
-    if (!input.match(/^[A-Za-z0-9]+$/i)) {
-      return "Invalid app name, only alphabetical letters and numbers are allowed.";
-    }
     return true;
   },
 };
