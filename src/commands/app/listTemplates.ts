@@ -5,8 +5,8 @@ import { cliContainer } from "../../container";
 async function run(argv: Arguments) {
   const templates = await cliContainer.getTemplates(argv.context.app || "");
   const table = createTable({ head: ["TYPE", "KEY", "URL"] });
-  for (const t of templates) {
-    table.push([t.type, t.key, t.url]);
+  for (const item of templates.items) {
+    table.push([item.type, item.key, item.signed_uri]);
   }
   console.log(table.toString());
 }

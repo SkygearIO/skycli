@@ -17,12 +17,10 @@ const mkdir = promisify(mkdirCB);
 
 async function run(argv: Arguments) {
   const templateDir = argv.dir as string;
-  const remoteTemplates = await cliContainer.getTemplates(
-    argv.context.app || ""
-  );
+  const { items } = await cliContainer.getTemplates(argv.context.app || "");
 
   const overwrites = [];
-  for (const i of remoteTemplates) {
+  for (const i of items) {
     const p = templateItemToLocalTemplatePath(i, templateDir);
     try {
       await fs.access(p);
@@ -52,9 +50,9 @@ async function run(argv: Arguments) {
 
   await mkdir(templateDir, { recursive: true });
 
-  for (const i of remoteTemplates) {
+  for (const i of items) {
     const p = templateItemToLocalTemplatePath(i, templateDir);
-    const resp = await fetch(i.url);
+    const resp = await fetch(i.signed_uri);
     const buf = await resp.buffer();
     await fs.writeFile(p, buf);
     console.log(`Downloaded template to ${p}`);

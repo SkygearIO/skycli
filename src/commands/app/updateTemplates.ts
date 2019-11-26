@@ -132,7 +132,7 @@ async function reuseAndUploadTemplateItems(
 
 async function run(argv: Arguments) {
   const appName = argv.context.app || "";
-  const remoteTemplates = await cliContainer.getTemplates(appName);
+  const { items } = await cliContainer.getTemplates(appName);
   const templateDir = argv.dir as string;
   const localTemplatePaths: string[] = [];
   await collectTemplatePaths(templateDir, localTemplatePaths, 2);
@@ -145,7 +145,7 @@ async function run(argv: Arguments) {
   }
 
   const { added, removed, updated, unchanged } = diff(
-    remoteTemplates,
+    items,
     localTemplateItems
   );
 
