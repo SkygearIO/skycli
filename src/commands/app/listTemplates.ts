@@ -3,11 +3,23 @@ import { requireApp, requireClusterConfig, requireUser } from "../middleware";
 import { cliContainer } from "../../container";
 
 async function run(argv: Arguments) {
-  const templates = await cliContainer.getTemplates(argv.context.app || "");
+  const { specs: gearSpecs, items } = await cliContainer.getTemplates(
+    argv.context.app || ""
+  );
   const table = createTable({ head: ["TYPE", "KEY", "URL"] });
-  for (const item of templates.items) {
+
+  for (const item of items) {
     table.push([item.type, item.key, item.signed_uri]);
   }
+
+  for (const specs of Object.values(gearSpecs)) {
+    for (const spec of specs) {
+      if (!items.some(item => item.type === spec.type)) {
+        table.push([spec.type, "", "<not provided>"]);
+      }
+    }
+  }
+
   console.log(table.toString());
 }
 
