@@ -26,6 +26,9 @@ fi
 
 if [[ "$SKYGEAR_VERSION" =~ "alpha" ]]; then
     NPM_PUBLISH_FLAG="--tag alpha"
+
+    # No tag means 'latest' tag, remove this line after releasing public version
+    NPM_PUBLISH_FLAG=""
 else
     NPM_PUBLISH_FLAG=""
 fi
