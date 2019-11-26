@@ -37,7 +37,6 @@ const configPaths: { [domain: string]: string } = {
   project: "./skygear.yaml",
 };
 
-// tslint:disable-next-line:no-any
 function migrate(configObject: Dictionary<any>) {
   const migrated = Object.assign({}, configObject);
   if (typeof migrated.version === "undefined") {
@@ -79,7 +78,6 @@ export function load(domain: ConfigDomain = ConfigDomain.GlobalDomain) {
 }
 
 export function save(
-  // tslint:disable-next-line:no-any
   configObject: Dictionary<any>,
   domain: ConfigDomain = ConfigDomain.GlobalDomain
 ) {
@@ -99,7 +97,6 @@ export function save(
 
 export function set(
   name: PropertyPath,
-  // tslint:disable-next-line:no-any
   value: any,
   domain: ConfigDomain = ConfigDomain.GlobalDomain
 ) {
