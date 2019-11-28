@@ -11,7 +11,7 @@ import {
   LocalTemplateItem,
   RemoteTemplateItem,
 } from "../../container/types";
-import { contentMD5OfFilePath } from "../../contentmd5";
+import { digestOfFilePath } from "../../digest";
 import { findEqualReference, printTemplateItems } from "./templateHelper";
 
 async function collectTemplatePaths(
@@ -55,12 +55,12 @@ async function localTemplatePathToLocalTemplateItem(
       throw new Error("unexpected template: " + keyType);
   }
 
-  const content_md5 = await contentMD5OfFilePath(templatePath);
+  const digest = await digestOfFilePath(templatePath);
 
   return {
     type,
     key,
-    content_md5,
+    digest,
     filePath: templatePath,
   };
 }
@@ -94,7 +94,7 @@ export function diff(
       removed.push(target);
     } else {
       // This else block can appear in either for-loop actually.
-      if (target.content_md5 === found.content_md5) {
+      if (target.digest === found.digest) {
         unchanged.push(target);
       } else {
         updated.push(found);

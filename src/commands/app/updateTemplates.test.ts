@@ -27,14 +27,14 @@ test("diff", () => {
         {
           type: "a",
           uri: "asset-gear:///a",
-          content_md5: "a",
+          digest: "a",
           signed_uri: "http://example.com/a",
         },
       ],
       local: [
         {
           type: "b",
-          content_md5: "b",
+          digest: "b",
           filePath: "b",
         },
       ],
@@ -42,7 +42,7 @@ test("diff", () => {
         added: [
           {
             type: "b",
-            content_md5: "b",
+            digest: "b",
             filePath: "b",
           },
         ],
@@ -50,7 +50,7 @@ test("diff", () => {
           {
             type: "a",
             uri: "asset-gear:///a",
-            content_md5: "a",
+            digest: "a",
             signed_uri: "http://example.com/a",
           },
         ],
@@ -65,25 +65,25 @@ test("diff", () => {
         {
           type: "a",
           uri: "asset-gear:///a",
-          content_md5: "a",
+          digest: "a",
           signed_uri: "http://example.com/a",
         },
         {
           type: "b",
           uri: "asset-gear:///b",
-          content_md5: "b",
+          digest: "b",
           signed_uri: "http://example.com/b",
         },
       ],
       local: [
         {
           type: "a",
-          content_md5: "a",
+          digest: "a",
           filePath: "a",
         },
         {
           type: "b",
-          content_md5: "bb",
+          digest: "bb",
           filePath: "b",
         },
       ],
@@ -93,7 +93,7 @@ test("diff", () => {
         updated: [
           {
             type: "b",
-            content_md5: "bb",
+            digest: "bb",
             filePath: "b",
           },
         ],
@@ -101,7 +101,7 @@ test("diff", () => {
           {
             type: "a",
             uri: "asset-gear:///a",
-            content_md5: "a",
+            digest: "a",
             signed_uri: "http://example.com/a",
           },
         ],

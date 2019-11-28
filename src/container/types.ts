@@ -118,7 +118,7 @@ export interface Collaborator {
 
 export interface TemplateItem {
   type: string;
-  content_md5: string;
+  digest: string;
   uri?: string;
   language_tag?: string;
   key?: string;
