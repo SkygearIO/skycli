@@ -63,6 +63,7 @@ export default createCommand({
         desc: "Secret type",
         type: "string",
         default: "opaque",
+        choices: ["opaque", "dockerconfigjson"],
       })
       .option("file", {
         alias: "f",
