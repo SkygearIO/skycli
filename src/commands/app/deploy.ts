@@ -33,12 +33,6 @@ function createArchiveReadStream(archivePath: string) {
   return fs.createReadStream(archivePath);
 }
 
-function archiveCloudCodeSrc(srcPath: string, archivePath: string) {
-  return dockerignore(srcPath, ".skyignore").then((paths: string[]) => {
-    return createTar({ srcPath: paths }, archivePath);
-  });
-}
-
 // By reading the microservice deployment config
 // Create map that entries for archive
 // key is the folder path
@@ -183,9 +177,6 @@ async function archiveDeploymentItem(
 ): Promise<Checksum> {
   console.log(chalk`Archiving cloud code: {green ${name}}`);
   switch (deployment.type) {
-    case "http-handler":
-      await archiveCloudCodeSrc(deployment.src, archivePath);
-      break;
     case "http-service":
       await archiveMicroserviceSrc(
         deployment,
