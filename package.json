@@ -94,8 +94,9 @@
     "natives": "1.1.3"
   },
   "jest": {
+    "rootDir": "src",
     "setupFiles": [
-      "<rootDir>/src/setupJest.js"
+      "<rootDir>/setupJest.js"
     ]
   },
   "pkg": {
