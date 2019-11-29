@@ -1,3 +1,17 @@
+## 2.0.0-alpha.7 (2019-11-29)
+
+### Features
+
+- Support pre-built docker image deployment
+
+### Bug Fixes
+
+- Fix app name validation by checking app name in controller
+
+### Breaking Changes
+
+- Update for new controller template API
+
 ## 2.0.0-alpha.6 (2019-11-26)
 
 ### Breaking Changes
