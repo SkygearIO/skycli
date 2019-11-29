@@ -25,18 +25,12 @@ import { tempPath } from "../../path";
 
 const gunzip = require("gunzip-maybe");
 
-function createArchivePath(index: number) {
-  return tempPath(`skygear-src-${index}.tgz`);
+function createArchivePath(name: string) {
+  return tempPath(`skygear-src-${name}.tgz`);
 }
 
 function createArchiveReadStream(archivePath: string) {
   return fs.createReadStream(archivePath);
-}
-
-function archiveCloudCodeSrc(srcPath: string, archivePath: string) {
-  return dockerignore(srcPath, ".skyignore").then((paths: string[]) => {
-    return createTar({ srcPath: paths }, archivePath);
-  });
 }
 
 // By reading the microservice deployment config
@@ -48,6 +42,10 @@ export async function createFolderToPathsMapForArchive(
   templateFolderPath: string | null = null
 ): Promise<{ [folder: string]: string[] }> {
   const folderToPathsMap: { [folder: string]: string[] } = {};
+
+  if (!config.context) {
+    throw Error("http-service missing context");
+  }
 
   // add user code to map
   // if there is template, use user provided `.skyignore` to ignore files
@@ -176,22 +174,26 @@ function getChecksum(archivePath: string): Promise<Checksum> {
   });
 }
 
+// archive deployment item if needed
+// for item that doesn't have artifact, null will be returned
 async function archiveDeploymentItem(
   name: string,
   deployment: DeploymentItemConfig,
   archivePath: string
-): Promise<Checksum> {
+): Promise<Checksum | null> {
   console.log(chalk`Archiving cloud code: {green ${name}}`);
   switch (deployment.type) {
-    case "http-handler":
-      await archiveCloudCodeSrc(deployment.src, archivePath);
-      break;
     case "http-service":
-      await archiveMicroserviceSrc(
-        deployment,
-        archivePath,
-        deployment.template && createTemplatePath(deployment.template)
-      );
+      if (deployment.context) {
+        fs.ensureFileSync(archivePath);
+        await archiveMicroserviceSrc(
+          deployment,
+          archivePath,
+          deployment.template && createTemplatePath(deployment.template)
+        );
+      } else {
+        return null;
+      }
       break;
     default:
       throw new Error("unexpected type");
@@ -386,42 +388,59 @@ async function run(argv: Arguments) {
 
     await downloadTemplateIfNeeded(deploymentMap);
 
-    const checksums: Checksum[] = [];
-
+    interface ArtifactItem {
+      artifact: Artifact;
+      itemName: string;
+      archivePath: string;
+    }
+    const artifactItems: ArtifactItem[] = [];
     // archive and get checksum
     for (let i = 0; i < itemNames.length; i++) {
       const name = itemNames[i];
       const deployment = deploymentMap[name];
-      const archivePath = createArchivePath(i);
-      fs.ensureFileSync(archivePath);
+      const archivePath = createArchivePath(name);
       const checksum = await archiveDeploymentItem(
         name,
         deployment,
         archivePath
       );
-      checksums.push(checksum);
+      if (checksum) {
+        artifactItems.push({
+          artifact: {
+            checksum_md5: checksum.md5,
+            checksum_sha256: checksum.sha256,
+            asset_name: "",
+          },
+          itemName: name,
+          archivePath: archivePath,
+        });
+      }
     }
 
     // upload artifact
     const artifacts: Artifact[] = [];
-    for (let i = 0; i < checksums.length; i++) {
-      const archivePath = createArchivePath(i);
+    for (let i = 0; i < artifactItems.length; i++) {
+      const archivePath = artifactItems[i].archivePath;
       const assetName = await cliContainer.uploadArtifact(archivePath);
       const currentProgress = i + 1;
-      console.log(`Archive uploaded (${currentProgress}/${checksums.length})`);
-      artifacts.push({
-        checksum_md5: checksums[i].md5,
-        checksum_sha256: checksums[i].sha256,
-        asset_name: assetName,
-      });
+      console.log(
+        `Archive uploaded (${currentProgress}/${artifactItems.length})`
+      );
+      artifactItems[i].artifact.asset_name = assetName;
+      artifacts.push(artifactItems[i].artifact);
     }
 
     // create artifacts
-    const artifactIDs = await cliContainer.createArtifacts(appName, artifacts);
     const artifactIDMap: { [name: string]: string } = {};
-    for (let i = 0; i < itemNames.length; i++) {
-      const name = itemNames[i];
-      artifactIDMap[name] = artifactIDs[i];
+    if (artifactItems.length > 0) {
+      const artifactIDs = await cliContainer.createArtifacts(
+        appName,
+        artifacts
+      );
+      for (let i = 0; i < artifactItems.length; i++) {
+        const name = artifactItems[i].itemName;
+        artifactIDMap[name] = artifactIDs[i];
+      }
     }
 
     // create deployment

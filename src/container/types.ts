@@ -55,11 +55,13 @@ export interface HttpServiceConfig {
   type: "http-service";
   path: string;
   port: number;
-  context: string;
+  context?: string;
   dockerfile?: string;
   environment?: Environment[];
   command?: string[];
   template?: string;
+  image?: string;
+  image_pull_secret?: string;
 }
 
 export interface Environment {
