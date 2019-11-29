@@ -118,16 +118,28 @@ export interface Collaborator {
 
 export interface TemplateItem {
   type: string;
-  content_md5: string;
+  digest: string;
   uri?: string;
   language_tag?: string;
   key?: string;
 }
 
-export interface RemoteTemplateItem extends TemplateItem {
-  url: string;
-}
-
 export interface LocalTemplateItem extends TemplateItem {
   filePath: string;
+}
+
+export interface TemplateSpec {
+  type: string;
+  default?: string;
+  is_keyed: boolean;
+  is_html: boolean;
+}
+
+export interface RemoteTemplateItem extends TemplateItem {
+  signed_uri: string;
+}
+
+export interface ListTemplateResponse {
+  specs: Record<string, TemplateSpec[]>;
+  items: RemoteTemplateItem[];
 }

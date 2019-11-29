@@ -12,7 +12,7 @@ import {
   UserConfiguration,
   Endpoint,
   Collaborator,
-  RemoteTemplateItem,
+  ListTemplateResponse,
   TemplateItem,
 } from "./types";
 
@@ -192,13 +192,11 @@ export class ControllerContainer<T extends BaseAPIClient> {
     );
   }
 
-  async getTemplates(appName: string): Promise<RemoteTemplateItem[]> {
+  async getTemplates(appName: string): Promise<ListTemplateResponse> {
     return this.fetchAPI(
       "GET",
       `${this.CONTROLLER_URL}/apps/${appName}/templates`
-    ).then(({ templates }) => {
-      return templates;
-    });
+    );
   }
 
   async putTemplates(
