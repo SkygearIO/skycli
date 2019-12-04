@@ -2,21 +2,15 @@ import chalk from "chalk";
 
 import { Arguments, createCommand } from "../../util";
 import { requireClusterConfig } from "../middleware";
-import { askCredentials, askInvitationCode } from "./util";
+import { askCredentials } from "./util";
 import { cliContainer } from "../../container";
 
 async function run(argv: Arguments) {
   const answers = await askCredentials(argv);
-  const invitationCode = await askInvitationCode();
-  const metadata: any = {};
-  if (invitationCode) {
-    metadata["invitation_code"] = invitationCode;
-  }
 
   await cliContainer.container.auth.signup(
     { email: answers.email },
-    answers.password,
-    { metadata }
+    answers.password
   );
   console.log(
     chalk`Sign up as {green ${
