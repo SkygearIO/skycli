@@ -15,7 +15,7 @@
  */
 import moment from "moment";
 import { Arguments as YargsArguments, Argv } from "yargs";
-import { AppConfig, CLIContext, GlobalConfig } from "./types";
+import { CLIContext } from "./types";
 import { printError } from "./error";
 import { cliContainer } from "./container";
 import Table, { HorizontalTable } from "cli-table3";
@@ -25,8 +25,6 @@ export interface Arguments extends YargsArguments {
   verbose: boolean;
   environment: string;
   context: CLIContext;
-  globalConfig: GlobalConfig;
-  appConfig: AppConfig;
 }
 
 // Ideally we should extend yargs's CommandModule

@@ -43,6 +43,7 @@ export interface CLIContext {
   app: string | null;
   debug: boolean;
   verbose: boolean;
+  appConfig: AppConfig;
 }
 
 export interface AppConfig {
