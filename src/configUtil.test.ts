@@ -5,6 +5,7 @@ import {
   ClusterConfig,
   ConfigContext,
   UserContext,
+  AppConfig,
 } from "./types";
 import { Arguments } from "./util";
 import { decodeUser, decodeIdentity } from "@skygear/node-client";
@@ -92,12 +93,13 @@ test("currentCLIContext with context1", async () => {
     access_token: userMap["user1"].access_token,
   };
 
-  const argv = ({
+  const argv: Arguments = ({} as any) as Arguments;
+  const config = {
     globalConfig: fixture,
-    appConfig: {},
-  } as any) as Arguments;
+    appConfig: ({} as any) as AppConfig,
+  };
 
-  const context = currentCLIContext(argv);
+  const context = currentCLIContext(argv, config);
   expect(clusterConfigMap["server1"]).toEqual(context.cluster);
   expect(context.user).toMatchObject(expectedUserContext);
 });
@@ -115,12 +117,13 @@ test("currentCLIContext with context2", async () => {
     access_token: userMap["user2"].access_token,
   };
 
-  const argv = ({
+  const argv: Arguments = ({} as any) as Arguments;
+  const config = {
     globalConfig: fixture,
-    appConfig: {},
-  } as any) as Arguments;
+    appConfig: ({} as any) as AppConfig,
+  };
 
-  const context = currentCLIContext(argv);
+  const context = currentCLIContext(argv, config);
   expect(clusterConfigMap["server2"]).toEqual(context.cluster);
   expect(context.user).toMatchObject(expectedUserContext);
 });
@@ -133,12 +136,13 @@ test("currentCLIContext with unknown context", async () => {
     user: userMap,
   };
 
-  const argv = ({
+  const argv: Arguments = ({} as any) as Arguments;
+  const config = {
     globalConfig: fixture,
-    appConfig: {},
-  } as any) as Arguments;
+    appConfig: ({} as any) as AppConfig,
+  };
 
-  const context = currentCLIContext(argv);
+  const context = currentCLIContext(argv, config);
   expect(context.cluster).not.toEqual(expect.anything());
   expect(context.user).not.toEqual(expect.anything());
 });

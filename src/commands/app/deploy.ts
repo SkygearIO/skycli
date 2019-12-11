@@ -376,8 +376,8 @@ function downloadDeployLogImpl(
 }
 
 async function run(argv: Arguments) {
-  const deploymentMap = argv.appConfig.deployments || {};
-  const hooks = argv.appConfig.hooks || [];
+  const deploymentMap = argv.context.appConfig.deployments || {};
+  const hooks = argv.context.appConfig.hooks || [];
   const appName = argv.context.app || "";
 
   await cliContainer.validateDeployment(appName, deploymentMap, hooks);

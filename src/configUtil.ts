@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { CLIContext, UserContext, GlobalConfig } from "./types";
+import { CLIContext, UserContext, GlobalConfig, AppConfig } from "./types";
 import { Arguments } from "./util";
 import { decodeUser, decodeIdentity } from "@skygear/node-client";
 
@@ -33,11 +33,13 @@ export function createGlobalConfig(): GlobalConfig {
   };
 }
 
-export function currentCLIContext(argv: Arguments): CLIContext {
-  const globalConfig = argv.globalConfig;
+export function currentCLIContext(
+  argv: Arguments,
+  config: { appConfig: AppConfig; globalConfig: GlobalConfig }
+): CLIContext {
+  const { appConfig, globalConfig } = config;
   const currentContextKey = globalConfig.current_context;
 
-  const appConfig = argv.appConfig;
   // specify app in command or from config file
   const appName = (argv.app as string) || appConfig.app;
 
@@ -59,6 +61,7 @@ export function currentCLIContext(argv: Arguments): CLIContext {
     null;
 
   return {
+    appConfig,
     app: appName,
     cluster: globalConfig.cluster && globalConfig.cluster[clusterContextKey],
     debug: !!argv.debug,

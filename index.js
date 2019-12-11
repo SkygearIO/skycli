@@ -13,36 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
+"use strict";
 
-require('@babel/polyfill');
-const config = require('./dist/config');
-const configUtil = require('./dist/configUtil');
+require("@babel/polyfill");
+const config = require("./dist/config");
+const configUtil = require("./dist/configUtil");
 
-function checkArguments(argv, options) {
+function checkArguments(argv) {
   // Populate some data from argv for convenience
-  argv.context = configUtil.currentCLIContext(argv);
+  argv.context = configUtil.currentCLIContext(argv, config.loadConfig());
 
   // Print argv for debug mode to facilitate debugging.
   if (argv.debug) {
-    console.log('argv: ', argv);
+    console.log("argv: ", argv);
   }
   return true;
 }
 
-const cli = require('yargs')
-  .commandDir('dist/commands')
+const cli = require("yargs")
+  .strict()
+  .commandDir("dist/commands")
   .demandCommand()
-  .pkgConf('skycli', __dirname)
-  .config(config.loadConfig())
-  .env('SKYCLI')
-  .option('debug', {
-    type: 'boolean',
-    desc: 'Show debug logs',
+  .pkgConf("skycli", __dirname)
+  .env("SKYCLI")
+  .option("debug", {
+    type: "boolean",
+    desc: "Show debug logs",
   })
-  .option('verbose', {
-    type: 'boolean',
-    desc: 'Show verbose logs',
+  .option("verbose", {
+    type: "boolean",
+    desc: "Show verbose logs",
+  })
+  .option("app", {
+    type: "string",
+    desc: "Specify the App name",
+  })
+  .option("context", {
+    hidden: true,
+    skipValidation: true,
   })
   .check(checkArguments)
   .help();
