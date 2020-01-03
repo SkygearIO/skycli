@@ -16,6 +16,8 @@
 import { loadConfig } from "./config";
 import { currentCLIContext } from "./configUtil";
 import { Arguments } from "./util";
+import commands from "./commands";
+import yargs from "yargs";
 
 function checkArguments(argv: Arguments) {
   // Populate some data from argv for convenience
@@ -28,9 +30,11 @@ function checkArguments(argv: Arguments) {
   return true;
 }
 
-const cli = require("yargs")
-  .strict()
-  .commandDir("dist/commands")
+let cli = yargs.strict();
+for (const c of commands) {
+  cli = cli.command(c as any);
+}
+cli = cli
   .demandCommand()
   .pkgConf("skycli", __dirname)
   .env("SKYCLI")
@@ -50,7 +54,7 @@ const cli = require("yargs")
     hidden: true,
     skipValidation: true,
   })
-  .check(checkArguments)
+  .check(checkArguments as any)
   .help();
 
 export default cli;
