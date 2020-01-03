@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-"use strict";
+import { loadConfig } from "./config";
+import { currentCLIContext } from "./configUtil";
+import { Arguments } from "./util";
 
-require("@babel/polyfill");
-const config = require("./dist/config");
-const configUtil = require("./dist/configUtil");
-
-function checkArguments(argv) {
+function checkArguments(argv: Arguments) {
   // Populate some data from argv for convenience
-  argv.context = configUtil.currentCLIContext(argv, config.loadConfig());
+  argv.context = currentCLIContext(argv, loadConfig());
 
   // Print argv for debug mode to facilitate debugging.
   if (argv.debug) {
@@ -55,4 +53,4 @@ const cli = require("yargs")
   .check(checkArguments)
   .help();
 
-module.exports = cli;
+export default cli;
