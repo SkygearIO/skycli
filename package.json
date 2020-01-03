@@ -101,8 +101,7 @@
   },
   "pkg": {
     "assets": [
-      "dist/**/*",
-      "templates/**/*"
+      "dist/**/*"
     ]
   },
   "skycli": {}
