@@ -122,10 +122,7 @@
     "typescript": "3.3.3333"
   },
   "jest": {
-    "rootDir": "src",
-    "setupFiles": [
-      "<rootDir>/setupJest.js"
-    ]
+    "rootDir": "src"
   },
   "pkg": {
     "assets": [
