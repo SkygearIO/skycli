@@ -2,20 +2,12 @@
   "name": "@skygear/skycli",
   "version": "2.0.0-alpha.7",
   "description": "Skycli is tool for managing Skygear cluster",
-  "main": "index.js",
-  "bin": {
-    "skycli": "./bin/skycli.js"
-  },
   "scripts": {
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint 'src/**/*.ts'",
     "prettier": "prettier --write 'src/**/*.ts'",
     "prettier-check": "prettier --check 'src/**/*.ts'",
-    "prepare": "gulp build",
-    "start": "gulp watch",
-    "skycli": "gulp build && ./bin/skycli.js",
-    "build-bin": "gulp build && mkdir -p dist-bin && pkg --out-path dist-bin --targets node8-macos,node8-linux,node8-win .",
     "clean": "rm -rf dist dist-bin",
     "prepare-new-release": "git log --first-parent `git describe --abbrev=0`.. > new-release"
   },
@@ -81,9 +73,6 @@
     "eslint-plugin-react-hooks": "1.6.0",
     "eslint-plugin-react-native": "3.7.0",
     "extend": "^3.0.2",
-    "gulp": "^4.0.0",
-    "gulp-babel": "^8.0.0",
-    "gulp-exclude-gitignore": "^1.2.0",
     "jest": "^24.8.0",
     "pkg": "^4.3.7",
     "prettier": "^1.16.4",
