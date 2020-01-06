@@ -102,7 +102,9 @@ async function askClusterServer(argv: Arguments) {
       throw new Error("Cluster not found");
     }
 
+    // eslint-disable-next-line require-atomic-updates
     server.apiKey = selected.apiKey;
+    // eslint-disable-next-line require-atomic-updates
     server.endpoint = selected.endpoint;
   }
 

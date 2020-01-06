@@ -3,6 +3,6 @@
   "rules": {
     "no-console": 0,
     "prefer-promise-reject-errors": 0,
-    "no-await-in-loop": 0
+    "@typescript-eslint/no-unnecessary-condition": 0
   }
 }
