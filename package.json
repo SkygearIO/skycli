@@ -113,7 +113,7 @@
     "prettier": "^1.16.4",
     "rollup": "1.27.14",
     "rollup-plugin-babel": "4.3.3",
-    "typescript": "3.3.3333"
+    "typescript": "3.7.4"
   },
   "jest": {
     "rootDir": "src"
