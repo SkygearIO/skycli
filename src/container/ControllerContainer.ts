@@ -132,9 +132,10 @@ export class ControllerContainer<T extends BaseAPIClient> {
   }
 
   async getAppByName(appName: string): Promise<App> {
-    return this.fetchAPI("GET", `${this.CONTROLLER_URL}/apps/${appName}`).then(
-      ({ app }) => decodeApp(app)
-    );
+    return this.fetchAPI(
+      "GET",
+      `${this.CONTROLLER_URL}/apps/${appName}`
+    ).then(({ app }) => decodeApp(app));
   }
 
   async getUserConfiguration(appName: string): Promise<UserConfiguration> {
