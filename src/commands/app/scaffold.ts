@@ -121,9 +121,7 @@ async function run(argv: Arguments) {
   });
 
   console.log(
-    chalk`{green Success!} Initialized {green "${
-      template.name
-    }"} template for {green "${app.name}"} in {green "${projectDir}"}.`
+    chalk`{green Success!} Initialized {green "${template.name}"} template for {green "${app.name}"} in {green "${projectDir}"}.`
   );
 }
 

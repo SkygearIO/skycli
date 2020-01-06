@@ -78,9 +78,7 @@ export async function createFolderToPathsMapForArchive(
       // throw error if file duplicate
       if (pathsSet.has(p)) {
         throw Error(
-          `${p} is reserved file, please remove it from folder ${
-            config.context
-          }`
+          `${p} is reserved file, please remove it from folder ${config.context}`
         );
       }
       pathsSet.add(p);

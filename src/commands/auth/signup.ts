@@ -13,9 +13,7 @@ async function run(argv: Arguments) {
     answers.password
   );
   console.log(
-    chalk`Sign up as {green ${
-      answers.email
-    }}. To use the account, please check your email inbox and click the link in the email to complete verification.`
+    chalk`Sign up as {green ${answers.email}}. To use the account, please check your email inbox and click the link in the email to complete verification.`
   );
 }
 
