@@ -22,7 +22,7 @@ function printVersion() {
   return Promise.resolve();
 }
 
-module.exports = createCommand({
+export default createCommand({
   command: "version",
   describe: "Print version",
   handler: printVersion,

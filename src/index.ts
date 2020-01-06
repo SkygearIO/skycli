@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-"use strict";
+import { loadConfig } from "./config";
+import { currentCLIContext } from "./configUtil";
+import { Arguments } from "./util";
+import commands from "./commands";
+import yargs from "yargs";
 
-require("@babel/polyfill");
-const config = require("./dist/config");
-const configUtil = require("./dist/configUtil");
-
-function checkArguments(argv) {
+function checkArguments(argv: Arguments) {
   // Populate some data from argv for convenience
-  argv.context = configUtil.currentCLIContext(argv, config.loadConfig());
+  argv.context = currentCLIContext(argv, loadConfig());
 
   // Print argv for debug mode to facilitate debugging.
   if (argv.debug) {
@@ -30,9 +30,11 @@ function checkArguments(argv) {
   return true;
 }
 
-const cli = require("yargs")
-  .strict()
-  .commandDir("dist/commands")
+let cli = yargs.strict();
+for (const c of commands) {
+  cli = cli.command(c as any);
+}
+cli = cli
   .demandCommand()
   .pkgConf("skycli", __dirname)
   .env("SKYCLI")
@@ -52,7 +54,7 @@ const cli = require("yargs")
     hidden: true,
     skipValidation: true,
   })
-  .check(checkArguments)
+  .check(checkArguments as any)
   .help();
 
-module.exports = cli;
+export default cli;
