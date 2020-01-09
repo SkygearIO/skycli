@@ -10,7 +10,6 @@ import {
   Secret,
   App,
   UserConfiguration,
-  Endpoint,
   Collaborator,
   ListTemplateResponse,
   TemplateItem,
@@ -111,15 +110,11 @@ export class ControllerContainer<T extends BaseAPIClient> {
     );
   }
 
-  async createApp(name: string): Promise<[App, UserConfiguration, Endpoint]> {
+  async createApp(name: string): Promise<App> {
     return this.fetchAPI("POST", `${this.CONTROLLER_URL}/apps`, {
       json: { name },
-    }).then(({ app, tenant_config, endpoint }) => {
-      return [decodeApp(app), tenant_config.user_config, endpoint] as [
-        App,
-        UserConfiguration,
-        Endpoint
-      ];
+    }).then(({ app }) => {
+      return decodeApp(app);
     });
   }
 

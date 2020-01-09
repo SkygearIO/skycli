@@ -7,8 +7,6 @@ export interface App {
   endpoints: string[];
 }
 
-export type Endpoint = string;
-
 export type SecretType = "opaque" | "dockerconfigjson";
 
 export interface Secret {
