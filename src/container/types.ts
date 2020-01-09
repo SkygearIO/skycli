@@ -7,8 +7,6 @@ export interface App {
   endpoints: string[];
 }
 
-export type Endpoint = string;
-
 export type SecretType = "opaque" | "dockerconfigjson";
 
 export interface Secret {
@@ -18,7 +16,8 @@ export interface Secret {
   updated_at: Date;
 }
 
-export interface UserConfiguration {
+export interface AppConfiguration {
+  version: string;
   clients: { [id: string]: APIClientConfig };
   master_key?: string;
   welcome_email?: WelcomeEmailConfiguration;

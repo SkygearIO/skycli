@@ -53,16 +53,16 @@ async function run(argv: Arguments) {
   console.log(chalk`App name: {green ${appName}}.`);
   console.log("Creating app...");
 
-  const payload = await cliContainer.createApp(appName);
-  const userConfig = payload[1];
-  const endpoint = payload[2];
-  const firstClient = userConfig.clients[Object.keys(userConfig.clients)[0]];
+  const app = await cliContainer.createApp(appName);
+  const endpoint = app.endpoints[0];
+  const appConfig = await cliContainer.getAppConfiguration(appName);
+  const firstClient = appConfig.clients[Object.keys(appConfig.clients)[0]];
 
   console.log(chalk`Your API endpoint: {green ${endpoint}}.`);
   console.log(
     chalk`Your API Key: {green ${firstClient ? firstClient.api_key : ""}}.`
   );
-  console.log(chalk`Your Master Key: {green ${userConfig.master_key || ""}}.`);
+  console.log(chalk`Your Master Key: {green ${appConfig.master_key || ""}}.`);
 
   console.log("Created app successfully! \n");
 

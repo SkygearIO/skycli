@@ -109,7 +109,7 @@ async function run(argv: Arguments) {
   }
 
   const app = await selectApp(argv);
-  const config = await cliContainer.getUserConfiguration(app.name);
+  const config = await cliContainer.getAppConfiguration(app.name);
   const template = await selectTemplate();
 
   fs.emptyDirSync(projectDir);

@@ -5,11 +5,11 @@ import { requireApp, requireClusterConfig, requireUser } from "../middleware";
 import { cliContainer } from "../../container";
 
 async function run(argv: Arguments) {
-  const userConfig = await cliContainer.getUserConfiguration(
+  const appConfig = await cliContainer.getAppConfiguration(
     argv.context.app || ""
   );
-  const userConfigYAML = yaml.safeDump(userConfig);
-  console.log(userConfigYAML);
+  const appConfigYAML = yaml.safeDump(appConfig);
+  console.log(appConfigYAML);
 }
 
 export default createCommand({
@@ -19,7 +19,7 @@ export default createCommand({
       .middleware(requireUser)
       .middleware(requireApp);
   },
-  command: "view-user-config",
-  describe: "View current app user config",
+  command: "view-config",
+  describe: "View current app config",
   handler: run,
 });
