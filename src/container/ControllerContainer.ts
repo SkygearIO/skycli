@@ -9,7 +9,7 @@ import {
 import {
   Secret,
   App,
-  UserConfiguration,
+  AppConfiguration,
   Collaborator,
   ListTemplateResponse,
   TemplateItem,
@@ -133,25 +133,25 @@ export class ControllerContainer<T extends BaseAPIClient> {
     ).then(({ app }) => decodeApp(app));
   }
 
-  async getUserConfiguration(appName: string): Promise<UserConfiguration> {
+  async getAppConfiguration(appName: string): Promise<AppConfiguration> {
     return this.fetchAPI(
       "GET",
-      `${this.CONTROLLER_URL}/apps/${appName}/userconfigs`
-    ).then(({ user_config }) => {
-      return user_config;
+      `${this.CONTROLLER_URL}/apps/${appName}/2/appconfigs`
+    ).then(({ app_config }) => {
+      return app_config;
     });
   }
 
-  async setUserConfiguration(
+  async setAppConfiguration(
     appName: string,
-    userConfig: UserConfiguration
+    appConfig: AppConfiguration
   ): Promise<void> {
     const payload = {
-      user_config: userConfig,
+      app_config: appConfig,
     };
     return this.fetchAPI(
       "POST",
-      `${this.CONTROLLER_URL}/apps/${appName}/userconfigs`,
+      `${this.CONTROLLER_URL}/apps/${appName}/2/appconfigs`,
       {
         json: payload,
       }

@@ -3,8 +3,8 @@ import appCreate from "./app/create";
 import appList from "./app/list";
 import appDeploy from "./app/deploy";
 import appScaffold from "./app/scaffold";
-import viewUserConfig from "./app/viewUserConfig";
-import updateUserConfig from "./app/updateUserConfig";
+import viewConfig from "./app/viewConfig";
+import updateConfig from "./app/updateConfig";
 import addCollaborator from "./app/addCollaborator";
 import listCollaborator from "./app/listCollaborator";
 import removeCollaboartor from "./app/removeCollaboartor";
@@ -17,8 +17,8 @@ const subCommands = [
   appList,
   appScaffold,
   appDeploy,
-  viewUserConfig,
-  updateUserConfig,
+  viewConfig,
+  updateConfig,
   addCollaborator,
   removeCollaboartor,
   listCollaborator,
