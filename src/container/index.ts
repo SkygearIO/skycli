@@ -12,70 +12,86 @@ import {
 } from "@skygear/node-client";
 
 import { CLIContainer } from "./CLIContainer";
-import { save, load } from "../config";
-import { GlobalConfig } from "../types";
-import { createGlobalConfig } from "../configUtil";
+import {
+  save,
+  load,
+  createSkycliConfig,
+  updateUser,
+  getUser,
+  deleteUser,
+  migrateSkycliConfig,
+} from "../config";
+import { SkycliConfig } from "../types";
 
 class CLIYAMLContainerStorage implements ContainerStorage {
-  private loadGlobalConfig(): GlobalConfig {
-    let globalConfig = load("global") as GlobalConfig;
+  private loadSkycliConfig(): SkycliConfig {
+    let globalConfig = migrateSkycliConfig(load("global"));
     if (!Object.keys(globalConfig).length) {
-      globalConfig = createGlobalConfig();
+      globalConfig = createSkycliConfig();
     }
     return globalConfig;
   }
 
-  private cloneConfigForUserUpdate(
-    globalConfig: GlobalConfig,
-    namespace: string
-  ): GlobalConfig {
-    // deep clone the user config with the given namespace for editing
-    return {
-      ...globalConfig,
-      user: {
-        ...globalConfig.user,
-        [namespace]: {
-          ...globalConfig.user[namespace],
-        },
-      },
-    };
-  }
-
   async setUser(namespace: string, user: User): Promise<void> {
     const e = encodeUser(user);
-    const globalConfig = this.loadGlobalConfig();
-    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
-    newConfig.user[namespace].user = e;
-    save(newConfig, "global");
+    save(
+      updateUser(this.loadSkycliConfig(), namespace, u => {
+        return {
+          ...u,
+          user: e,
+        };
+      }),
+      "global"
+    );
   }
 
   async setIdentity(namespace: string, identity: Identity): Promise<void> {
     const e = encodeIdentity(identity);
-    const globalConfig = this.loadGlobalConfig();
-    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
-    newConfig.user[namespace].identity = e;
-    save(newConfig, "global");
+    save(
+      updateUser(this.loadSkycliConfig(), namespace, u => {
+        return {
+          ...u,
+          identity: e,
+        };
+      }),
+      "global"
+    );
   }
 
   async setAccessToken(namespace: string, accessToken: string): Promise<void> {
-    const globalConfig = this.loadGlobalConfig();
-    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
-    newConfig.user[namespace].access_token = accessToken;
-    save(newConfig, "global");
+    save(
+      updateUser(this.loadSkycliConfig(), namespace, u => {
+        return {
+          ...u,
+          access_token: accessToken,
+        };
+      }),
+      "global"
+    );
   }
 
   async setRefreshToken(namespace: string, refreshToken: string) {
-    const globalConfig = this.loadGlobalConfig();
-    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
-    newConfig.user[namespace].refresh_token = refreshToken;
-    save(newConfig, "global");
+    save(
+      updateUser(this.loadSkycliConfig(), namespace, u => {
+        return {
+          ...u,
+          refresh_token: refreshToken,
+        };
+      }),
+      "global"
+    );
   }
 
   async setSessionID(namespace: string, sessionID: string) {
-    const globalConfig = this.loadGlobalConfig();
-    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
-    newConfig.user[namespace].session_id = sessionID;
-    save(newConfig, "global");
+    save(
+      updateUser(this.loadSkycliConfig(), namespace, u => {
+        return {
+          ...u,
+          session_id: sessionID,
+        };
+      }),
+      "global"
+    );
   }
 
   async setOAuthRedirectAction(
@@ -89,10 +105,15 @@ class CLIYAMLContainerStorage implements ContainerStorage {
     namespace: string,
     options: ExtraSessionInfoOptions
   ) {
-    const globalConfig = this.loadGlobalConfig();
-    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
-    newConfig.user[namespace].extra_session_info_options = options;
-    save(newConfig, "global");
+    save(
+      updateUser(this.loadSkycliConfig(), namespace, u => {
+        return {
+          ...u,
+          extra_session_info_options: options,
+        };
+      }),
+      "global"
+    );
   }
 
   async setAuthenticationSession(
@@ -103,65 +124,49 @@ class CLIYAMLContainerStorage implements ContainerStorage {
   }
 
   async setMFABearerToken(namespace: string, mfaBearerToken: string) {
-    const globalConfig = this.loadGlobalConfig();
-    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
-    newConfig.user[namespace].mfa_bearer_token = mfaBearerToken;
-    save(newConfig, "global");
+    save(
+      updateUser(this.loadSkycliConfig(), namespace, u => {
+        return {
+          ...u,
+          mfa_bearer_token: mfaBearerToken,
+        };
+      }),
+      "global"
+    );
   }
 
   async getUser(namespace: string): Promise<User | null> {
-    const globalConfig = this.loadGlobalConfig();
-    const d = globalConfig.user[namespace] && globalConfig.user[namespace].user;
-    if (d) {
-      return decodeUser(d);
-    }
-    return null;
+    const skycliConfig = this.loadSkycliConfig();
+    const d = getUser(skycliConfig, namespace)?.user;
+    return d != null ? decodeUser(d) : null;
   }
 
   async getIdentity(namespace: string): Promise<Identity | null> {
-    const globalConfig = this.loadGlobalConfig();
-    const d =
-      globalConfig.user[namespace] && globalConfig.user[namespace].identity;
-    if (d) {
-      return decodeIdentity(d);
-    }
-    return null;
+    const skycliConfig = this.loadSkycliConfig();
+    const d = getUser(skycliConfig, namespace)?.identity;
+    return d != null ? decodeIdentity(d) : null;
   }
 
   async getAccessToken(namespace: string): Promise<string | null> {
-    const globalConfig = this.loadGlobalConfig();
-    return (
-      globalConfig.user[namespace] && globalConfig.user[namespace].access_token
-    );
+    const skycliConfig = this.loadSkycliConfig();
+    return getUser(skycliConfig, namespace)?.access_token ?? null;
   }
 
   async getRefreshToken(namespace: string): Promise<string | null> {
-    const globalConfig = this.loadGlobalConfig();
-    return (
-      (globalConfig.user[namespace] &&
-        globalConfig.user[namespace].refresh_token) ||
-      null
-    );
+    const skycliConfig = this.loadSkycliConfig();
+    return getUser(skycliConfig, namespace)?.refresh_token ?? null;
   }
 
   async getSessionID(namespace: string): Promise<string | null> {
-    const globalConfig = this.loadGlobalConfig();
-    return (
-      (globalConfig.user[namespace] &&
-        globalConfig.user[namespace].session_id) ||
-      null
-    );
+    const skycliConfig = this.loadSkycliConfig();
+    return getUser(skycliConfig, namespace)?.session_id ?? null;
   }
 
   async getExtraSessionInfoOptions(
     namespace: string
   ): Promise<Partial<ExtraSessionInfoOptions> | null> {
-    const globalConfig = this.loadGlobalConfig();
-    return (
-      (globalConfig.user[namespace] &&
-        globalConfig.user[namespace].extra_session_info_options) ||
-      null
-    );
+    const skycliConfig = this.loadSkycliConfig();
+    return getUser(skycliConfig, namespace)?.extra_session_info_options ?? null;
   }
 
   async getOAuthRedirectAction(_namespace: string): Promise<string | null> {
@@ -176,47 +181,28 @@ class CLIYAMLContainerStorage implements ContainerStorage {
   }
 
   async getMFABearerToken(namespace: string): Promise<string | null> {
-    const globalConfig = this.loadGlobalConfig();
-    return (
-      (globalConfig.user[namespace] &&
-        globalConfig.user[namespace].mfa_bearer_token) ||
-      null
-    );
+    const skycliConfig = this.loadSkycliConfig();
+    return getUser(skycliConfig, namespace)?.mfa_bearer_token ?? null;
   }
 
   async delUser(namespace: string): Promise<void> {
-    const globalConfig = this.loadGlobalConfig();
-    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
-    delete newConfig.user[namespace].user;
-    save(newConfig, "global");
+    save(deleteUser(this.loadSkycliConfig(), namespace), "global");
   }
 
   async delIdentity(namespace: string): Promise<void> {
-    const globalConfig = this.loadGlobalConfig();
-    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
-    delete newConfig.user[namespace].identity;
-    save(newConfig, "global");
+    save(deleteUser(this.loadSkycliConfig(), namespace), "global");
   }
 
   async delAccessToken(namespace: string): Promise<void> {
-    const globalConfig = this.loadGlobalConfig();
-    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
-    delete newConfig.user[namespace].access_token;
-    save(newConfig, "global");
+    save(deleteUser(this.loadSkycliConfig(), namespace), "global");
   }
 
   async delRefreshToken(namespace: string) {
-    const globalConfig = this.loadGlobalConfig();
-    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
-    delete newConfig.user[namespace].refresh_token;
-    save(newConfig, "global");
+    save(deleteUser(this.loadSkycliConfig(), namespace), "global");
   }
 
   async delSessionID(namespace: string) {
-    const globalConfig = this.loadGlobalConfig();
-    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
-    delete newConfig.user[namespace].session_id;
-    save(newConfig, "global");
+    save(deleteUser(this.loadSkycliConfig(), namespace), "global");
   }
 
   async delOAuthRedirectAction(_namespace: string): Promise<void> {
@@ -228,10 +214,15 @@ class CLIYAMLContainerStorage implements ContainerStorage {
   }
 
   async delMFABearerToken(namespace: string) {
-    const globalConfig = this.loadGlobalConfig();
-    const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
-    delete newConfig.user[namespace].mfa_bearer_token;
-    save(newConfig, "global");
+    save(
+      updateUser(this.loadSkycliConfig(), namespace, u => {
+        return {
+          ...u,
+          mfa_bearer_token: undefined,
+        };
+      }),
+      "global"
+    );
   }
 }
 

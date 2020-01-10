@@ -13,60 +13,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { CLIContext, UserContext, GlobalConfig } from "./types";
+import { CLIContext, SkycliConfig } from "./types";
 import { SkygearYAML } from "./container/types";
 import { Arguments } from "./util";
 import { decodeUser, decodeIdentity } from "@skygear/node-client";
 
-const defaultContext = "default";
-
-export function createGlobalConfig(): GlobalConfig {
-  return {
-    cluster: {},
-    context: {
-      [defaultContext]: {
-        cluster: defaultContext,
-        user: defaultContext,
-      },
-    },
-    current_context: defaultContext,
-    user: {},
-  };
-}
-
 export function currentCLIContext(
   argv: Arguments,
-  config: { skygearYAML: SkygearYAML; globalConfig: GlobalConfig }
+  config: { skygearYAML: SkygearYAML; skycliConfig: SkycliConfig }
 ): CLIContext {
-  const { skygearYAML, globalConfig } = config;
-  const currentContextKey = globalConfig.current_context;
+  const { skygearYAML, skycliConfig } = config;
+  const currentContextKey = skycliConfig.current_context;
 
   // specify app in command or from config file
-  const appName = (argv.app as string) || skygearYAML.app;
+  const app = (argv.app as string) || skygearYAML.app;
 
-  const clusterContextKey = globalConfig.context[currentContextKey].cluster;
-  const userContextKey = globalConfig.context[currentContextKey].user;
+  const context = skycliConfig.contexts?.find(
+    c => c.name === currentContextKey
+  );
+  const clusterName = context?.context.cluster;
+  const userName = context?.context.user;
 
-  // decode user context from global yaml config
-  const clusterUserConfig =
-    globalConfig.user && globalConfig.user[userContextKey];
-  const userContext: UserContext | null =
-    (clusterUserConfig &&
-      clusterUserConfig.user &&
-      clusterUserConfig.identity &&
-      clusterUserConfig.access_token && {
-        user: decodeUser(clusterUserConfig.user),
-        identity: decodeIdentity(clusterUserConfig.identity),
-        access_token: clusterUserConfig.access_token,
-      }) ||
-    null;
+  const userConfig = skycliConfig.users?.find(u => u.name === userName)?.user;
+  const user =
+    userConfig == null
+      ? undefined
+      : {
+          user: decodeUser(userConfig.user),
+          identity: decodeIdentity(userConfig.identity),
+          access_token: userConfig.access_token,
+        };
+
+  const cluster = skycliConfig.clusters?.find(c => c.name === clusterName)
+    ?.cluster;
 
   return {
     skygearYAML,
-    app: appName,
-    cluster: globalConfig.cluster && globalConfig.cluster[clusterContextKey],
+    app,
+    cluster,
+    user,
     debug: !!argv.debug,
-    user: userContext,
     verbose: !!argv.verbose,
   };
 }

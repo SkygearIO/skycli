@@ -22,15 +22,20 @@ export interface ClusterUserConfig {
   extra_session_info_options?: ExtraSessionInfoOptions;
   mfa_bearer_token?: string;
 }
+
 export interface ConfigContext {
   cluster: string;
-  user: string;
+  user?: string;
 }
-export interface GlobalConfig {
-  cluster: { [s: string]: ClusterConfig };
-  context: { [s: string]: ConfigContext };
-  current_context: string;
-  user: { [s: string]: ClusterUserConfig };
+
+type Named<Key extends string, T> = { name: string } & Record<Key, T>;
+
+export interface SkycliConfig {
+  version: string;
+  clusters?: Named<"cluster", ClusterConfig>[];
+  users?: Named<"user", ClusterUserConfig>[];
+  contexts?: Named<"context", ConfigContext>[];
+  current_context?: string;
 }
 
 export interface UserContext {
@@ -38,6 +43,7 @@ export interface UserContext {
   identity: Identity;
   access_token: string;
 }
+
 export interface CLIContext {
   cluster?: ClusterConfig | null;
   user?: UserContext | null;
