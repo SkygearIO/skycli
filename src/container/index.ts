@@ -12,13 +12,13 @@ import {
 } from "@skygear/node-client";
 
 import { CLIContainer } from "./CLIContainer";
-import { save, load, ConfigDomain } from "../config";
+import { save, load } from "../config";
 import { GlobalConfig } from "../types";
 import { createGlobalConfig } from "../configUtil";
 
 class CLIYAMLContainerStorage implements ContainerStorage {
   private loadGlobalConfig(): GlobalConfig {
-    let globalConfig = load(ConfigDomain.GlobalDomain) as GlobalConfig;
+    let globalConfig = load("global") as GlobalConfig;
     if (!Object.keys(globalConfig).length) {
       globalConfig = createGlobalConfig();
     }
@@ -46,7 +46,7 @@ class CLIYAMLContainerStorage implements ContainerStorage {
     const globalConfig = this.loadGlobalConfig();
     const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
     newConfig.user[namespace].user = e;
-    save(newConfig, ConfigDomain.GlobalDomain);
+    save(newConfig, "global");
   }
 
   async setIdentity(namespace: string, identity: Identity): Promise<void> {
@@ -54,28 +54,28 @@ class CLIYAMLContainerStorage implements ContainerStorage {
     const globalConfig = this.loadGlobalConfig();
     const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
     newConfig.user[namespace].identity = e;
-    save(newConfig, ConfigDomain.GlobalDomain);
+    save(newConfig, "global");
   }
 
   async setAccessToken(namespace: string, accessToken: string): Promise<void> {
     const globalConfig = this.loadGlobalConfig();
     const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
     newConfig.user[namespace].access_token = accessToken;
-    save(newConfig, ConfigDomain.GlobalDomain);
+    save(newConfig, "global");
   }
 
   async setRefreshToken(namespace: string, refreshToken: string) {
     const globalConfig = this.loadGlobalConfig();
     const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
     newConfig.user[namespace].refresh_token = refreshToken;
-    save(newConfig, ConfigDomain.GlobalDomain);
+    save(newConfig, "global");
   }
 
   async setSessionID(namespace: string, sessionID: string) {
     const globalConfig = this.loadGlobalConfig();
     const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
     newConfig.user[namespace].session_id = sessionID;
-    save(newConfig, ConfigDomain.GlobalDomain);
+    save(newConfig, "global");
   }
 
   async setOAuthRedirectAction(
@@ -92,7 +92,7 @@ class CLIYAMLContainerStorage implements ContainerStorage {
     const globalConfig = this.loadGlobalConfig();
     const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
     newConfig.user[namespace].extra_session_info_options = options;
-    save(newConfig, ConfigDomain.GlobalDomain);
+    save(newConfig, "global");
   }
 
   async setAuthenticationSession(
@@ -106,7 +106,7 @@ class CLIYAMLContainerStorage implements ContainerStorage {
     const globalConfig = this.loadGlobalConfig();
     const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
     newConfig.user[namespace].mfa_bearer_token = mfaBearerToken;
-    save(newConfig, ConfigDomain.GlobalDomain);
+    save(newConfig, "global");
   }
 
   async getUser(namespace: string): Promise<User | null> {
@@ -188,35 +188,35 @@ class CLIYAMLContainerStorage implements ContainerStorage {
     const globalConfig = this.loadGlobalConfig();
     const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
     delete newConfig.user[namespace].user;
-    save(newConfig, ConfigDomain.GlobalDomain);
+    save(newConfig, "global");
   }
 
   async delIdentity(namespace: string): Promise<void> {
     const globalConfig = this.loadGlobalConfig();
     const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
     delete newConfig.user[namespace].identity;
-    save(newConfig, ConfigDomain.GlobalDomain);
+    save(newConfig, "global");
   }
 
   async delAccessToken(namespace: string): Promise<void> {
     const globalConfig = this.loadGlobalConfig();
     const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
     delete newConfig.user[namespace].access_token;
-    save(newConfig, ConfigDomain.GlobalDomain);
+    save(newConfig, "global");
   }
 
   async delRefreshToken(namespace: string) {
     const globalConfig = this.loadGlobalConfig();
     const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
     delete newConfig.user[namespace].refresh_token;
-    save(newConfig, ConfigDomain.GlobalDomain);
+    save(newConfig, "global");
   }
 
   async delSessionID(namespace: string) {
     const globalConfig = this.loadGlobalConfig();
     const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
     delete newConfig.user[namespace].session_id;
-    save(newConfig, ConfigDomain.GlobalDomain);
+    save(newConfig, "global");
   }
 
   async delOAuthRedirectAction(_namespace: string): Promise<void> {
@@ -231,7 +231,7 @@ class CLIYAMLContainerStorage implements ContainerStorage {
     const globalConfig = this.loadGlobalConfig();
     const newConfig = this.cloneConfigForUserUpdate(globalConfig, namespace);
     delete newConfig.user[namespace].mfa_bearer_token;
-    save(newConfig, ConfigDomain.GlobalDomain);
+    save(newConfig, "global");
   }
 }
 

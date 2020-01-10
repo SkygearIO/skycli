@@ -149,7 +149,7 @@ async function run(argv: Arguments) {
     api_key: apiKey,
     env: env,
   };
-  config.save(newGlobalConfig, config.ConfigDomain.GlobalDomain);
+  config.save(newGlobalConfig, "global");
   console.log(chalk`Connected to Skygear cluster at {green ${endpoint}}.`);
 }
 

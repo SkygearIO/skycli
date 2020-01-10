@@ -26,10 +26,7 @@ import { GlobalConfig } from "./types";
 import { createGlobalConfig } from "./configUtil";
 import { configPath } from "./path";
 
-export enum ConfigDomain {
-  GlobalDomain = "global",
-  ProjectDomain = "project",
-}
+export type ConfigDomain = "global" | "project";
 
 const configPaths: { [domain: string]: string } = {
   global: configPath("config"),
@@ -53,7 +50,7 @@ function findConfig(
   return fs.existsSync(fullPath) ? fullPath : undefined;
 }
 
-export function load(domain: ConfigDomain = ConfigDomain.GlobalDomain) {
+export function load(domain: ConfigDomain) {
   let content = {};
 
   const configPath = findConfig(domain);
@@ -64,10 +61,7 @@ export function load(domain: ConfigDomain = ConfigDomain.GlobalDomain) {
   return content;
 }
 
-export function save(
-  configObject: Dictionary<any>,
-  domain: ConfigDomain = ConfigDomain.GlobalDomain
-) {
+export function save(configObject: Dictionary<any>, domain: ConfigDomain) {
   let configPath = findConfig(domain);
   if (!configPath) {
     configPath = findConfig(domain, false);
@@ -82,11 +76,7 @@ export function save(
   }
 }
 
-export function set(
-  name: PropertyPath,
-  value: any,
-  domain: ConfigDomain = ConfigDomain.GlobalDomain
-) {
+export function set(name: PropertyPath, value: any, domain: ConfigDomain) {
   const configObject = load(domain);
   const oldValue = _get(configObject, name);
   if (value !== oldValue) {
@@ -96,12 +86,12 @@ export function set(
 }
 
 export function loadConfig() {
-  let globalConfig = load(ConfigDomain.GlobalDomain) as GlobalConfig;
+  let globalConfig = load("global") as GlobalConfig;
   if (!Object.keys(globalConfig).length) {
     globalConfig = createGlobalConfig();
   }
 
-  const skygearYAML = load(ConfigDomain.ProjectDomain) as SkygearYAML;
+  const skygearYAML = load("project") as SkygearYAML;
   return {
     skygearYAML,
     globalConfig,
