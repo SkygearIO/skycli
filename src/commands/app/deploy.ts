@@ -13,12 +13,12 @@ import requireUser from "../middleware/requireUser";
 import { walk, dockerignore, dockerignorePaths } from "../../ignore";
 import { cliContainer } from "../../container";
 import {
-  Artifact,
+  ArtifactRequest,
   DeploymentStatus,
   Checksum,
   LogEntry,
-  DeploymentItemsMap,
   DeploymentItemConfig,
+  DeploymentItemArtifact,
   HttpServiceConfig,
 } from "../../container/types";
 import { tempPath } from "../../path";
@@ -243,7 +243,7 @@ function waitForDeploymentStatusImpl(
 
 async function confirmIfItemsWillBeRemovedInNewDeployment(
   appName: string,
-  deployments: DeploymentItemsMap
+  deployments: DeploymentItemConfig[]
 ) {
   if (!appName) {
     return;
@@ -262,15 +262,14 @@ async function confirmIfItemsWillBeRemovedInNewDeployment(
   );
 
   const itemsWillBeRemoved: string[] = [];
-  for (const itemName of Object.keys(existingDeployments)) {
+  for (const existingItem of existingDeployments) {
     // item is considered removed if
     // itemName is found in existing deployment but not found in new deployment
     // or
     // itemName is found in both deployment but the types differ.
-    const existingItem = existingDeployments[itemName];
-    const newItem = deployments[itemName];
+    const newItem = deployments.find(a => a.name === existingItem.name);
     if (!newItem || existingItem.type !== newItem.type) {
-      itemsWillBeRemoved.push(itemName);
+      itemsWillBeRemoved.push(existingItem.name);
     }
   }
 
@@ -297,12 +296,11 @@ function createTemplatePath(templateName: string) {
 }
 
 async function downloadTemplateIfNeeded(
-  deployments: DeploymentItemsMap,
+  deployments: DeploymentItemConfig[],
   cacheTemplate: boolean = false
 ) {
   const templatesToDownloadSet = new Set<string>();
-  for (const itemName of Object.keys(deployments)) {
-    const d = deployments[itemName];
+  for (const d of deployments) {
     if (d.type === "http-service" && d.template) {
       templatesToDownloadSet.add(d.template);
     }
@@ -374,32 +372,28 @@ function downloadDeployLogImpl(
 }
 
 async function run(argv: Arguments) {
-  const deploymentMap = argv.context.appConfig.deployments || {};
-  const hooks = argv.context.appConfig.hooks || [];
+  const { skygearYAML } = argv.context;
+  const deployments = skygearYAML.deployments || [];
   const appName = argv.context.app || "";
 
-  await cliContainer.validateDeployment(appName, deploymentMap, hooks);
+  await cliContainer.validateDeployment(appName, skygearYAML);
 
   try {
-    const itemNames: string[] = Object.keys(deploymentMap);
-    await confirmIfItemsWillBeRemovedInNewDeployment(appName, deploymentMap);
+    await confirmIfItemsWillBeRemovedInNewDeployment(appName, deployments);
 
-    await downloadTemplateIfNeeded(deploymentMap);
+    await downloadTemplateIfNeeded(deployments);
 
-    interface ArtifactItem {
-      artifact: Artifact;
-      itemName: string;
+    const artifactItems: {
+      artifact: ArtifactRequest;
+      deployItemName: string;
       archivePath: string;
-    }
-    const artifactItems: ArtifactItem[] = [];
+    }[] = [];
     // archive and get checksum
-    for (let i = 0; i < itemNames.length; i++) {
-      const name = itemNames[i];
-      const deployment = deploymentMap[name];
-      const archivePath = createArchivePath(name);
+    for (const deployItem of deployments) {
+      const archivePath = createArchivePath(deployItem.name);
       const checksum = await archiveDeploymentItem(
-        name,
-        deployment,
+        deployItem.name,
+        deployItem,
         archivePath
       );
       if (checksum) {
@@ -409,14 +403,13 @@ async function run(argv: Arguments) {
             checksum_sha256: checksum.sha256,
             asset_name: "",
           },
-          itemName: name,
+          deployItemName: deployItem.name,
           archivePath: archivePath,
         });
       }
     }
 
     // upload artifact
-    const artifacts: Artifact[] = [];
     for (let i = 0; i < artifactItems.length; i++) {
       const archivePath = artifactItems[i].archivePath;
       const assetName = await cliContainer.uploadArtifact(archivePath);
@@ -425,28 +418,28 @@ async function run(argv: Arguments) {
         `Archive uploaded (${currentProgress}/${artifactItems.length})`
       );
       artifactItems[i].artifact.asset_name = assetName;
-      artifacts.push(artifactItems[i].artifact);
     }
 
     // create artifacts
-    const artifactIDMap: { [name: string]: string } = {};
+    const deploymentItemArtifacts: DeploymentItemArtifact[] = [];
     if (artifactItems.length > 0) {
-      const artifactIDs = await cliContainer.createArtifacts(
+      const artifactResponses = await cliContainer.createArtifacts(
         appName,
-        artifacts
+        artifactItems.map(a => a.artifact)
       );
       for (let i = 0; i < artifactItems.length; i++) {
-        const name = artifactItems[i].itemName;
-        artifactIDMap[name] = artifactIDs[i];
+        deploymentItemArtifacts.push({
+          deploy_item_name: artifactItems[i].deployItemName,
+          artifact_id: artifactResponses[i].id,
+        });
       }
     }
 
     // create deployment
     const deploymentID = await cliContainer.createDeployment(
       appName,
-      deploymentMap,
-      artifactIDMap,
-      hooks
+      skygearYAML,
+      deploymentItemArtifacts
     );
 
     console.log(chalk`Wait for deployment: {green ${deploymentID}}`);

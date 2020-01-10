@@ -10,12 +10,13 @@ import {
 
 import { ControllerContainer } from "./ControllerContainer";
 import {
+  ArtifactRequest,
+  ArtifactResponse,
+  DeploymentItemArtifact,
   Deployment,
-  DeploymentItemsMap,
   DeploymentItemConfig,
-  HookConfig,
   LogEntry,
-  Artifact,
+  SkygearYAML,
 } from "./types";
 
 function encodeLogEntry(input: any): LogEntry {
@@ -48,7 +49,7 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
   async getDeploymentItems(
     appName: string,
     deploymentID: string
-  ): Promise<DeploymentItemsMap> {
+  ): Promise<DeploymentItemConfig[]> {
     return this.fetchAPI(
       "GET",
       `${this.CONTROLLER_URL}/apps/${appName}/deployments/${deploymentID}/items`
@@ -75,8 +76,8 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
   // createArtifact returns artifact id if success
   async createArtifacts(
     appName: string,
-    artifacts: Artifact[]
-  ): Promise<string[]> {
+    artifacts: ArtifactRequest[]
+  ): Promise<ArtifactResponse[]> {
     return this.fetchAPI(
       "POST",
       `${this.CONTROLLER_URL}/apps/${appName}/artifacts`,
@@ -86,41 +87,35 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
         },
       }
     ).then(({ artifacts }) => {
-      return artifacts.map((a: { id: string }) => a.id);
+      return artifacts;
     });
   }
 
   async validateDeployment(
     appName: string,
-    deployments: { [name: string]: DeploymentItemConfig },
-    hooks: HookConfig[]
+    skygearYAML: SkygearYAML
   ): Promise<void> {
     return this.fetchAPI(
       "POST",
       `${this.CONTROLLER_URL}/apps/${appName}/deployment_validations`,
       {
-        json: {
-          deployments: deployments as any,
-          hooks: hooks as any,
-        },
+        json: skygearYAML,
       }
     );
   }
 
   async createDeployment(
     appName: string,
-    deployments: { [name: string]: DeploymentItemConfig },
-    artifactIDs: { [name: string]: string },
-    hooks: HookConfig[]
+    skygearYAML: SkygearYAML,
+    artifacts: DeploymentItemArtifact[]
   ): Promise<string> {
     return this.fetchAPI(
       "POST",
       `${this.CONTROLLER_URL}/apps/${appName}/deployments`,
       {
         json: {
-          artifact_ids: artifactIDs,
-          deployments: deployments as any,
-          hooks: hooks as any,
+          ...skygearYAML,
+          artifacts,
           sync: true,
         },
       }

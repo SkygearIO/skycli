@@ -3,6 +3,7 @@ import { createFolderToPathsMapForArchive } from "./deploy";
 test("createFolderToPathsMapForArchive with template", async () => {
   const result = await createFolderToPathsMapForArchive(
     {
+      name: "svc1",
       type: "http-service",
       context: "fixture/deploy/user_code",
       path: "",
@@ -26,6 +27,7 @@ test("createFolderToPathsMapForArchive should not provide .dockerignore with tem
   await expect(
     createFolderToPathsMapForArchive(
       {
+        name: "svc1",
         type: "http-service",
         context: "fixture/deploy/user_code_with_dockerignore",
         path: "",
@@ -41,6 +43,7 @@ test("createFolderToPathsMapForArchive should not provide .dockerignore with tem
 test("createFolderToPathsMapForArchive without template", async () => {
   const result = await createFolderToPathsMapForArchive(
     {
+      name: "svc1",
       type: "http-service",
       context: "fixture/deploy/user_code_with_dockerignore",
       path: "",

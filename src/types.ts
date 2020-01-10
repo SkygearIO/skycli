@@ -1,10 +1,11 @@
-import { DeploymentItemConfig, HookConfig } from "./container/types";
 import {
   Identity,
   User,
   JSONObject,
   ExtraSessionInfoOptions,
 } from "@skygear/node-client";
+
+import { SkygearYAML } from "./container/types";
 
 export interface ClusterConfig {
   env: string | null;
@@ -38,16 +39,10 @@ export interface UserContext {
   access_token: string;
 }
 export interface CLIContext {
-  cluster: ClusterConfig | null;
-  user: UserContext | null;
-  app: string | null;
+  cluster?: ClusterConfig | null;
+  user?: UserContext | null;
+  app?: string | null;
   debug: boolean;
   verbose: boolean;
-  appConfig: AppConfig;
-}
-
-export interface AppConfig {
-  app: string;
-  deployments: { [name: string]: DeploymentItemConfig };
-  hooks: HookConfig[];
+  skygearYAML: SkygearYAML;
 }
