@@ -373,7 +373,10 @@ function downloadDeployLogImpl(
 
 async function run(argv: Arguments) {
   const { skygearYAML } = argv.context;
-  const deployments = skygearYAML.deployments || [];
+  if (skygearYAML == null) {
+    throw new Error(`skygear.yaml was not found in current directory`);
+  }
+  const deployments = skygearYAML.deployments ?? [];
   const appName = argv.context.app || "";
 
   await cliContainer.validateDeployment(appName, skygearYAML);

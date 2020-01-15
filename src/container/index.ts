@@ -12,24 +12,12 @@ import {
 } from "@skygear/node-client";
 
 import { CLIContainer } from "./CLIContainer";
-import {
-  save,
-  load,
-  createSkycliConfig,
-  updateUser,
-  getUser,
-  deleteUser,
-  migrateSkycliConfig,
-} from "../config";
+import { save, loadConfig, updateUser, getUser, deleteUser } from "../config";
 import { SkycliConfig } from "../types";
 
 class CLIYAMLContainerStorage implements ContainerStorage {
   private loadSkycliConfig(): SkycliConfig {
-    let globalConfig = migrateSkycliConfig(load("global"));
-    if (!Object.keys(globalConfig).length) {
-      globalConfig = createSkycliConfig();
-    }
-    return globalConfig;
+    return loadConfig().skycliConfig;
   }
 
   async setUser(namespace: string, user: User): Promise<void> {
