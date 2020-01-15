@@ -22,19 +22,48 @@ import path from "path";
 import untildify from "untildify";
 
 import { SkygearYAML } from "./container/types";
-import { GlobalConfig } from "./types";
-import { createGlobalConfig } from "./configUtil";
+import { ClusterConfig, SkycliConfig, ClusterUserConfig } from "./types";
 import { configPath } from "./path";
 
-export enum ConfigDomain {
-  GlobalDomain = "global",
-  ProjectDomain = "project",
-}
+export type ConfigDomain = "global" | "project";
+
+const defaultContext = "default";
+const configVersion = "v1";
 
 const configPaths: { [domain: string]: string } = {
   global: configPath("config"),
   project: "./skygear.yaml",
 };
+
+export function createSkycliConfig(): SkycliConfig {
+  return {
+    version: configVersion,
+  };
+}
+
+export function createSkycliConfigWithClusterConfig(
+  cluster: ClusterConfig
+): SkycliConfig {
+  return {
+    version: configVersion,
+    clusters: [
+      {
+        name: defaultContext,
+        cluster,
+      },
+    ],
+    contexts: [
+      {
+        name: defaultContext,
+        context: {
+          cluster: defaultContext,
+          user: defaultContext,
+        },
+      },
+    ],
+    current_context: defaultContext,
+  };
+}
 
 function findConfig(
   domain: ConfigDomain,
@@ -53,7 +82,7 @@ function findConfig(
   return fs.existsSync(fullPath) ? fullPath : undefined;
 }
 
-export function load(domain: ConfigDomain = ConfigDomain.GlobalDomain) {
+export function load(domain: ConfigDomain) {
   let content = {};
 
   const configPath = findConfig(domain);
@@ -64,10 +93,7 @@ export function load(domain: ConfigDomain = ConfigDomain.GlobalDomain) {
   return content;
 }
 
-export function save(
-  configObject: Dictionary<any>,
-  domain: ConfigDomain = ConfigDomain.GlobalDomain
-) {
+export function save(configObject: Dictionary<any>, domain: ConfigDomain) {
   let configPath = findConfig(domain);
   if (!configPath) {
     configPath = findConfig(domain, false);
@@ -82,11 +108,7 @@ export function save(
   }
 }
 
-export function set(
-  name: PropertyPath,
-  value: any,
-  domain: ConfigDomain = ConfigDomain.GlobalDomain
-) {
+export function set(name: PropertyPath, value: any, domain: ConfigDomain) {
   const configObject = load(domain);
   const oldValue = _get(configObject, name);
   if (value !== oldValue) {
@@ -95,16 +117,119 @@ export function set(
   }
 }
 
-export function loadConfig() {
-  let globalConfig = load(ConfigDomain.GlobalDomain) as GlobalConfig;
-  if (!Object.keys(globalConfig).length) {
-    globalConfig = createGlobalConfig();
+export function migrateSkycliConfig(c: any): SkycliConfig {
+  if (c.version === configVersion) {
+    return c;
   }
 
-  const skygearYAML = load(ConfigDomain.ProjectDomain) as SkygearYAML;
+  const clusters: SkycliConfig["clusters"] = [];
+  const users: SkycliConfig["users"] = [];
+  const contexts: SkycliConfig["contexts"] = [];
+
+  if (c.cluster != null) {
+    for (const name of Object.keys(c.cluster)) {
+      clusters.push({
+        name,
+        cluster: c.cluster[name],
+      });
+    }
+  }
+
+  if (c.user != null) {
+    for (const name of Object.keys(c.user)) {
+      users.push({
+        name,
+        user: c.user[name],
+      });
+    }
+  }
+
+  if (c.context != null) {
+    for (const name of Object.keys(c.context)) {
+      contexts.push({
+        name,
+        context: c.context[name],
+      });
+    }
+  }
+
+  const skycliConfig: SkycliConfig = {
+    version: configVersion,
+  };
+  if (clusters.length > 0) {
+    skycliConfig.clusters = clusters;
+  }
+  if (users.length > 0) {
+    skycliConfig.users = users;
+  }
+  if (contexts.length > 0) {
+    skycliConfig.contexts = contexts;
+  }
+  if (c.current_context != null) {
+    skycliConfig.current_context = c.current_context;
+  }
+  return skycliConfig;
+}
+
+export function loadConfig() {
+  let skycliConfig = migrateSkycliConfig(load("global"));
+  if (!Object.keys(skycliConfig).length) {
+    skycliConfig = createSkycliConfig();
+  }
+
+  const skygearYAML = load("project") as SkygearYAML;
   return {
     skygearYAML,
-    globalConfig,
+    skycliConfig,
+  };
+}
+
+export function updateUser(
+  skycliConfig: SkycliConfig,
+  name: string,
+  updater: (user: ClusterUserConfig) => ClusterUserConfig
+): SkycliConfig {
+  const users = skycliConfig.users ?? [];
+  const idx = users.findIndex(u => u.name === name);
+
+  if (idx != null && idx >= 0) {
+    return {
+      ...skycliConfig,
+      users: skycliConfig.users?.map(u => {
+        if (u.name === name) {
+          return {
+            ...u,
+            user: updater(u.user),
+          };
+        }
+        return u;
+      }),
+    };
+  }
+
+  return {
+    ...skycliConfig,
+    users: [
+      ...users,
+      {
+        name,
+        user: updater({} as any),
+      },
+    ],
+  };
+}
+
+export function getUser(
+  skycliConfig: SkycliConfig,
+  name: string
+): ClusterUserConfig | undefined {
+  return skycliConfig.users?.find(u => u.name === name)?.user;
+}
+
+export function deleteUser(skycliConfig: SkycliConfig, name: string) {
+  return {
+    ...skycliConfig,
+    users: skycliConfig.users?.filter(u => u.name !== name),
   };
 }
 

@@ -1,8 +1,7 @@
 import chalk from "chalk";
 import inquirer from "inquirer";
 
-import * as config from "../../config";
-import { createGlobalConfig } from "../../configUtil";
+import { save, createSkycliConfigWithClusterConfig } from "../../config";
 import { Arguments, createCommand } from "../../util";
 import { cliContainer } from "../../container";
 
@@ -141,15 +140,12 @@ async function run(argv: Arguments) {
   });
 
   const env = await cliContainer.getClusterEnv();
-  const newGlobalConfig = createGlobalConfig();
-  const currentContextKey = newGlobalConfig.current_context;
-  const currentClusterKey = newGlobalConfig.context[currentContextKey].cluster;
-  newGlobalConfig.cluster[currentClusterKey] = {
+  const skycliConfig = createSkycliConfigWithClusterConfig({
     endpoint: endpoint,
     api_key: apiKey,
     env: env,
-  };
-  config.save(newGlobalConfig, config.ConfigDomain.GlobalDomain);
+  });
+  save(skycliConfig, "global");
   console.log(chalk`Connected to Skygear cluster at {green ${endpoint}}.`);
 }
 
