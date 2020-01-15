@@ -41,16 +41,8 @@ export interface ForgotPasswordConfiguration {
   reply_to?: string;
 }
 
-export interface HttpHandlerConfig {
-  type: "http-handler";
-  path: string;
-  runtime_environment: string;
-  entry: string;
-  src: string;
-  secrets: string[];
-}
-
 export interface HttpServiceConfig {
+  name: string;
   type: "http-service";
   path: string;
   port: number;
@@ -74,10 +66,11 @@ export interface HookConfig {
   path: string;
 }
 
-export type DeploymentItemConfig = HttpHandlerConfig | HttpServiceConfig;
+export type DeploymentItemConfig = HttpServiceConfig;
 
-export interface DeploymentItemsMap {
-  [name: string]: DeploymentItemConfig;
+export interface DeploymentItemArtifact {
+  deploy_item_name: string;
+  artifact_id: string;
 }
 
 // artifact related models
@@ -86,7 +79,14 @@ export interface Checksum {
   md5: string;
 }
 
-export interface Artifact {
+export interface ArtifactRequest {
+  checksum_sha256: string;
+  checksum_md5: string;
+  asset_name: string;
+}
+
+export interface ArtifactResponse {
+  id: string;
   checksum_sha256: string;
   checksum_md5: string;
   asset_name: string;
@@ -143,4 +143,11 @@ export interface RemoteTemplateItem extends TemplateItem {
 export interface ListTemplateResponse {
   specs: Record<string, TemplateSpec[]>;
   items: RemoteTemplateItem[];
+}
+
+export interface SkygearYAML {
+  version?: string;
+  app?: string;
+  deployments?: DeploymentItemConfig[];
+  hooks?: HookConfig[];
 }

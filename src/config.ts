@@ -21,11 +21,10 @@ import _set from "lodash/set";
 import path from "path";
 import untildify from "untildify";
 
-import { AppConfig, GlobalConfig } from "./types";
+import { SkygearYAML } from "./container/types";
+import { GlobalConfig } from "./types";
 import { createGlobalConfig } from "./configUtil";
 import { configPath } from "./path";
-
-const currentConfigVersion = 1;
 
 export enum ConfigDomain {
   GlobalDomain = "global",
@@ -36,18 +35,6 @@ const configPaths: { [domain: string]: string } = {
   global: configPath("config"),
   project: "./skygear.yaml",
 };
-
-function migrate(configObject: Dictionary<any>) {
-  const migrated = Object.assign({}, configObject);
-  if (typeof migrated.version === "undefined") {
-    migrated.version = currentConfigVersion;
-  }
-
-  // If we have new config version in the future, migrate the config object
-  // from previous config version to the current one here.
-
-  return migrated;
-}
 
 function findConfig(
   domain: ConfigDomain,
@@ -114,9 +101,9 @@ export function loadConfig() {
     globalConfig = createGlobalConfig();
   }
 
-  const appConfig = migrate(load(ConfigDomain.ProjectDomain)) as AppConfig;
+  const skygearYAML = load(ConfigDomain.ProjectDomain) as SkygearYAML;
   return {
-    appConfig,
+    skygearYAML,
     globalConfig,
   };
 }

@@ -27,7 +27,7 @@ function decodeApp(app: any): App {
 }
 
 export class ControllerContainer<T extends BaseAPIClient> {
-  protected CONTROLLER_URL = "/_controller";
+  protected CONTROLLER_URL = "/_controller/v2.1";
   container: Container<T>;
 
   constructor(container: Container<T>) {
@@ -136,7 +136,7 @@ export class ControllerContainer<T extends BaseAPIClient> {
   async getAppConfiguration(appName: string): Promise<AppConfiguration> {
     return this.fetchAPI(
       "GET",
-      `${this.CONTROLLER_URL}/apps/${appName}/2/appconfigs`
+      `${this.CONTROLLER_URL}/apps/${appName}/appconfigs`
     ).then(({ app_config }) => {
       return app_config;
     });
@@ -151,7 +151,7 @@ export class ControllerContainer<T extends BaseAPIClient> {
     };
     return this.fetchAPI(
       "POST",
-      `${this.CONTROLLER_URL}/apps/${appName}/2/appconfigs`,
+      `${this.CONTROLLER_URL}/apps/${appName}/appconfigs`,
       {
         json: payload,
       }

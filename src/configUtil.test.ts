@@ -5,8 +5,8 @@ import {
   ClusterConfig,
   ConfigContext,
   UserContext,
-  AppConfig,
 } from "./types";
+import { SkygearYAML } from "./container/types";
 import { Arguments } from "./util";
 import { decodeUser, decodeIdentity } from "@skygear/node-client";
 
@@ -96,7 +96,7 @@ test("currentCLIContext with context1", async () => {
   const argv: Arguments = ({} as any) as Arguments;
   const config = {
     globalConfig: fixture,
-    appConfig: ({} as any) as AppConfig,
+    skygearYAML: ({} as any) as SkygearYAML,
   };
 
   const context = currentCLIContext(argv, config);
@@ -120,7 +120,7 @@ test("currentCLIContext with context2", async () => {
   const argv: Arguments = ({} as any) as Arguments;
   const config = {
     globalConfig: fixture,
-    appConfig: ({} as any) as AppConfig,
+    skygearYAML: ({} as any) as SkygearYAML,
   };
 
   const context = currentCLIContext(argv, config);
@@ -139,7 +139,7 @@ test("currentCLIContext with unknown context", async () => {
   const argv: Arguments = ({} as any) as Arguments;
   const config = {
     globalConfig: fixture,
-    appConfig: ({} as any) as AppConfig,
+    skygearYAML: ({} as any) as SkygearYAML,
   };
 
   const context = currentCLIContext(argv, config);
