@@ -31,7 +31,7 @@ export interface ConfigContext {
 type Named<Key extends string, T> = { name: string } & Record<Key, T>;
 
 export interface SkycliConfig {
-  version: string;
+  api_version: string;
   clusters?: Named<"cluster", ClusterConfig>[];
   users?: Named<"user", ClusterUserConfig>[];
   contexts?: Named<"context", ConfigContext>[];
@@ -50,5 +50,5 @@ export interface CLIContext {
   app?: string | null;
   debug: boolean;
   verbose: boolean;
-  skygearYAML: SkygearYAML;
+  skygearYAML?: SkygearYAML | null;
 }

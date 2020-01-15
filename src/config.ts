@@ -15,7 +15,7 @@
  */
 import fs from "fs-extra";
 import * as yaml from "js-yaml";
-import { Dictionary, PropertyPath } from "lodash";
+import { PropertyPath } from "lodash";
 import _get from "lodash/get";
 import _set from "lodash/set";
 import path from "path";
@@ -37,7 +37,7 @@ const configPaths: { [domain: string]: string } = {
 
 export function createSkycliConfig(): SkycliConfig {
   return {
-    version: configVersion,
+    api_version: configVersion,
   };
 }
 
@@ -45,7 +45,7 @@ export function createSkycliConfigWithClusterConfig(
   cluster: ClusterConfig
 ): SkycliConfig {
   return {
-    version: configVersion,
+    api_version: configVersion,
     clusters: [
       {
         name: defaultContext,
@@ -82,18 +82,15 @@ function findConfig(
   return fs.existsSync(fullPath) ? fullPath : undefined;
 }
 
-export function load(domain: ConfigDomain) {
-  let content = {};
-
+export function load(domain: ConfigDomain): object | undefined {
   const configPath = findConfig(domain);
   if (configPath) {
-    content = yaml.safeLoad(fs.readFileSync(configPath, "utf-8"));
+    return yaml.safeLoad(fs.readFileSync(configPath, "utf-8"));
   }
-
-  return content;
+  return undefined;
 }
 
-export function save(configObject: Dictionary<any>, domain: ConfigDomain) {
+export function save(configObject: object, domain: ConfigDomain) {
   let configPath = findConfig(domain);
   if (!configPath) {
     configPath = findConfig(domain, false);
@@ -109,7 +106,7 @@ export function save(configObject: Dictionary<any>, domain: ConfigDomain) {
 }
 
 export function set(name: PropertyPath, value: any, domain: ConfigDomain) {
-  const configObject = load(domain);
+  const configObject = load(domain) ?? {};
   const oldValue = _get(configObject, name);
   if (value !== oldValue) {
     _set(configObject, name, value);
@@ -117,9 +114,9 @@ export function set(name: PropertyPath, value: any, domain: ConfigDomain) {
   }
 }
 
-export function migrateSkycliConfig(c: any): SkycliConfig {
-  if (c.version === configVersion) {
-    return c;
+export function migrateSkycliConfig(c: { [key: string]: any }): SkycliConfig {
+  if (c.api_version === configVersion) {
+    return c as SkycliConfig;
   }
 
   const clusters: SkycliConfig["clusters"] = [];
@@ -154,7 +151,7 @@ export function migrateSkycliConfig(c: any): SkycliConfig {
   }
 
   const skycliConfig: SkycliConfig = {
-    version: configVersion,
+    api_version: configVersion,
   };
   if (clusters.length > 0) {
     skycliConfig.clusters = clusters;
@@ -171,10 +168,22 @@ export function migrateSkycliConfig(c: any): SkycliConfig {
   return skycliConfig;
 }
 
-export function loadConfig() {
-  let skycliConfig = migrateSkycliConfig(load("global"));
-  if (!Object.keys(skycliConfig).length) {
+export function loadConfig(): {
+  skygearYAML?: SkygearYAML;
+  skycliConfig: SkycliConfig;
+} {
+  const loadedConfig = load("global");
+
+  let skycliConfig: SkycliConfig;
+  if (loadedConfig == null) {
     skycliConfig = createSkycliConfig();
+  } else {
+    skycliConfig = migrateSkycliConfig(loadedConfig);
+  }
+
+  // Migrated; Save the migrated config.
+  if (loadedConfig != null && skycliConfig !== loadedConfig) {
+    save(skycliConfig, "global");
   }
 
   const skygearYAML = load("project") as SkygearYAML;

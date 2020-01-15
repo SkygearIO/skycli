@@ -20,13 +20,13 @@ import { decodeUser, decodeIdentity } from "@skygear/node-client";
 
 export function currentCLIContext(
   argv: Arguments,
-  config: { skygearYAML: SkygearYAML; skycliConfig: SkycliConfig }
+  config: { skygearYAML?: SkygearYAML; skycliConfig: SkycliConfig }
 ): CLIContext {
   const { skygearYAML, skycliConfig } = config;
   const currentContextKey = skycliConfig.current_context;
 
   // specify app in command or from config file
-  const app = (argv.app as string) || skygearYAML.app;
+  const app = (argv.app as string | undefined) ?? skygearYAML?.app;
 
   const context = skycliConfig.contexts?.find(
     c => c.name === currentContextKey
