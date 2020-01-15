@@ -37,7 +37,7 @@ const configPaths: { [domain: string]: string } = {
 
 export function createSkycliConfig(): SkycliConfig {
   return {
-    version: configVersion,
+    api_version: configVersion,
   };
 }
 
@@ -45,7 +45,7 @@ export function createSkycliConfigWithClusterConfig(
   cluster: ClusterConfig
 ): SkycliConfig {
   return {
-    version: configVersion,
+    api_version: configVersion,
     clusters: [
       {
         name: defaultContext,
@@ -118,7 +118,7 @@ export function set(name: PropertyPath, value: any, domain: ConfigDomain) {
 }
 
 export function migrateSkycliConfig(c: any): SkycliConfig {
-  if (c.version === configVersion) {
+  if (c.api_version === configVersion) {
     return c;
   }
 
@@ -154,7 +154,7 @@ export function migrateSkycliConfig(c: any): SkycliConfig {
   }
 
   const skycliConfig: SkycliConfig = {
-    version: configVersion,
+    api_version: configVersion,
   };
   if (clusters.length > 0) {
     skycliConfig.clusters = clusters;

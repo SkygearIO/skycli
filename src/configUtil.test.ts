@@ -4,7 +4,7 @@ import { SkygearYAML } from "./container/types";
 import { Arguments } from "./util";
 
 const fixture: SkycliConfig = {
-  version: "1",
+  api_version: "v1",
   clusters: [
     {
       name: "server1",
