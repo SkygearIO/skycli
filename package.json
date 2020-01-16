@@ -7,9 +7,9 @@
     "skycli": "./dist/skycli.js"
   },
   "scripts": {
-    "prepare": "rollup --config",
-    "skycli": "rollup --config && ./dist/skycli.js",
-    "build-bin": "npm run prepare && mkdir -p dist-bin && pkg --out-path dist-bin --targets node10-macos,node10-linux,node10-win .",
+    "prepublishOnly": "rollup --config",
+    "skycli": "npm run prepublishOnly && ./dist/skycli.js",
+    "build-bin": "rollup --config --environment PKG && mkdir -p dist-bin && pkg --out-path dist-bin --targets node10-macos,node10-linux,node10-win .",
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint 'src/**/*.ts'",
@@ -61,6 +61,7 @@
     "@rollup/plugin-commonjs": "11.0.1",
     "@rollup/plugin-json": "4.0.1",
     "@rollup/plugin-node-resolve": "7.0.0",
+    "@rollup/plugin-replace": "2.3.0",
     "@types/fs-extra": "5.1.0",
     "@types/inquirer": "6.5.0",
     "@types/jest": "24.0.25",

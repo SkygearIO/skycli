@@ -4,6 +4,7 @@ import babel from "rollup-plugin-babel";
 import commonjs from "@rollup/plugin-commonjs";
 import json from "@rollup/plugin-json";
 import resolve from "@rollup/plugin-node-resolve";
+import replace from "@rollup/plugin-replace";
 
 const getBuiltins = require("builtins");
 
@@ -26,6 +27,14 @@ const plugins = [
   }),
   commonjs({
     include: "node_modules/**",
+  }),
+  replace({
+    // NOTE(program-path): The environment variable PKG is a placeholder
+    // to be replaced at BUILD time. It is used by a function to tell
+    // the program path. See the comment in that for details.
+    "process.env.PKG": JSON.stringify(
+      process.env.PKG === "true" ? "true" : "false"
+    ),
   }),
   babel({
     extensions,
