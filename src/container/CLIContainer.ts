@@ -30,10 +30,8 @@ function encodeLogEntry(input: any): LogEntry {
 export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
   T
 > {
-  async getClusterEnv(): Promise<string> {
-    return this.fetchAPI("GET", `${this.CONTROLLER_URL}/configs`).then(
-      ({ env }) => env
-    );
+  async getClusterConfig(): Promise<{ env: string; cluster_name: string }> {
+    return this.fetchAPI("GET", `${this.CONTROLLER_URL}/configs`);
   }
 
   async getDeployment(

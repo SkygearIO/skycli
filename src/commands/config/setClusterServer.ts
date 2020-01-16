@@ -139,7 +139,7 @@ async function run(argv: Arguments) {
     apiKey,
   });
 
-  const env = await cliContainer.getClusterEnv();
+  const { env } = await cliContainer.getClusterConfig();
   const skycliConfig = createSkycliConfigWithClusterConfig({
     endpoint: endpoint,
     api_key: apiKey,
