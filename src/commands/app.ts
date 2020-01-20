@@ -13,6 +13,7 @@ import updateTemplates from "./app/updateTemplates";
 import downloadTemplates from "./app/downloadTemplates";
 import getK8SCredentials from "./app/getK8SCredentials";
 import getK8STokenRequest from "./app/getK8STokenRequest";
+import deleteK8SCredentials from "./app/deleteK8SCredentials";
 
 const subCommands = [
   appCreate,
@@ -29,6 +30,7 @@ const subCommands = [
   downloadTemplates,
   getK8SCredentials,
   getK8STokenRequest,
+  deleteK8SCredentials,
 ];
 
 function run(_argv: Arguments) {
