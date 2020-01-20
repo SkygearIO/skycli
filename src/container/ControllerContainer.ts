@@ -87,8 +87,10 @@ export class ControllerContainer<T extends BaseAPIClient> {
   async createSecret(
     appName: string,
     secretName: string,
-    secretValue: string,
-    secretType: string
+    secretType: string,
+    secretValue?: string,
+    secretCert?: string,
+    secretKey?: string
   ): Promise<void> {
     return this.fetchAPI(
       "POST",
@@ -98,6 +100,8 @@ export class ControllerContainer<T extends BaseAPIClient> {
           secret_name: secretName,
           secret_value: secretValue,
           secret_type: secretType,
+          tls_cert: secretCert,
+          tls_key: secretKey,
         },
       }
     );
