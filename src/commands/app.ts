@@ -11,6 +11,7 @@ import removeCollaboartor from "./app/removeCollaboartor";
 import listTemplates from "./app/listTemplates";
 import updateTemplates from "./app/updateTemplates";
 import downloadTemplates from "./app/downloadTemplates";
+import getK8SCredentials from "./app/getK8SCredentials";
 
 const subCommands = [
   appCreate,
@@ -25,6 +26,7 @@ const subCommands = [
   listTemplates,
   updateTemplates,
   downloadTemplates,
+  getK8SCredentials,
 ];
 
 function run(_argv: Arguments) {
