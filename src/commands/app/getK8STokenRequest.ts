@@ -1,18 +1,40 @@
 import { Arguments, createCommand } from "../../util";
 import { requireClusterConfig, requireUser, requireApp } from "../middleware";
 import { cliContainer } from "../../container";
+import { cacheString } from "../../cache";
 
 async function run(argv: Arguments) {
-  const appName = argv.context.app ?? "";
-  const {
-    token_request: { status },
-  } = await cliContainer.getTokenRequest(appName);
-  const execCredential = {
-    apiVersion: "client.authentication.k8s.io/v1beta1",
-    kind: "ExecCredential",
-    status,
-  };
-  console.log(JSON.stringify(execCredential));
+  // TODO(get-k8s-credentials): Support --context
+  const cacheKey = `ExecCredential_${argv.context.skycliConfig
+    ?.current_context ?? ""}`;
+
+  const content = await cacheString({
+    cacheKey,
+    create: async () => {
+      const appName = argv.context.app ?? "";
+      const {
+        token_request: { status },
+      } = await cliContainer.getTokenRequest(appName);
+      const execCredential = {
+        apiVersion: "client.authentication.k8s.io/v1beta1",
+        kind: "ExecCredential",
+        status,
+      };
+      return JSON.stringify(execCredential);
+    },
+    validate: async (content: string) => {
+      const execCredential = JSON.parse(content);
+      const now = new Date();
+      const date = new Date(execCredential.status.expirationTimestamp);
+      if (isNaN(date.getTime())) {
+        throw new Error();
+      }
+      if (date <= now) {
+        throw new Error();
+      }
+    },
+  });
+  console.log(content);
 }
 
 export default createCommand({

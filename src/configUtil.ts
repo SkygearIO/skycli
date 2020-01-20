@@ -49,6 +49,7 @@ export function currentCLIContext(
 
   return {
     skygearYAML,
+    skycliConfig,
     app,
     cluster,
     user,
