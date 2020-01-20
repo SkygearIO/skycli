@@ -48,6 +48,7 @@
     "moment": "2.24.0",
     "node-fetch": "1.7.3",
     "tar-fs": "2.0.0",
+    "tmp-promise": "2.0.2",
     "untildify": "3.0.3",
     "yargs": "13.3.0"
   },
@@ -72,6 +73,7 @@
     "@types/node": "10.17.13",
     "@types/node-fetch": "2.5.4",
     "@types/query-string": "5.1.0",
+    "@types/tmp": "0.1.0",
     "@types/untildify": "3.0.0",
     "@types/yargs": "13.0.4",
     "builtins": "3.0.0",
