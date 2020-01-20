@@ -13,6 +13,7 @@ import {
   Collaborator,
   ListTemplateResponse,
   TemplateItem,
+  CustomDomainResponse,
 } from "./types";
 
 function decodeApp(app: any): App {
@@ -210,6 +211,21 @@ export class ControllerContainer<T extends BaseAPIClient> {
         json: {
           app_name: appName,
           template_items: templateItems,
+        },
+      }
+    );
+  }
+
+  async addDomain(
+    appName: string,
+    domain: string
+  ): Promise<CustomDomainResponse> {
+    return this.fetchAPI(
+      "POST",
+      `${this.CONTROLLER_URL}/apps/${appName}/custom_domains`,
+      {
+        json: {
+          domain: domain,
         },
       }
     );

@@ -145,6 +145,48 @@ export interface ListTemplateResponse {
   items: RemoteTemplateItem[];
 }
 
+export interface CustomDomain {
+  id: string;
+  app_id: string;
+  domain: string;
+  verified: boolean;
+  dns_records: DNSRecord[];
+  created_at: Date;
+  updated_at: Date;
+  verified_at?: Date;
+  created_by: string;
+  updated_by: string;
+  verified_by?: string;
+  root_domain_id: string;
+  redirect_domain?: string;
+  tls_secret_id?: string;
+  tls_secret_expiry?: Date;
+}
+
+export interface RootDomain {
+  id: string;
+  app_id: string;
+  domain: string;
+  verified: boolean;
+  dns_records: DNSRecord[];
+  created_at: Date;
+  verified_at?: Date;
+  created_by: string;
+  verified_by?: string;
+}
+
+export type DNSRecordType = "A" | "TXT";
+export interface DNSRecord {
+  host: string;
+  type: DNSRecordType;
+  value: string;
+}
+
+export interface CustomDomainResponse {
+  custom_domain: CustomDomain;
+  root_domain: RootDomain;
+}
+
 export interface SkygearYAML {
   version?: string;
   app?: string;
