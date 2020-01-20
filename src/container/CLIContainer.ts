@@ -34,6 +34,36 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
     return this.fetchAPI("GET", `${this.CONTROLLER_URL}/configs`);
   }
 
+  async createServiceAccount(
+    appName: string
+  ): Promise<{
+    server: string;
+    certificate_authority_data?: string;
+  }> {
+    return this.fetchAPI(
+      "POST",
+      `${this.CONTROLLER_URL}/apps/${appName}/service_accounts`,
+      { json: {} }
+    );
+  }
+
+  async getTokenRequest(
+    appName: string
+  ): Promise<{
+    token_request: {
+      status: {
+        token: string;
+        expirationTimestamp: string;
+      };
+    };
+  }> {
+    return this.fetchAPI(
+      "POST",
+      `${this.CONTROLLER_URL}/apps/${appName}/service_accounts/access_token`,
+      { json: {} }
+    );
+  }
+
   async getDeployment(
     appName: string,
     deploymentID: string
