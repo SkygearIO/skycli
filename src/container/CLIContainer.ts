@@ -30,9 +30,37 @@ function encodeLogEntry(input: any): LogEntry {
 export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
   T
 > {
-  async getClusterEnv(): Promise<string> {
-    return this.fetchAPI("GET", `${this.CONTROLLER_URL}/configs`).then(
-      ({ env }) => env
+  async getClusterConfig(): Promise<{ env: string; cluster_name: string }> {
+    return this.fetchAPI("GET", `${this.CONTROLLER_URL}/configs`);
+  }
+
+  async createServiceAccount(
+    appName: string
+  ): Promise<{
+    server: string;
+    certificate_authority_data?: string;
+  }> {
+    return this.fetchAPI(
+      "POST",
+      `${this.CONTROLLER_URL}/apps/${appName}/service_accounts`,
+      { json: {} }
+    );
+  }
+
+  async getTokenRequest(
+    appName: string
+  ): Promise<{
+    token_request: {
+      status: {
+        token: string;
+        expirationTimestamp: string;
+      };
+    };
+  }> {
+    return this.fetchAPI(
+      "POST",
+      `${this.CONTROLLER_URL}/apps/${appName}/service_accounts/access_token`,
+      { json: {} }
     );
   }
 

@@ -51,4 +51,5 @@ export interface CLIContext {
   debug: boolean;
   verbose: boolean;
   skygearYAML?: SkygearYAML | null;
+  skycliConfig?: SkycliConfig | null;
 }
