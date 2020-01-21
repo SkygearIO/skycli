@@ -18,20 +18,28 @@ async function run(argv: Arguments) {
       const execCredential = {
         apiVersion: "client.authentication.k8s.io/v1beta1",
         kind: "ExecCredential",
-        status,
+        status: {
+          // Ideally we should include expirationTimestamp
+          // but it seems that including it will make
+          // kubectl keeps emitting 401 error.
+          token: status.token,
+        },
       };
       return JSON.stringify(execCredential);
     },
-    validate: async (content: string) => {
-      const execCredential = JSON.parse(content);
-      const now = new Date();
-      const date = new Date(execCredential.status.expirationTimestamp);
-      if (isNaN(date.getTime())) {
-        throw new Error();
-      }
-      if (date <= now) {
-        throw new Error();
-      }
+    validate: async (_content: string) => {
+      // We do not include expirationTimestamp now
+      // So there is no way to validate the cache.
+      throw new Error();
+      // const execCredential = JSON.parse(content);
+      // const now = new Date();
+      // const date = new Date(execCredential.status.expirationTimestamp);
+      // if (isNaN(date.getTime())) {
+      //   throw new Error();
+      // }
+      // if (date <= now) {
+      //   throw new Error();
+      // }
     },
   });
   console.log(content);
