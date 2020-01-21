@@ -1,8 +1,8 @@
 import { spawnSync } from "child_process";
-import { writeFileSync } from "fs";
 
 import chalk from "chalk";
 import { withFile } from "tmp-promise";
+import { ensureFile, writeFile } from "fs-extra";
 
 import { Arguments, createCommand } from "../../util";
 import { programPath } from "../../program";
@@ -27,12 +27,12 @@ async function run(argv: Arguments) {
       server,
     ];
     if (certificate_authority_data != null) {
-      writeFileSync(path, certificate_authority_data, { encoding: "base64" });
+      await ensureFile(path);
+      await writeFile(path, certificate_authority_data, { encoding: "base64" });
       setClusterArgs = setClusterArgs.concat([
         "--certificate-authority",
         path,
         "--embed-certs",
-        "true",
       ]);
     }
 
@@ -43,7 +43,7 @@ async function run(argv: Arguments) {
       contextName,
       "--exec-command",
       programPath(),
-      "--exec-api-version=client.authentication.k8s.io/v1beta",
+      "--exec-api-version=client.authentication.k8s.io/v1beta1",
       "--exec-arg=--app",
       "--exec-arg",
       appName,
