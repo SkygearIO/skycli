@@ -29,7 +29,7 @@ function decodeApp(app: any): App {
 }
 
 export class ControllerContainer<T extends BaseAPIClient> {
-  protected CONTROLLER_URL = "/_controller/v2.1";
+  protected CONTROLLER_URL = `/_controller/${process.env.API_VERSION}`;
   container: Container<T>;
 
   constructor(container: Container<T>) {
