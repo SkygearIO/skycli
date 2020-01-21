@@ -1,3 +1,23 @@
+## 2.1.0 (2020-01-21)
+
+### Breaking Changes
+
+- Update skygear.yaml format
+- Apply API versioning
+
+### Features
+
+- Add custom domain commands (#181)
+- Implement k8s credential commands
+- Strict command line options (#96)
+- Remove signup invitation flow
+
+### Internals
+
+- Upgrade skygear node client
+- Update dependencies
+- Replace gulp with rollup
+
 ## 2.0.0-alpha.7 (2019-11-29)
 
 ### Features
