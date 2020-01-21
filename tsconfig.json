@@ -9,7 +9,7 @@
     "noUnusedParameters": true,
     "strict": true,
     "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "target": "es5",
     "lib": [
       "es2015",
