@@ -187,6 +187,11 @@ export interface CustomDomainResponse {
   root_domain: RootDomain;
 }
 
+export interface CustomDomainsResponse {
+  custom_domains: CustomDomain[];
+  root_domains: RootDomain[];
+}
+
 export interface SkygearYAML {
   version?: string;
   app?: string;

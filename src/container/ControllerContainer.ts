@@ -14,6 +14,7 @@ import {
   ListTemplateResponse,
   TemplateItem,
   CustomDomainResponse,
+  CustomDomainsResponse,
 } from "./types";
 
 function decodeApp(app: any): App {
@@ -228,6 +229,13 @@ export class ControllerContainer<T extends BaseAPIClient> {
           domain: domain,
         },
       }
+    );
+  }
+
+  async getDomains(appName: string): Promise<CustomDomainsResponse> {
+    return this.fetchAPI(
+      "GET",
+      `${this.CONTROLLER_URL}/apps/${appName}/custom_domains`
     );
   }
 }
