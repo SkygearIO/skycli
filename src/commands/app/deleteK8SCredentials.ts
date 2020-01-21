@@ -3,7 +3,12 @@ import { spawnSync } from "child_process";
 import chalk from "chalk";
 
 import { Arguments, createCommand } from "../../util";
-import { requireClusterConfig, requireUser, requireApp } from "../middleware";
+import {
+  requireClusterConfig,
+  requireUser,
+  requireApp,
+  requireProgram,
+} from "../middleware";
 import { cliContainer } from "../../container";
 
 async function run(argv: Arguments) {
@@ -38,7 +43,8 @@ export default createCommand({
     return yargs
       .middleware(requireClusterConfig)
       .middleware(requireUser)
-      .middleware(requireApp);
+      .middleware(requireApp)
+      .middleware(requireProgram("kubectl") as any);
   },
   command: "delete-k8s-credentials",
   describe: "Delete k8s credentials with kubectl",

@@ -6,7 +6,12 @@ import { ensureFile, writeFile } from "fs-extra";
 
 import { Arguments, createCommand } from "../../util";
 import { programPath } from "../../program";
-import { requireClusterConfig, requireUser, requireApp } from "../middleware";
+import {
+  requireClusterConfig,
+  requireUser,
+  requireApp,
+  requireProgram,
+} from "../middleware";
 import { cliContainer } from "../../container";
 
 async function run(argv: Arguments) {
@@ -73,7 +78,8 @@ export default createCommand({
     return yargs
       .middleware(requireClusterConfig)
       .middleware(requireUser)
-      .middleware(requireApp);
+      .middleware(requireApp)
+      .middleware(requireProgram("kubectl") as any);
   },
   command: "get-k8s-credentials",
   describe: "Write k8s credentials with kubectl",
