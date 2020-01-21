@@ -11,6 +11,7 @@ import {
   requireUser,
   requireApp,
   requireProgram,
+  requireKubectlVersion,
 } from "../middleware";
 import { cliContainer } from "../../container";
 
@@ -75,11 +76,15 @@ async function run(argv: Arguments) {
 
 export default createCommand({
   builder: yargs => {
-    return yargs
-      .middleware(requireClusterConfig)
-      .middleware(requireUser)
-      .middleware(requireApp)
-      .middleware(requireProgram("kubectl") as any);
+    return (
+      yargs
+        .middleware(requireClusterConfig)
+        .middleware(requireUser)
+        .middleware(requireApp)
+        .middleware(requireProgram("kubectl") as any)
+        // kubectl config set-credentials --exec-* requires >= 1.15
+        .middleware(requireKubectlVersion(1, 15) as any)
+    );
   },
   command: "get-k8s-credentials",
   describe: "Write k8s credentials with kubectl",
