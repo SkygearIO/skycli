@@ -33,7 +33,7 @@
   },
   "homepage": "https://skygear.io/",
   "dependencies": {
-    "@skygear/node-client": "2.0.0-alpha.16",
+    "@skygear/node-client": "2.1.0",
     "@zeit/dockerignore": "0.0.5",
     "chalk": "2.4.2",
     "cli-table3": "0.5.1",
