@@ -90,7 +90,7 @@ For detailed information on this command and its flags, run:
   skycli ${command} help`;
 }
 
-export function displayDate(date: Date): string {
+export function displayDate(date: string | Date): string {
   return date && moment(date).format("YYYY-MM-DD HH:mm:ss Z");
 }
 

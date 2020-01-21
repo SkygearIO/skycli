@@ -13,6 +13,8 @@ import {
   Collaborator,
   ListTemplateResponse,
   TemplateItem,
+  CustomDomainResponse,
+  CustomDomainsResponse,
 } from "./types";
 
 function decodeApp(app: any): App {
@@ -87,8 +89,10 @@ export class ControllerContainer<T extends BaseAPIClient> {
   async createSecret(
     appName: string,
     secretName: string,
-    secretValue: string,
-    secretType: string
+    secretType: string,
+    secretValue?: string,
+    secretCert?: string,
+    secretKey?: string
   ): Promise<void> {
     return this.fetchAPI(
       "POST",
@@ -98,6 +102,8 @@ export class ControllerContainer<T extends BaseAPIClient> {
           secret_name: secretName,
           secret_value: secretValue,
           secret_type: secretType,
+          tls_cert: secretCert,
+          tls_key: secretKey,
         },
       }
     );
@@ -208,6 +214,60 @@ export class ControllerContainer<T extends BaseAPIClient> {
           template_items: templateItems,
         },
       }
+    );
+  }
+
+  async addDomain(
+    appName: string,
+    domain: string
+  ): Promise<CustomDomainResponse> {
+    return this.fetchAPI(
+      "POST",
+      `${this.CONTROLLER_URL}/apps/${appName}/custom_domains`,
+      {
+        json: {
+          domain: domain,
+        },
+      }
+    );
+  }
+
+  async getDomains(appName: string): Promise<CustomDomainsResponse> {
+    return this.fetchAPI(
+      "GET",
+      `${this.CONTROLLER_URL}/apps/${appName}/custom_domains`
+    );
+  }
+
+  async verifyDomain(appName: string, customDomainID: string): Promise<void> {
+    return this.fetchAPI(
+      "POST",
+      `${this.CONTROLLER_URL}/apps/${appName}/custom_domains/${customDomainID}/verify`
+    );
+  }
+
+  async updateDomain(
+    appName: string,
+    customDomainID: string,
+    redirectDomain?: string,
+    tlsSecretName?: string
+  ): Promise<void> {
+    return this.fetchAPI(
+      "PUT",
+      `${this.CONTROLLER_URL}/apps/${appName}/custom_domains/${customDomainID}`,
+      {
+        json: {
+          redirect_domain: redirectDomain,
+          tls_secret_name: tlsSecretName,
+        },
+      }
+    );
+  }
+
+  async deleteDomain(appName: string, customDomainID: string): Promise<void> {
+    return this.fetchAPI(
+      "DELETE",
+      `${this.CONTROLLER_URL}/apps/${appName}/custom_domains/${customDomainID}`
     );
   }
 }

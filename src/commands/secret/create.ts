@@ -7,19 +7,21 @@ import { cliContainer } from "../../container";
 
 async function run(argv: Arguments) {
   const secretName = argv.name as string;
-  const secretValue = (argv.value || argv.file) as string;
   const secretType = argv.type as string;
-  const encodedValue = Buffer.from(secretValue).toString("base64");
   await cliContainer.createSecret(
     argv.context.app || "",
     secretName,
-    encodedValue,
-    secretType
+    secretType,
+    argv.encodedValue as string | undefined,
+    argv.encodedCert as string | undefined,
+    argv.encodedKey as string | undefined
   );
   console.log(chalk`{green Success!} Created secret ${secretName}`);
 }
 
-const requireSecretValue = (function(argv: Arguments): Promise<void> {
+const parseSecretValue = function(
+  argv: Arguments
+): Promise<{ [key: string]: string }> {
   let crt = 0;
   if (argv.value) {
     crt++;
@@ -39,7 +41,30 @@ const requireSecretValue = (function(argv: Arguments): Promise<void> {
     );
   }
 
-  return Promise.resolve();
+  const secretValue = (argv.value || argv.file) as string;
+  const encodedValue = Buffer.from(secretValue).toString("base64");
+  return Promise.resolve({ encodedValue });
+};
+
+const parseSecretTLS = function(
+  argv: Arguments
+): Promise<{ [key: string]: string }> {
+  if (!argv.cert || !argv.key) {
+    return Promise.reject(
+      chalk`{red ERROR:} Cert and key are required for TLS secret`
+    );
+  }
+
+  const encodedCert = Buffer.from(argv.cert as string).toString("base64");
+  const encodedKey = Buffer.from(argv.key as string).toString("base64");
+  return Promise.resolve({ encodedCert, encodedKey });
+};
+
+const parseSecretValues = (function(argv: Arguments): Promise<any> {
+  if (argv.type === "tls") {
+    return parseSecretTLS(argv);
+  }
+  return parseSecretValue(argv);
 } as any) as MiddlewareFunction;
 
 export default createCommand({
@@ -48,7 +73,7 @@ export default createCommand({
       .middleware(requireClusterConfig)
       .middleware(requireUser)
       .middleware(requireApp)
-      .middleware(requireSecretValue)
+      .middleware(parseSecretValues)
       .demandOption(["name"])
       .option("name", {
         desc:
@@ -63,7 +88,7 @@ export default createCommand({
         desc: "Secret type",
         type: "string",
         default: "opaque",
-        choices: ["opaque", "dockerconfigjson"],
+        choices: ["opaque", "dockerconfigjson", "tls"],
       })
       .option("file", {
         alias: "f",
@@ -71,6 +96,20 @@ export default createCommand({
         type: "string",
       })
       .coerce("file", function(arg) {
+        return require("fs").readFileSync(arg, "utf8");
+      })
+      .option("cert", {
+        desc: "PEM encoded public key certificate file",
+        type: "string",
+      })
+      .coerce("cert", function(arg) {
+        return require("fs").readFileSync(arg, "utf8");
+      })
+      .option("key", {
+        desc: "PEM encoded private key file associated with given certificate",
+        type: "string",
+      })
+      .coerce("key", function(arg) {
         return require("fs").readFileSync(arg, "utf8");
       });
   },

@@ -12,8 +12,8 @@ export type SecretType = "opaque" | "dockerconfigjson";
 export interface Secret {
   name: string;
   type: SecretType;
-  created_at: Date;
-  updated_at: Date;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface AppConfiguration {
@@ -143,6 +143,53 @@ export interface RemoteTemplateItem extends TemplateItem {
 export interface ListTemplateResponse {
   specs: Record<string, TemplateSpec[]>;
   items: RemoteTemplateItem[];
+}
+
+export interface CustomDomain {
+  id: string;
+  app_id: string;
+  domain: string;
+  verified: boolean;
+  dns_records: DNSRecord[];
+  created_at: string;
+  updated_at: string;
+  verified_at?: string;
+  created_by: string;
+  updated_by: string;
+  verified_by?: string;
+  root_domain_id: string;
+  redirect_domain?: string;
+  tls_secret_id?: string;
+  tls_secret_expiry?: string;
+}
+
+export interface RootDomain {
+  id: string;
+  app_id: string;
+  domain: string;
+  verified: boolean;
+  dns_records: DNSRecord[];
+  created_at: string;
+  verified_at?: string;
+  created_by: string;
+  verified_by?: string;
+}
+
+export type DNSRecordType = "A" | "TXT";
+export interface DNSRecord {
+  host: string;
+  type: DNSRecordType;
+  value: string;
+}
+
+export interface CustomDomainResponse {
+  custom_domain: CustomDomain;
+  root_domain: RootDomain;
+}
+
+export interface CustomDomainsResponse {
+  custom_domains: CustomDomain[];
+  root_domains: RootDomain[];
 }
 
 export interface SkygearYAML {
