@@ -4,6 +4,7 @@ import domainList from "./domain/list";
 import domainView from "./domain/view";
 import domainVerify from "./domain/verify";
 import domainUpdate from "./domain/update";
+import domainRemove from "./domain/remove";
 
 const subCommands = [
   domainAdd,
@@ -11,6 +12,7 @@ const subCommands = [
   domainView,
   domainVerify,
   domainUpdate,
+  domainRemove,
 ];
 
 function run(_argv: Arguments) {

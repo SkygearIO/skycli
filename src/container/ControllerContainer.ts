@@ -263,4 +263,11 @@ export class ControllerContainer<T extends BaseAPIClient> {
       }
     );
   }
+
+  async deleteDomain(appName: string, customDomainID: string): Promise<void> {
+    return this.fetchAPI(
+      "DELETE",
+      `${this.CONTROLLER_URL}/apps/${appName}/custom_domains/${customDomainID}`
+    );
+  }
 }
