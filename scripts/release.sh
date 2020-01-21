@@ -34,6 +34,10 @@ else
 fi
 
 npm run clean
+npm run prettier-check
+npm run lint
+npm run typecheck
+npm test
 npm --no-git-tag-version version "$SKYGEAR_VERSION"
 
 touch NEWCHANGELOG && cat new-release > NEWCHANGELOG && echo "" >> NEWCHANGELOG && cat CHANGELOG.md >> NEWCHANGELOG && mv NEWCHANGELOG CHANGELOG.md
