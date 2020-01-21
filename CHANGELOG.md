@@ -1,3 +1,13 @@
+## 2.1.1 (2020-01-21)
+
+### Bug Fixes
+
+- Stub unused storage methods
+
+### Internals
+
+- Run prettier,lint,typecheck,test before deploy
+
 ## 2.1.0 (2020-01-21)
 
 ### Breaking Changes
