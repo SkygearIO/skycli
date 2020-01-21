@@ -238,4 +238,11 @@ export class ControllerContainer<T extends BaseAPIClient> {
       `${this.CONTROLLER_URL}/apps/${appName}/custom_domains`
     );
   }
+
+  async verifyDomain(appName: string, customDomainID: string): Promise<void> {
+    return this.fetchAPI(
+      "POST",
+      `${this.CONTROLLER_URL}/apps/${appName}/custom_domains/${customDomainID}/verify`
+    );
+  }
 }
