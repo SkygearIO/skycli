@@ -212,6 +212,21 @@ class CLIYAMLContainerStorage implements ContainerStorage {
       "global"
     );
   }
+
+  async setOAuthCodeVerifier(
+    _namespace: string,
+    _authorizationCode: string
+  ): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+
+  async getOAuthCodeVerifier(_namespace: string): Promise<string | null> {
+    throw new Error("Method not implemented.");
+  }
+
+  async delOAuthCodeVerifier(_namespace: string): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
 }
 
 export const cliContainer = new CLIContainer(
