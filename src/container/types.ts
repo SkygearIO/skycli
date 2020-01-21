@@ -12,8 +12,8 @@ export type SecretType = "opaque" | "dockerconfigjson";
 export interface Secret {
   name: string;
   type: SecretType;
-  created_at: Date;
-  updated_at: Date;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface AppConfiguration {
@@ -151,16 +151,16 @@ export interface CustomDomain {
   domain: string;
   verified: boolean;
   dns_records: DNSRecord[];
-  created_at: Date;
-  updated_at: Date;
-  verified_at?: Date;
+  created_at: string;
+  updated_at: string;
+  verified_at?: string;
   created_by: string;
   updated_by: string;
   verified_by?: string;
   root_domain_id: string;
   redirect_domain?: string;
   tls_secret_id?: string;
-  tls_secret_expiry?: Date;
+  tls_secret_expiry?: string;
 }
 
 export interface RootDomain {
@@ -169,8 +169,8 @@ export interface RootDomain {
   domain: string;
   verified: boolean;
   dns_records: DNSRecord[];
-  created_at: Date;
-  verified_at?: Date;
+  created_at: string;
+  verified_at?: string;
   created_by: string;
   verified_by?: string;
 }
