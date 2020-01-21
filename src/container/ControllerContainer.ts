@@ -245,4 +245,22 @@ export class ControllerContainer<T extends BaseAPIClient> {
       `${this.CONTROLLER_URL}/apps/${appName}/custom_domains/${customDomainID}/verify`
     );
   }
+
+  async updateDomain(
+    appName: string,
+    customDomainID: string,
+    redirectDomain?: string,
+    tlsSecretName?: string
+  ): Promise<void> {
+    return this.fetchAPI(
+      "PUT",
+      `${this.CONTROLLER_URL}/apps/${appName}/custom_domains/${customDomainID}`,
+      {
+        json: {
+          redirect_domain: redirectDomain,
+          tls_secret_name: tlsSecretName,
+        },
+      }
+    );
+  }
 }
