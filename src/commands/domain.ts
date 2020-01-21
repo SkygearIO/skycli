@@ -1,8 +1,9 @@
 import { Arguments, createCommand, getCommandGroupHelpMessage } from "../util";
 import domainAdd from "./domain/add";
 import domainList from "./domain/list";
+import domainView from "./domain/view";
 
-const subCommands = [domainAdd, domainList];
+const subCommands = [domainAdd, domainList, domainView];
 
 function run(_argv: Arguments) {
   console.log(getCommandGroupHelpMessage("domain", subCommands));
