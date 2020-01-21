@@ -7,6 +7,9 @@ import resolve from "@rollup/plugin-node-resolve";
 import replace from "@rollup/plugin-replace";
 
 const getBuiltins = require("builtins");
+const semver = require("semver");
+
+const pkg = require("./package.json");
 
 const extensions = [".mjs", ".js", ".jsx", ".ts", ".tsx"];
 
@@ -34,6 +37,9 @@ const plugins = [
     // the program path. See the comment in that for details.
     "process.env.PKG": JSON.stringify(
       process.env.PKG === "true" ? "true" : "false"
+    ),
+    "process.env.API_VERSION": JSON.stringify(
+      `v${semver.major(pkg.version)}.${semver.minor(pkg.version)}`
     ),
   }),
   babel({
