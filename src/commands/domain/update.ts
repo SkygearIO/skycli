@@ -74,6 +74,7 @@ export default createCommand({
         type: "boolean",
         describe: "Configure using let's encrypt certs for the given domain",
       })
+      .conflicts("tls-secret", "use-letsencrypt")
       .option("disable-redirect", {
         type: "boolean",
         describe: "Disable domain redirect.",
@@ -82,7 +83,8 @@ export default createCommand({
         type: "string",
         describe:
           "Configure domain redirect, provide domain name that you want to redirect to",
-      });
+      })
+      .conflicts("disable-redirect", "redirect-domain");
   },
   command: "update [domain]",
   describe: "Update domain of app",
