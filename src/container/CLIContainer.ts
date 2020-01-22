@@ -204,7 +204,7 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
     });
 
     if (result.needReconnect) {
-      return this.downloadDeployLog(
+      await this.downloadDeployLog(
         appName,
         deploymentID,
         onData,

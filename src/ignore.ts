@@ -46,7 +46,7 @@ export async function dockerignore(
     const ig = zeitdockerignore();
     ig.add(dockerignoreFile.toString());
     return pathnames.filter(ig.createFilter());
-  } catch (e) {
+  } catch {
     return pathnames;
   }
 }
@@ -61,7 +61,7 @@ export async function dockerignorePaths(
     const ig = zeitdockerignore();
     ig.add(dockerignoreFile.toString());
     return paths.filter(ig.createFilter());
-  } catch (e) {
+  } catch {
     return paths;
   }
 }

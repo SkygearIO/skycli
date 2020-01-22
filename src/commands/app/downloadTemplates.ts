@@ -25,7 +25,7 @@ async function run(argv: Arguments) {
     try {
       await fs.access(p);
       overwrites.push(i);
-    } catch (e) {}
+    } catch {}
   }
 
   if (overwrites.length > 0) {

@@ -74,7 +74,7 @@ async function run(argv: Arguments) {
     return;
   }
 
-  return AppScaffoldCommand.execute({
+  await AppScaffoldCommand.execute({
     ...argv,
     app: appName,
     dest: ".",

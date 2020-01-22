@@ -46,7 +46,7 @@ async function selectTemplate(): Promise<ScaffoldingTemplate> {
     try {
       await updateTemplates(latestVersion);
       localVersion = latestVersion;
-    } catch (error) {
+    } catch {
       console.log(chalk`{yellow WARN:} Failed to update templates`);
     }
   }
