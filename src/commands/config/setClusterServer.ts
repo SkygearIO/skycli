@@ -98,7 +98,12 @@ async function askClusterServer(argv: Arguments) {
       selected = await selectCluster(argv);
     }
     if (!selected) {
-      throw new Error("Cluster not found");
+      const choices = clusterOptions
+        .filter(o => !o.debug || argv.debug)
+        .map(o => o.id);
+      throw new Error(
+        `Cluster not found. Valid choices are: ${choices.join(", ")}`
+      );
     }
 
     // eslint-disable-next-line require-atomic-updates
@@ -151,9 +156,6 @@ async function run(argv: Arguments) {
 
 export default createCommand({
   builder: yargs => {
-    const choices = clusterOptions
-      .filter(o => !o.debug || yargs.argv.debug)
-      .map(t => t.id);
     return yargs
       .option("endpoint", {
         desc: "Cluster API endpoint.",
@@ -166,8 +168,8 @@ export default createCommand({
       .option("cluster", {
         desc: "Cluster type.",
         type: "string",
-        choices: choices,
-      });
+      })
+      .conflicts("cluster", ["endpoint", "api-key"]);
   },
   command: "set-cluster",
   describe: "Connect to Skygear cluster",
