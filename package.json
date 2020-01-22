@@ -35,7 +35,7 @@
   "dependencies": {
     "@skygear/node-client": "2.1.0",
     "@zeit/dockerignore": "0.0.5",
-    "chalk": "2.4.2",
+    "chalk": "3.0.0",
     "cli-table3": "0.5.1",
     "command-exists": "1.2.8",
     "core-js": "3.6.4",
