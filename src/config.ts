@@ -15,9 +15,6 @@
  */
 import fs from "fs-extra";
 import * as yaml from "js-yaml";
-import { PropertyPath } from "lodash";
-import _get from "lodash/get";
-import _set from "lodash/set";
 import path from "path";
 import untildify from "untildify";
 
@@ -102,15 +99,6 @@ export function save(configObject: object, domain: ConfigDomain) {
   const content = yaml.safeDump(configObject);
   if (configPath) {
     fs.writeFileSync(configPath, content);
-  }
-}
-
-export function set(name: PropertyPath, value: any, domain: ConfigDomain) {
-  const configObject = load(domain) ?? {};
-  const oldValue = _get(configObject, name);
-  if (value !== oldValue) {
-    _set(configObject, name, value);
-    save(configObject, domain);
   }
 }
 
