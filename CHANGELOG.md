@@ -1,3 +1,14 @@
+## 2.1.2 (2020-01-22)
+
+### Bug Fixes
+
+- Fix skycli config set-cluster --cluster option
+- Make some command options mutually exclusive
+
+### Internals
+
+- Run runtime and dev dependencies
+
 ## 2.1.1 (2020-01-21)
 
 ### Bug Fixes
