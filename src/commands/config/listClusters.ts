@@ -1,10 +1,7 @@
 import { Arguments, createCommand, createTable } from "../../util";
 
 function run(argv: Arguments) {
-  const contexts = argv.context.skycliConfig?.contexts ?? [];
-  const currentContext = argv.context.skycliConfig?.current_context;
-  const currentCluster = contexts.find(ctx => ctx.name === currentContext)
-    ?.name;
+  const currentCluster = argv.context.context?.cluster;
   const clusters = argv.context.skycliConfig?.clusters ?? [];
   const table = createTable({
     head: ["CURRENT", "NAME"],

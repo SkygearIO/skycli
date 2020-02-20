@@ -35,7 +35,7 @@ export interface SkycliConfig {
   clusters?: Named<"cluster", ClusterConfig>[];
   users?: Named<"user", ClusterUserConfig>[];
   contexts?: Named<"context", ConfigContext>[];
-  current_context?: string;
+  current_context?: string | null;
 }
 
 export interface UserContext {
@@ -45,6 +45,7 @@ export interface UserContext {
 }
 
 export interface CLIContext {
+  context?: ConfigContext | null;
   cluster?: ClusterConfig | null;
   user?: UserContext | null;
   app?: string | null;
