@@ -202,7 +202,9 @@ async function run(argv: Arguments) {
 
   if (!config.current_context) {
     config.current_context = clusterName;
-    console.log(chalk`Current cluster set to {green ${clusterName}}.`);
+    console.log(chalk`Current context set to {green ${clusterName}}.`);
+  } else {
+    console.log(chalk`Context {green ${clusterName}} added.`);
   }
   save(config, "global");
 

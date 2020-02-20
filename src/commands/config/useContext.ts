@@ -5,19 +5,17 @@ import { save } from "../../config";
 function run(argv: Arguments) {
   const config = argv.context.skycliConfig;
   const contexts = config?.contexts ?? [];
-  const clusterContext = contexts.find(
-    ctx => ctx.context.cluster === argv.name
-  );
-  if (!config || !clusterContext) {
+  const context = contexts.find(ctx => ctx.name === argv.name);
+  if (!config || !context) {
     throw new Error(
-      `Cluster not configured. Use list-clusters command to list valid clusters.`
+      `Context not configured. Use get-contexts command to list valid contexts.`
     );
   }
 
-  config.current_context = clusterContext.name;
+  config.current_context = context.name;
   save(config, "global");
 
-  console.log(chalk`Current cluster set to {green ${clusterContext.name}}.`);
+  console.log(chalk`Current context set to {green ${context.name}}.`);
 
   return Promise.resolve();
 }
@@ -26,10 +24,10 @@ export default createCommand({
   builder: yargs => {
     return yargs.demandOption(["name"]).option("name", {
       type: "string",
-      describe: "Cluster name",
+      describe: "Context name",
     });
   },
-  command: "use-cluster [name]",
-  describe: "Set current cluster",
+  command: "use-context [name]",
+  describe: "Set current context",
   handler: run,
 });

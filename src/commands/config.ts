@@ -1,14 +1,14 @@
 import { Arguments, createCommand, getCommandGroupHelpMessage } from "../util";
-import configSet from "./config/setClusterServer";
-import configListClusters from "./config/listClusters";
-import configUseCluster from "./config/useCluster";
+import configSetCluster from "./config/setCluster";
+import configGetContexts from "./config/getContexts";
+import configUseContext from "./config/useContext";
 import configView from "./config/view";
 
 const subCommands = [
   configView,
-  configSet,
-  configListClusters,
-  configUseCluster,
+  configSetCluster,
+  configGetContexts,
+  configUseContext,
 ];
 
 function run(_argv: Arguments) {
