@@ -1,8 +1,15 @@
 import { Arguments, createCommand, getCommandGroupHelpMessage } from "../util";
 import configSet from "./config/setClusterServer";
+import configListClusters from "./config/listClusters";
+import configUseCluster from "./config/useCluster";
 import configView from "./config/view";
 
-const subCommands = [configView, configSet];
+const subCommands = [
+  configView,
+  configSet,
+  configListClusters,
+  configUseCluster,
+];
 
 function run(_argv: Arguments) {
   console.log(getCommandGroupHelpMessage("config", subCommands));
