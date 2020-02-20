@@ -122,7 +122,7 @@ export function migrateSkycliConfig(c: { [key: string]: any }): SkycliConfig {
     clusters,
     users,
     contexts,
-    current_context: c.current_context,
+    current_context: c.current_context || null,
   };
   return skycliConfig;
 }
