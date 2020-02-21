@@ -4,9 +4,7 @@ import { cliContainer } from "../../container";
 import { cacheString } from "../../cache";
 
 async function run(argv: Arguments) {
-  // TODO(get-k8s-credentials): Support --context
-  const cacheKey = `ExecCredential_${argv.context.skycliConfig
-    ?.current_context ?? ""}`;
+  const cacheKey = `ExecCredential_${argv.context.currentContext ?? ""}`;
 
   const content = await cacheString({
     cacheKey,

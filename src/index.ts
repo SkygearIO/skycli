@@ -51,8 +51,8 @@ cli = cli
     desc: "Specify the App name",
   })
   .option("context", {
-    hidden: true,
-    skipValidation: true,
+    type: "string",
+    desc: "Specify the context name",
   })
   .check(checkArguments as any)
   .help();

@@ -45,6 +45,7 @@ export interface UserContext {
 }
 
 export interface CLIContext {
+  currentContext?: string | null;
   context?: ConfigContext | null;
   cluster?: ClusterConfig | null;
   user?: UserContext | null;

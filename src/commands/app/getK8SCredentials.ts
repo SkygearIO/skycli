@@ -18,8 +18,9 @@ import { cliContainer } from "../../container";
 async function run(argv: Arguments) {
   await withFile(async ({ path }) => {
     const appName = argv.context.app ?? "";
+    const contextName = argv.context.currentContext ?? "";
     const { cluster_name } = await cliContainer.getClusterConfig();
-    const contextName = `skygear-${cluster_name}-${appName}`;
+    const k8sContextName = `skygear-${cluster_name}-${appName}`;
     const {
       server,
       certificate_authority_data,
@@ -28,7 +29,7 @@ async function run(argv: Arguments) {
     let setClusterArgs = [
       "config",
       "set-cluster",
-      contextName,
+      k8sContextName,
       "--server",
       server,
     ];
@@ -46,30 +47,33 @@ async function run(argv: Arguments) {
     spawnSync("kubectl", [
       "config",
       "set-credentials",
-      contextName,
+      k8sContextName,
       "--exec-command",
       programPath(),
       "--exec-api-version=client.authentication.k8s.io/v1beta1",
       "--exec-arg=--app",
       "--exec-arg",
       appName,
+      "--exec-arg=--context",
+      "--exec-arg",
+      contextName,
       "--exec-arg=app",
       "--exec-arg=get-k8s-token-request",
     ]);
     spawnSync("kubectl", [
       "config",
       "set-context",
-      contextName,
+      k8sContextName,
       "--cluster",
-      contextName,
+      k8sContextName,
       "--user",
-      contextName,
+      k8sContextName,
       "--namespace",
       appName,
     ]);
 
     console.log(
-      chalk`Run {green kubectl config use-context ${contextName}} to switch to the context of this app.`
+      chalk`Run {green kubectl config use-context ${k8sContextName}} to switch to the context of this app.`
     );
   });
 }

@@ -2,7 +2,7 @@ import { Arguments, createCommand, createTable } from "../../util";
 
 function run(argv: Arguments) {
   const config = argv.context.skycliConfig;
-  const currentContext = config?.current_context;
+  const currentContext = argv.context.currentContext;
   const contexts = config?.contexts ?? [];
   const table = createTable({
     head: ["CURRENT", "CLUSTER", "USER"],
