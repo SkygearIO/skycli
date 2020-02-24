@@ -120,24 +120,26 @@ async function askClusterServer(argv: Arguments) {
     } else {
       selected = clusterOptions.find(c => c.cluster?.name === server.name)
         ?.cluster;
+      if (!selected) {
+        const choices = clusterOptions
+          .filter(o => !o.debug || argv.debug)
+          .map(o => o.cluster?.name)
+          .filter(n => n);
+        throw new Error(
+          `Cluster not found. Valid choices are: ${choices.join(", ")}`
+        );
+      }
     }
 
-    if (!selected) {
-      const choices = clusterOptions
-        .filter(o => !o.debug || argv.debug)
-        .map(o => o.cluster?.name)
-        .filter(n => n);
-      throw new Error(
-        `Cluster not found. Valid choices are: ${choices.join(", ")}`
-      );
-    }
-    if (!server.endpoint) {
-      // eslint-disable-next-line require-atomic-updates
-      server.endpoint = selected.endpoint;
-    }
-    if (!server.apiKey) {
-      // eslint-disable-next-line require-atomic-updates
-      server.apiKey = selected.apiKey;
+    if (selected) {
+      if (!server.endpoint) {
+        // eslint-disable-next-line require-atomic-updates
+        server.endpoint = selected.endpoint;
+      }
+      if (!server.apiKey) {
+        // eslint-disable-next-line require-atomic-updates
+        server.apiKey = selected.apiKey;
+      }
     }
   }
 
