@@ -221,7 +221,7 @@ export default createCommand({
         type: "string",
       })
       .option("cluster", {
-        desc: "Cluster type.",
+        desc: "Cluster name.",
         type: "string",
       });
   },
