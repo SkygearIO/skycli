@@ -202,12 +202,8 @@ async function run(argv: Arguments) {
     context.context.cluster = clusterName;
   }
 
-  if (!config.current_context) {
-    config.current_context = clusterName;
-    console.log(chalk`Current context set to {green ${clusterName}}.`);
-  } else {
-    console.log(chalk`Context {green ${clusterName}} added.`);
-  }
+  config.current_context = clusterName;
+  console.log(chalk`Current context set to {green ${clusterName}}.`);
   save(config, "global");
 
   console.log(chalk`Connected to Skygear cluster at {green ${endpoint}}.`);
