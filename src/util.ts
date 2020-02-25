@@ -47,7 +47,11 @@ export function createCommand(
     execute: module.handler,
     handler: (argv: Arguments) => {
       // Handle both sync and async error
-      const clusterConfig = argv.context && argv.context.cluster;
+      const clusterConfig = argv.context?.cluster;
+      const contextConfig = argv.context?.context;
+      if (contextConfig?.user) {
+        cliContainer.container.name = contextConfig.user;
+      }
       cliContainer.container
         .configure({
           endpoint: (clusterConfig && clusterConfig.endpoint) || "",

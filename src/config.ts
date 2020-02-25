@@ -19,12 +19,11 @@ import path from "path";
 import untildify from "untildify";
 
 import { SkygearYAML } from "./container/types";
-import { ClusterConfig, SkycliConfig, ClusterUserConfig } from "./types";
+import { SkycliConfig, ClusterUserConfig } from "./types";
 import { configPath } from "./path";
 
 export type ConfigDomain = "global" | "project";
 
-const defaultContext = "default";
 const configVersion = "v1";
 
 const configPaths: { [domain: string]: string } = {
@@ -35,30 +34,10 @@ const configPaths: { [domain: string]: string } = {
 export function createSkycliConfig(): SkycliConfig {
   return {
     api_version: configVersion,
-  };
-}
-
-export function createSkycliConfigWithClusterConfig(
-  cluster: ClusterConfig
-): SkycliConfig {
-  return {
-    api_version: configVersion,
-    clusters: [
-      {
-        name: defaultContext,
-        cluster,
-      },
-    ],
-    contexts: [
-      {
-        name: defaultContext,
-        context: {
-          cluster: defaultContext,
-          user: defaultContext,
-        },
-      },
-    ],
-    current_context: defaultContext,
+    clusters: [],
+    contexts: [],
+    users: [],
+    current_context: null,
   };
 }
 
@@ -140,19 +119,11 @@ export function migrateSkycliConfig(c: { [key: string]: any }): SkycliConfig {
 
   const skycliConfig: SkycliConfig = {
     api_version: configVersion,
+    clusters,
+    users,
+    contexts,
+    current_context: c.current_context || null,
   };
-  if (clusters.length > 0) {
-    skycliConfig.clusters = clusters;
-  }
-  if (users.length > 0) {
-    skycliConfig.users = users;
-  }
-  if (contexts.length > 0) {
-    skycliConfig.contexts = contexts;
-  }
-  if (c.current_context != null) {
-    skycliConfig.current_context = c.current_context;
-  }
   return skycliConfig;
 }
 

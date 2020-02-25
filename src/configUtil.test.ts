@@ -98,6 +98,7 @@ const fixture: SkycliConfig = {
       },
     },
   ],
+  current_context: null,
 };
 
 test("currentCLIContext with context1", async () => {

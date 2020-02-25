@@ -15,24 +15,23 @@
  */
 import { CLIContext, SkycliConfig } from "./types";
 import { SkygearYAML } from "./container/types";
-import { Arguments } from "./util";
 import { decodeUser, decodeIdentity } from "@skygear/node-client";
 
 export function currentCLIContext(
-  argv: Arguments,
+  argv: Record<string, unknown>,
   config: { skygearYAML?: SkygearYAML; skycliConfig: SkycliConfig }
 ): CLIContext {
   const { skygearYAML, skycliConfig } = config;
-  const currentContextKey = skycliConfig.current_context;
+  const currentContext =
+    (argv.context as string | undefined) ?? skycliConfig.current_context;
 
   // specify app in command or from config file
   const app = (argv.app as string | undefined) ?? skygearYAML?.app;
 
-  const context = skycliConfig.contexts?.find(
-    c => c.name === currentContextKey
-  );
-  const clusterName = context?.context.cluster;
-  const userName = context?.context.user;
+  const context = skycliConfig.contexts?.find(c => c.name === currentContext)
+    ?.context;
+  const clusterName = context?.cluster;
+  const userName = context?.user;
 
   const userConfig = skycliConfig.users?.find(u => u.name === userName)?.user;
   const user =
@@ -50,7 +49,9 @@ export function currentCLIContext(
   return {
     skygearYAML,
     skycliConfig,
+    currentContext,
     app,
+    context,
     cluster,
     user,
     debug: !!argv.debug,

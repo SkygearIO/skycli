@@ -94,6 +94,10 @@ describe("migrateSkycliConfig", () => {
     const migrated = migrateSkycliConfig(oldConfig);
     expect(migrated).toEqual({
       api_version: "v1",
+      clusters: [],
+      contexts: [],
+      users: [],
+      current_context: null,
     });
   });
 });
@@ -109,14 +113,20 @@ describe("updateUser, getUser, deleteUser", () => {
 
   expect(c).toEqual({
     api_version: "v1",
+    contexts: [],
+    clusters: [],
     users: [{ name: "default", user: { access_token: "access_token" } }],
+    current_context: null,
   });
 
   expect(getUser(c, "default")).toEqual({ access_token: "access_token" });
 
   expect(deleteUser(c, "default")).toEqual({
     api_version: "v1",
+    contexts: [],
+    clusters: [],
     users: [],
+    current_context: null,
   });
 
   expect(
@@ -128,7 +138,10 @@ describe("updateUser, getUser, deleteUser", () => {
     })
   ).toEqual({
     api_version: "v1",
+    contexts: [],
+    clusters: [],
     users: [{ name: "default", user: { access_token: "new_token" } }],
+    current_context: null,
   });
 
   expect(deleteUser(c, "non-exist")).toEqual(c);
