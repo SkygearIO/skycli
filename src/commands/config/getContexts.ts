@@ -5,13 +5,14 @@ function run(argv: Arguments) {
   const currentContext = argv.context.currentContext;
   const contexts = config?.contexts ?? [];
   const table = createTable({
-    head: ["CURRENT", "CLUSTER", "USER"],
+    head: ["CURRENT", "CONTEXT", "CLUSTER", "USER"],
   });
 
   for (const { name, context } of contexts) {
     const userConfig = config?.users?.find(u => u.name === context.user);
     table.push([
       name === currentContext ? "*" : " ",
+      name,
       context.cluster,
       userConfig ? (userConfig.user.identity as any).login_id : "",
     ]);
