@@ -8,7 +8,7 @@ function run(argv: Arguments) {
   const context = contexts.find(ctx => ctx.name === argv.name);
   if (!config || !context) {
     throw new Error(
-      `Context not configured. Use get-contexts command to list valid contexts.`
+      `Context ${argv.name} does not exist. Use get-contexts to list available contexts.`
     );
   }
 
