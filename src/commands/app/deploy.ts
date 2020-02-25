@@ -20,6 +20,7 @@ import {
   DeploymentItemConfig,
   DeploymentItemArtifact,
   HttpServiceConfig,
+  StaticConfig,
 } from "../../container/types";
 import { tempPath } from "../../path";
 
@@ -107,15 +108,22 @@ async function archiveMicroserviceSrc(
   );
   return createTar(folderToPathsMap, archivePath);
 }
+async function archiveStaticAssets(config: StaticConfig, archivePath: string) {
+  const folderToPathsMap = {
+    [config.context]: await dockerignore(config.context, ".skyignore"),
+  };
+  return createTar(folderToPathsMap, archivePath, { dereference: true });
+}
 
 async function createTar(
   folderToPathsMap: { [folder: string]: string[] },
-  archivePath: string
+  archivePath: string,
+  options: tar.PackOptions = {}
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     const z = zlib.createGzip();
     const folders = Object.keys(folderToPathsMap);
-    createPack(folders, folderToPathsMap, null, 0)
+    createPack(folders, folderToPathsMap, options, 0)
       .pipe(z)
       .pipe(fs.createWriteStream(archivePath))
       .on("error", reject)
@@ -126,7 +134,7 @@ async function createTar(
 function createPack(
   folders: string[],
   folderToPathsMap: { [folder: string]: string[] },
-  pack?: any,
+  options: tar.PackOptions,
   cur: number = 0
 ): any {
   const folder = folders[cur];
@@ -140,8 +148,8 @@ function createPack(
         createPack(folders, folderToPathsMap, partsOfPack, cur);
       }
     },
-    pack: pack,
     entries: paths,
+    ...options,
   });
 }
 
@@ -192,6 +200,10 @@ async function archiveDeploymentItem(
       } else {
         return null;
       }
+      break;
+    case "static":
+      fs.ensureFileSync(archivePath);
+      await archiveStaticAssets(deployment, archivePath);
       break;
     default:
       throw new Error("unexpected type");

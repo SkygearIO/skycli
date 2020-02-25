@@ -144,7 +144,6 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
         json: {
           ...skygearYAML,
           artifacts,
-          sync: true,
         },
       }
     ).then(({ deployment }) => {

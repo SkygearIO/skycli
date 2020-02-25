@@ -61,12 +61,21 @@ export interface Environment {
   secret?: string;
 }
 
+export interface StaticConfig {
+  name: string;
+  type: "static";
+  path: string;
+  context: string;
+  fallback?: string;
+  expires: number;
+}
+
 export interface HookConfig {
   event: string;
   path: string;
 }
 
-export type DeploymentItemConfig = HttpServiceConfig;
+export type DeploymentItemConfig = HttpServiceConfig | StaticConfig;
 
 export interface DeploymentItemArtifact {
   deploy_item_name: string;
