@@ -78,7 +78,7 @@ const urlPrompt: inquirer.Question = {
 
 const namePrompt: inquirer.Question = {
   message: "Cluster Name:",
-  name: "cluster",
+  name: "name",
   type: "input",
   validate: input => {
     if (!/^[a-zA-Z0-9-]{1,}$/.test(input)) {
