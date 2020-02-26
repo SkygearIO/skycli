@@ -11,9 +11,6 @@ async function run(argv: Arguments) {
   if (!customDomain) {
     throw new Error("Domain not found.");
   }
-  if (customDomain.verified) {
-    throw new Error("Domain is verified already.");
-  }
 
   let missingRecords: any[] = [];
   try {
