@@ -7,6 +7,7 @@ export function getDomainTableHeader(): string[] {
   return [
     "DOMAIN",
     "VERIFIED",
+    "CONNECTED",
     "CUSTOM_CERT",
     "REDIRECT",
     "SSL_CERT_EXPIRY",
@@ -18,6 +19,7 @@ export function getDomainTableRow(customDomain: CustomDomain): string[] {
   return [
     customDomain.domain,
     customDomain.verified ? "true" : "false",
+    customDomain.connected ? "true" : "false",
     customDomain.tls_secret_id ? "true" : "false",
     customDomain.redirect_domain || "-",
     customDomain.tls_secret_expiry

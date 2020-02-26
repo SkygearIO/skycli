@@ -159,6 +159,7 @@ export interface CustomDomain {
   app_id: string;
   domain: string;
   verified: boolean;
+  connected: boolean;
   dns_records: DNSRecord[];
   created_at: string;
   updated_at: string;
