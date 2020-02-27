@@ -22,11 +22,9 @@ async function run(argv: Arguments) {
 
   console.log(`Add following DNS records in your DNS provider.\n`);
   const table = createTable({ head: getDNSRecordTableHeader() });
-  if (!rootDomain.verified) {
-    rootDomain.dns_records.forEach(dns => {
-      table.push(getDNSRecordTableRow(dns));
-    });
-  }
+  rootDomain.dns_records.forEach(dns => {
+    table.push(getDNSRecordTableRow(dns));
+  });
   customDomain.dns_records.forEach(dns => {
     table.push(getDNSRecordTableRow(dns));
   });

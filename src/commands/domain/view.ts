@@ -48,17 +48,13 @@ async function run(argv: Arguments) {
     },
   });
 
-  if (!rootDomain.verified) {
-    rootDomain.dns_records.forEach(dns => {
-      dnsRecordsTable.push(getDNSRecordTableRow(dns));
-    });
-  }
+  rootDomain.dns_records.forEach(dns => {
+    dnsRecordsTable.push(getDNSRecordTableRow(dns));
+  });
 
-  if (!customDomain.verified) {
-    customDomain.dns_records.forEach(dns => {
-      dnsRecordsTable.push(getDNSRecordTableRow(dns));
-    });
-  }
+  customDomain.dns_records.forEach(dns => {
+    dnsRecordsTable.push(getDNSRecordTableRow(dns));
+  });
 
   const hasRows = dnsRecordsTable.length > 0;
   if (hasRows) {
