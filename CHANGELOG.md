@@ -1,3 +1,11 @@
+## 2.2.0 (2020-03-02)
+
+### Features
+
+- Support multiple contexts #180
+- Support deploying static assets #190
+- Support domain reverification
+
 ## 2.1.2 (2020-01-22)
 
 ### Bug Fixes
