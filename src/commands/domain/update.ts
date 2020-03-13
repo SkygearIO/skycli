@@ -31,11 +31,17 @@ async function run(argv: Arguments) {
     tlsSecretName = argv["tls-secret"] as string;
   }
 
+  let assignment: string | undefined;
+  if (argv["assign-to"]) {
+    assignment = argv["assign-to"] as string;
+  }
+
   await cliContainer.updateDomain(
     argv.context.app || "",
     customDomain.id,
     redirectDomain,
-    tlsSecretName
+    tlsSecretName,
+    assignment
   );
 
   console.log(chalk`{green Success!} Updated domain ${customDomain.domain}.`);
@@ -85,6 +91,11 @@ export default createCommand({
         type: "string",
         describe:
           "Configure domain redirect, provide domain name that you want to redirect to",
+      })
+      .option("assign-to", {
+        type: "string",
+        describe: "Configure domain assignment.",
+        choices: ["microservices", "auth", "asset"],
       })
       .conflicts("disable-redirect", "redirect-domain");
   },
