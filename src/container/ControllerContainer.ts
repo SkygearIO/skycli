@@ -250,7 +250,8 @@ export class ControllerContainer<T extends BaseAPIClient> {
     appName: string,
     customDomainID: string,
     redirectDomain?: string,
-    tlsSecretName?: string
+    tlsSecretName?: string,
+    assignment?: string
   ): Promise<void> {
     return this.fetchAPI(
       "PUT",
@@ -259,6 +260,7 @@ export class ControllerContainer<T extends BaseAPIClient> {
         json: {
           redirect_domain: redirectDomain,
           tls_secret_name: tlsSecretName,
+          assignment: assignment,
         },
       }
     );

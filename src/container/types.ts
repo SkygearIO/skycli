@@ -158,6 +158,7 @@ export interface CustomDomain {
   id: string;
   app_id: string;
   domain: string;
+  assignment: string;
   verified: boolean;
   connected: boolean;
   dns_records: DNSRecord[];

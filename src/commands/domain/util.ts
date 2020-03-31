@@ -6,6 +6,7 @@ export const tableIndentationPadding = 4;
 export function getDomainTableHeader(): string[] {
   return [
     "DOMAIN",
+    "ASSIGNMENT",
     "VERIFIED",
     "CONNECTED",
     "CUSTOM_CERT",
@@ -18,6 +19,7 @@ export function getDomainTableHeader(): string[] {
 export function getDomainTableRow(customDomain: CustomDomain): string[] {
   return [
     customDomain.domain,
+    customDomain.assignment,
     customDomain.verified ? "true" : "false",
     customDomain.connected ? "true" : "false",
     customDomain.tls_secret_id ? "true" : "false",
