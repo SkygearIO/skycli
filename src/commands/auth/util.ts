@@ -7,7 +7,7 @@ const emailPrompt: inquirer.Question = {
   message: "Email:",
   name: "email",
   type: "input",
-  validate: input => {
+  validate: (input) => {
     if (input.trim() === "") {
       return "Email is required.";
     }
@@ -22,7 +22,7 @@ const passwordPrompt: inquirer.Question = {
   message: "Password:",
   name: "password",
   type: "password",
-  validate: input => {
+  validate: (input) => {
     if (input === "") {
       return "Password is required.";
     }
@@ -45,7 +45,7 @@ export function askCredentials(argv: Arguments) {
 
   prompts.push(passwordPrompt);
 
-  return inquirer.prompt(prompts).then(answers => {
+  return inquirer.prompt(prompts).then((answers) => {
     return {
       ...credentials,
       ...answers,

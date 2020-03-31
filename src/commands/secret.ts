@@ -11,7 +11,7 @@ function run(_argv: Arguments) {
 }
 
 export default createCommand({
-  builder: yargs => {
+  builder: (yargs) => {
     return subCommands.reduce((y, cmd) => y.command(cmd as any), yargs);
   },
   command: "secret",

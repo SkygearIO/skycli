@@ -8,7 +8,7 @@ function requireKubectlVersion(
   expectedMajor: number,
   minimumMinor: number
 ): (argv: Arguments) => Promise<void> {
-  return async function(_argv: Arguments): Promise<void> {
+  return async function (_argv: Arguments): Promise<void> {
     const { stdout } = spawnSync(
       "kubectl",
       ["version", "--client", "--output", "json"],

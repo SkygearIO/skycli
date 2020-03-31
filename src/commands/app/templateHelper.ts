@@ -27,7 +27,7 @@ export function findEqualReference<
   T1 extends TemplateItem,
   T2 extends TemplateItem
 >(items: T1[], target: T2): T1 | undefined {
-  return items.find(item => isEqualReference(item, target));
+  return items.find((item) => isEqualReference(item, target));
 }
 
 export function printTemplateItems(

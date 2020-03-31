@@ -10,7 +10,7 @@ const appNamePrompt: inquirer.Question = {
   message: "What is your app name?",
   name: "app",
   type: "input",
-  validate: input => {
+  validate: (input) => {
     if (input.trim() === "") {
       return "App name is required.";
     }
@@ -19,7 +19,7 @@ const appNamePrompt: inquirer.Question = {
 };
 
 function ask() {
-  return inquirer.prompt([appNamePrompt]).then(answers => {
+  return inquirer.prompt([appNamePrompt]).then((answers) => {
     return {
       ...answers,
     };
@@ -82,7 +82,7 @@ async function run(argv: Arguments) {
 }
 
 export default createCommand({
-  builder: yargs => {
+  builder: (yargs) => {
     return yargs
       .middleware(requireClusterConfig)
       .middleware(requireUser)

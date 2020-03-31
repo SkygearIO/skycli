@@ -158,12 +158,12 @@ export function updateUser(
   updater: (user: ClusterUserConfig) => ClusterUserConfig
 ): SkycliConfig {
   const users = skycliConfig.users ?? [];
-  const idx = users.findIndex(u => u.name === name);
+  const idx = users.findIndex((u) => u.name === name);
 
   if (idx != null && idx >= 0) {
     return {
       ...skycliConfig,
-      users: skycliConfig.users?.map(u => {
+      users: skycliConfig.users?.map((u) => {
         if (u.name === name) {
           return {
             ...u,
@@ -191,13 +191,13 @@ export function getUser(
   skycliConfig: SkycliConfig,
   name: string
 ): ClusterUserConfig | undefined {
-  return skycliConfig.users?.find(u => u.name === name)?.user;
+  return skycliConfig.users?.find((u) => u.name === name)?.user;
 }
 
 export function deleteUser(skycliConfig: SkycliConfig, name: string) {
   return {
     ...skycliConfig,
-    users: skycliConfig.users?.filter(u => u.name !== name),
+    users: skycliConfig.users?.filter((u) => u.name !== name),
   };
 }
 

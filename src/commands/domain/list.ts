@@ -16,7 +16,7 @@ async function run(argv: Arguments) {
     head: getDomainTableHeader(),
   });
 
-  resp.custom_domains.forEach(c => {
+  resp.custom_domains.forEach((c) => {
     table.push(getDomainTableRow(c));
   });
 
@@ -24,7 +24,7 @@ async function run(argv: Arguments) {
 }
 
 export default createCommand({
-  builder: yargs => {
+  builder: (yargs) => {
     return yargs
       .middleware(requireClusterConfig)
       .middleware(requireUser)

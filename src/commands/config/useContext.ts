@@ -5,7 +5,7 @@ import { save } from "../../config";
 function run(argv: Arguments) {
   const config = argv.context.skycliConfig;
   const contexts = config?.contexts ?? [];
-  const context = contexts.find(ctx => ctx.name === argv.name);
+  const context = contexts.find((ctx) => ctx.name === argv.name);
   if (!config || !context) {
     throw new Error(
       `Context ${argv.name} does not exist. Use get-contexts to list available contexts.`
@@ -21,7 +21,7 @@ function run(argv: Arguments) {
 }
 
 export default createCommand({
-  builder: yargs => {
+  builder: (yargs) => {
     return yargs.demandOption(["name"]).option("name", {
       type: "string",
       describe: "Context name",

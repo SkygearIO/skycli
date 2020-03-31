@@ -25,13 +25,13 @@ export async function walk(dir: string): Promise<string[]> {
     const stats = await lstat(filePath);
     if (stats.isDirectory()) {
       const basenames = await readdir(filePath);
-      const filePaths = basenames.map(basename => join(filePath, basename));
+      const filePaths = basenames.map((basename) => join(filePath, basename));
       input = input.concat(filePaths);
     } else if (stats.isFile() || stats.isSymbolicLink()) {
       output.push(filePath);
     }
   }
-  return output.map(pathname => relative(dir, pathname));
+  return output.map((pathname) => relative(dir, pathname));
 }
 
 // Same as walk except that if .dockerignore is found

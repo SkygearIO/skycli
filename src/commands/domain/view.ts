@@ -12,13 +12,15 @@ import { cliContainer } from "../../container";
 async function run(argv: Arguments) {
   const resp = await cliContainer.getDomains(argv.context.app || "");
 
-  const customDomain = resp.custom_domains.find(c => c.domain === argv.domain);
+  const customDomain = resp.custom_domains.find(
+    (c) => c.domain === argv.domain
+  );
   if (!customDomain) {
     throw new Error("Domain not found.");
   }
 
   const rootDomain = resp.root_domains.find(
-    r => r.id === customDomain?.root_domain_id
+    (r) => r.id === customDomain?.root_domain_id
   );
   if (!rootDomain) {
     throw new Error("Root domain not found.");
@@ -48,11 +50,11 @@ async function run(argv: Arguments) {
     },
   });
 
-  rootDomain.dns_records.forEach(dns => {
+  rootDomain.dns_records.forEach((dns) => {
     dnsRecordsTable.push(getDNSRecordTableRow(dns));
   });
 
-  customDomain.dns_records.forEach(dns => {
+  customDomain.dns_records.forEach((dns) => {
     dnsRecordsTable.push(getDNSRecordTableRow(dns));
   });
 
@@ -64,7 +66,7 @@ async function run(argv: Arguments) {
 }
 
 export default createCommand({
-  builder: yargs => {
+  builder: (yargs) => {
     return yargs
       .middleware(requireClusterConfig)
       .middleware(requireUser)

@@ -12,14 +12,14 @@ async function run(argv: Arguments) {
   }
 
   const table = createTable({ head: ["NAME", "TYPE", "CREATED_AT"] });
-  secrets.map(s => {
+  secrets.map((s) => {
     table.push([s.name, s.type, displayDate(s.created_at)]);
   });
   console.log(table.toString());
 }
 
 export default createCommand({
-  builder: yargs => {
+  builder: (yargs) => {
     return yargs
       .middleware(requireClusterConfig)
       .middleware(requireUser)

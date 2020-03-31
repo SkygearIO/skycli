@@ -22,7 +22,9 @@ async function run(argv: Arguments) {
     return;
   }
   const resp = await cliContainer.getDomains(argv.context.app || "");
-  const customDomain = resp.custom_domains.find(c => c.domain === argv.domain);
+  const customDomain = resp.custom_domains.find(
+    (c) => c.domain === argv.domain
+  );
   if (!customDomain) {
     throw new Error("Domain not found.");
   }
@@ -31,7 +33,7 @@ async function run(argv: Arguments) {
 }
 
 export default createCommand({
-  builder: yargs => {
+  builder: (yargs) => {
     return yargs
       .middleware(requireClusterConfig)
       .middleware(requireUser)

@@ -9,7 +9,7 @@ function run(argv: Arguments) {
   });
 
   for (const { name, context } of contexts) {
-    const userConfig = config?.users?.find(u => u.name === context.user);
+    const userConfig = config?.users?.find((u) => u.name === context.user);
     table.push([
       name === currentContext ? "*" : " ",
       name,
