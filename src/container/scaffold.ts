@@ -95,7 +95,7 @@ export function instantiateTemplate(
   const applyTemplate = (locs: TemplatePlaceholderLocations, value: string) => {
     for (const placeholder of Object.keys(locs)) {
       const regex = RegExp(placeholder, "g");
-      const paths = locs[placeholder].map(path => join(destPath, path));
+      const paths = locs[placeholder].map((path) => join(destPath, path));
       for (const path of paths) {
         let content = fs.readFileSync(path).toString();
         content = content.replace(regex, value);

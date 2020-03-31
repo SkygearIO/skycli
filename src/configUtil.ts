@@ -28,12 +28,12 @@ export function currentCLIContext(
   // specify app in command or from config file
   const app = (argv.app as string | undefined) ?? skygearYAML?.app;
 
-  const context = skycliConfig.contexts?.find(c => c.name === currentContext)
+  const context = skycliConfig.contexts?.find((c) => c.name === currentContext)
     ?.context;
   const clusterName = context?.cluster;
   const userName = context?.user;
 
-  const userConfig = skycliConfig.users?.find(u => u.name === userName)?.user;
+  const userConfig = skycliConfig.users?.find((u) => u.name === userName)?.user;
   const user =
     userConfig == null
       ? undefined
@@ -43,7 +43,7 @@ export function currentCLIContext(
           access_token: userConfig.access_token,
         };
 
-  const cluster = skycliConfig.clusters?.find(c => c.name === clusterName)
+  const cluster = skycliConfig.clusters?.find((c) => c.name === clusterName)
     ?.cluster;
 
   return {

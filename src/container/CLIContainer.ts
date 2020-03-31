@@ -181,12 +181,12 @@ export class CLIContainer<T extends BaseAPIClient> extends ControllerContainer<
       };
 
       resp.body
-        .on("data", data => {
+        .on("data", (data) => {
           count += data.length;
           buffer += data.toString("utf-8");
           consumeBuffer();
         })
-        .on("error", err => {
+        .on("error", (err) => {
           reject(err);
         })
         .on("end", () => {

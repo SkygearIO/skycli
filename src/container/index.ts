@@ -23,7 +23,7 @@ class CLIYAMLContainerStorage implements ContainerStorage {
   async setUser(namespace: string, user: User): Promise<void> {
     const e = encodeUser(user);
     save(
-      updateUser(this.loadSkycliConfig(), namespace, u => {
+      updateUser(this.loadSkycliConfig(), namespace, (u) => {
         return {
           ...u,
           user: e,
@@ -36,7 +36,7 @@ class CLIYAMLContainerStorage implements ContainerStorage {
   async setIdentity(namespace: string, identity: Identity): Promise<void> {
     const e = encodeIdentity(identity);
     save(
-      updateUser(this.loadSkycliConfig(), namespace, u => {
+      updateUser(this.loadSkycliConfig(), namespace, (u) => {
         return {
           ...u,
           identity: e,
@@ -48,7 +48,7 @@ class CLIYAMLContainerStorage implements ContainerStorage {
 
   async setAccessToken(namespace: string, accessToken: string): Promise<void> {
     save(
-      updateUser(this.loadSkycliConfig(), namespace, u => {
+      updateUser(this.loadSkycliConfig(), namespace, (u) => {
         return {
           ...u,
           access_token: accessToken,
@@ -60,7 +60,7 @@ class CLIYAMLContainerStorage implements ContainerStorage {
 
   async setRefreshToken(namespace: string, refreshToken: string) {
     save(
-      updateUser(this.loadSkycliConfig(), namespace, u => {
+      updateUser(this.loadSkycliConfig(), namespace, (u) => {
         return {
           ...u,
           refresh_token: refreshToken,
@@ -72,7 +72,7 @@ class CLIYAMLContainerStorage implements ContainerStorage {
 
   async setSessionID(namespace: string, sessionID: string) {
     save(
-      updateUser(this.loadSkycliConfig(), namespace, u => {
+      updateUser(this.loadSkycliConfig(), namespace, (u) => {
         return {
           ...u,
           session_id: sessionID,
@@ -94,7 +94,7 @@ class CLIYAMLContainerStorage implements ContainerStorage {
     options: ExtraSessionInfoOptions
   ) {
     save(
-      updateUser(this.loadSkycliConfig(), namespace, u => {
+      updateUser(this.loadSkycliConfig(), namespace, (u) => {
         return {
           ...u,
           extra_session_info_options: options,
@@ -113,7 +113,7 @@ class CLIYAMLContainerStorage implements ContainerStorage {
 
   async setMFABearerToken(namespace: string, mfaBearerToken: string) {
     save(
-      updateUser(this.loadSkycliConfig(), namespace, u => {
+      updateUser(this.loadSkycliConfig(), namespace, (u) => {
         return {
           ...u,
           mfa_bearer_token: mfaBearerToken,
@@ -203,7 +203,7 @@ class CLIYAMLContainerStorage implements ContainerStorage {
 
   async delMFABearerToken(namespace: string) {
     save(
-      updateUser(this.loadSkycliConfig(), namespace, u => {
+      updateUser(this.loadSkycliConfig(), namespace, (u) => {
         return {
           ...u,
           mfa_bearer_token: undefined,

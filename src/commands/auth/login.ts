@@ -33,12 +33,12 @@ async function readStdin(): Promise<string> {
     let data = "";
     const stdin = process.stdin;
 
-    stdin.on("data", function(chuck) {
+    stdin.on("data", function (chuck) {
       if (chuck !== null) {
         data += chuck;
       }
     });
-    stdin.on("end", function() {
+    stdin.on("end", function () {
       resolve(data);
     });
     stdin.on("error", (err: Error) => {
@@ -48,7 +48,7 @@ async function readStdin(): Promise<string> {
 }
 
 export default createCommand({
-  builder: yargs => {
+  builder: (yargs) => {
     return yargs
       .middleware(requireClusterConfig)
       .option("email", {

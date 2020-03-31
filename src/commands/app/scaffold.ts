@@ -19,7 +19,7 @@ async function selectApp(argv: Arguments): Promise<App> {
   const apps = await cliContainer.getApps();
 
   if (argv.app && typeof argv.app === "string") {
-    const app = apps.find(app => app.name === argv.app);
+    const app = apps.find((app) => app.name === argv.app);
     if (!app) {
       throw new Error("App not found.");
     }
@@ -27,7 +27,7 @@ async function selectApp(argv: Arguments): Promise<App> {
 
   const answers = await inquirer.prompt([
     {
-      choices: apps.map(app => ({ name: app.name, value: app })),
+      choices: apps.map((app) => ({ name: app.name, value: app })),
       message: "Select an app to be associated with the directory:",
       name: "app",
       type: "list",
@@ -58,7 +58,7 @@ async function selectTemplate(): Promise<ScaffoldingTemplate> {
 
   const answers = await inquirer.prompt([
     {
-      choices: templates.map(t => ({ name: t.name, value: t })),
+      choices: templates.map((t) => ({ name: t.name, value: t })),
 
       message: "Select template:",
       name: "template",
@@ -126,7 +126,7 @@ async function run(argv: Arguments) {
 }
 
 export default createCommand({
-  builder: yargs => {
+  builder: (yargs) => {
     return yargs
       .middleware(requireClusterConfig)
       .middleware(requireUser)

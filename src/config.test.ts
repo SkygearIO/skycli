@@ -104,7 +104,7 @@ describe("migrateSkycliConfig", () => {
 
 describe("updateUser, getUser, deleteUser", () => {
   let c = createSkycliConfig();
-  c = updateUser(c, "default", u => {
+  c = updateUser(c, "default", (u) => {
     return {
       ...u,
       access_token: "access_token",
@@ -130,7 +130,7 @@ describe("updateUser, getUser, deleteUser", () => {
   });
 
   expect(
-    updateUser(c, "default", u => {
+    updateUser(c, "default", (u) => {
       return {
         ...u,
         access_token: "new_token",

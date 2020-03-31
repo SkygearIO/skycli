@@ -9,14 +9,14 @@ async function run(_: Arguments) {
     return;
   }
   const table = createTable({ head: ["NAME", "CREATED_AT"] });
-  apps.map(a => {
+  apps.map((a) => {
     table.push([a.name, displayDate(a.created_at)]);
   });
   console.log(table.toString());
 }
 
 export default createCommand({
-  builder: yargs => {
+  builder: (yargs) => {
     return yargs.middleware(requireClusterConfig).middleware(requireUser);
   },
   command: "list",

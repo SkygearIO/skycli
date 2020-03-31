@@ -60,7 +60,7 @@ async function run(argv: Arguments) {
 }
 
 export default createCommand({
-  builder: yargs => {
+  builder: (yargs) => {
     return yargs
       .middleware(requireClusterConfig)
       .middleware(requireUser)

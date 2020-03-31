@@ -7,7 +7,9 @@ import { SkygearError } from "@skygear/node-client";
 async function run(argv: Arguments) {
   const resp = await cliContainer.getDomains(argv.context.app || "");
 
-  const customDomain = resp.custom_domains.find(c => c.domain === argv.domain);
+  const customDomain = resp.custom_domains.find(
+    (c) => c.domain === argv.domain
+  );
   if (!customDomain) {
     throw new Error("Domain not found.");
   }
@@ -29,7 +31,7 @@ async function run(argv: Arguments) {
   if (missingRecords.length > 0) {
     console.log(
       chalk`{yellow WARN:} Some provided DNS records is not found. You may want to check DNS configuration again:
-${missingRecords.map(r => JSON.stringify(r, null, 4)).join("\n")}`
+${missingRecords.map((r) => JSON.stringify(r, null, 4)).join("\n")}`
     );
   }
   console.log(
@@ -38,7 +40,7 @@ ${missingRecords.map(r => JSON.stringify(r, null, 4)).join("\n")}`
 }
 
 export default createCommand({
-  builder: yargs => {
+  builder: (yargs) => {
     return yargs
       .middleware(requireClusterConfig)
       .middleware(requireUser)

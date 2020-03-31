@@ -8,14 +8,14 @@ async function run(argv: Arguments) {
   const collaborators = await cliContainer.getCollaborators(appName);
 
   const table = createTable({ head: ["EMAIL"] });
-  collaborators.map(c => {
+  collaborators.map((c) => {
     table.push([c.email]);
   });
   console.log(table.toString());
 }
 
 export default createCommand({
-  builder: yargs => {
+  builder: (yargs) => {
     return yargs
       .middleware(requireClusterConfig)
       .middleware(requireUser)

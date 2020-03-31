@@ -7,7 +7,9 @@ import { MiddlewareFunction } from "yargs";
 async function run(argv: Arguments) {
   const resp = await cliContainer.getDomains(argv.context.app || "");
 
-  const customDomain = resp.custom_domains.find(c => c.domain === argv.domain);
+  const customDomain = resp.custom_domains.find(
+    (c) => c.domain === argv.domain
+  );
   if (!customDomain) {
     throw new Error("Domain not found.");
   }
@@ -39,7 +41,7 @@ async function run(argv: Arguments) {
   console.log(chalk`{green Success!} Updated domain ${customDomain.domain}.`);
 }
 
-const validateDomainUpdate = (function(argv: Arguments): Promise<any> {
+const validateDomainUpdate = (function (argv: Arguments): Promise<any> {
   if (argv["disable-redirect"] && argv["redirect-domain"]) {
     return Promise.reject(
       chalk`{red ERROR:} You can provider either {bold --disable-redirect} or {bold --redirect-domain=[REDIRECT_DOMAIN]}`
@@ -55,7 +57,7 @@ const validateDomainUpdate = (function(argv: Arguments): Promise<any> {
 } as any) as MiddlewareFunction;
 
 export default createCommand({
-  builder: yargs => {
+  builder: (yargs) => {
     return yargs
       .middleware(requireClusterConfig)
       .middleware(requireUser)

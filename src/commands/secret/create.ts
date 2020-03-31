@@ -19,7 +19,7 @@ async function run(argv: Arguments) {
   console.log(chalk`{green Success!} Created secret ${secretName}`);
 }
 
-const parseSecretValue = function(
+const parseSecretValue = function (
   argv: Arguments
 ): Promise<{ [key: string]: string }> {
   let crt = 0;
@@ -46,7 +46,7 @@ const parseSecretValue = function(
   return Promise.resolve({ encodedValue });
 };
 
-const parseSecretTLS = function(
+const parseSecretTLS = function (
   argv: Arguments
 ): Promise<{ [key: string]: string }> {
   if (!argv.cert || !argv.key) {
@@ -60,7 +60,7 @@ const parseSecretTLS = function(
   return Promise.resolve({ encodedCert, encodedKey });
 };
 
-const parseSecretValues = (function(argv: Arguments): Promise<any> {
+const parseSecretValues = (function (argv: Arguments): Promise<any> {
   if (argv.type === "tls") {
     return parseSecretTLS(argv);
   }
@@ -68,7 +68,7 @@ const parseSecretValues = (function(argv: Arguments): Promise<any> {
 } as any) as MiddlewareFunction;
 
 export default createCommand({
-  builder: yargs => {
+  builder: (yargs) => {
     return yargs
       .middleware(requireClusterConfig)
       .middleware(requireUser)
@@ -95,21 +95,21 @@ export default createCommand({
         desc: "Secret value from file",
         type: "string",
       })
-      .coerce("file", function(arg) {
+      .coerce("file", function (arg) {
         return require("fs").readFileSync(arg, "utf8");
       })
       .option("cert", {
         desc: "PEM encoded public key certificate file",
         type: "string",
       })
-      .coerce("cert", function(arg) {
+      .coerce("cert", function (arg) {
         return require("fs").readFileSync(arg, "utf8");
       })
       .option("key", {
         desc: "PEM encoded private key file associated with given certificate",
         type: "string",
       })
-      .coerce("key", function(arg) {
+      .coerce("key", function (arg) {
         return require("fs").readFileSync(arg, "utf8");
       });
   },

@@ -14,7 +14,7 @@ async function run(argv: Arguments) {
 
   for (const specs of Object.values(gearSpecs)) {
     for (const spec of specs) {
-      if (!items.some(item => item.type === spec.type)) {
+      if (!items.some((item) => item.type === spec.type)) {
         table.push([spec.type, "", "<not provided>"]);
       }
     }
@@ -24,7 +24,7 @@ async function run(argv: Arguments) {
 }
 
 export default createCommand({
-  builder: yargs => {
+  builder: (yargs) => {
     return yargs
       .middleware(requireClusterConfig)
       .middleware(requireUser)

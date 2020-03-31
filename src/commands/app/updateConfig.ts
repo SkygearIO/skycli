@@ -42,7 +42,7 @@ async function run(argv: Arguments) {
 }
 
 export default createCommand({
-  builder: yargs => {
+  builder: (yargs) => {
     return yargs
       .middleware(requireClusterConfig)
       .middleware(requireUser)
@@ -52,7 +52,7 @@ export default createCommand({
         type: "string",
         describe: "Current app config file in yaml format",
       })
-      .coerce("file", function(arg) {
+      .coerce("file", function (arg) {
         return require("fs").readFileSync(arg, "utf8");
       });
   },

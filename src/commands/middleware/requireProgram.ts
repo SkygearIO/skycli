@@ -3,7 +3,7 @@ import { Arguments } from "../../util";
 import commandExists from "command-exists";
 
 function requireProgram(program: string): (argv: Arguments) => Promise<void> {
-  return function(_argv: Arguments): Promise<void> {
+  return function (_argv: Arguments): Promise<void> {
     return new Promise((resolve, reject) => {
       commandExists(program, (err, exists) => {
         if (err) {

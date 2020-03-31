@@ -60,7 +60,7 @@ export function createCommand(
         .then(() => {
           return module.handler(argv);
         })
-        .catch(e => {
+        .catch((e) => {
           printError(e);
           process.exit(1);
         });
@@ -77,7 +77,7 @@ export function getCommandGroupHelpMessage(
   subCommands: CommandModule[]
 ) {
   const cmdsText = subCommands
-    .map(cmd => {
+    .map((cmd) => {
       if (typeof cmd.command === "string") {
         return cmd.command.split(" ");
       } else if (cmd.command == null) {
@@ -85,7 +85,7 @@ export function getCommandGroupHelpMessage(
       }
       return cmd.command;
     })
-    .map(cmd => cmd[0])
+    .map((cmd) => cmd[0])
     .join(" | ");
   return `Usage: skycli ${command} [action]
   action maybe           ${cmdsText}

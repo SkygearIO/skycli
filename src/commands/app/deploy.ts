@@ -142,7 +142,7 @@ function createPack(
   const finalize = cur >= folders.length - 1;
   return tar.pack(folder, {
     finalize: finalize,
-    finish: function(partsOfPack: any) {
+    finish: function (partsOfPack: any) {
       cur += 1;
       if (!finalize) {
         createPack(folders, folderToPathsMap, partsOfPack, cur);
@@ -159,7 +159,7 @@ function getChecksum(archivePath: string): Promise<Checksum> {
   return new Promise((resolve, reject) => {
     try {
       const stream = createArchiveReadStream(archivePath);
-      stream.on("data", data => {
+      stream.on("data", (data) => {
         md5.update(data, "utf8");
         sha256.update(data, "utf8");
       });
@@ -229,7 +229,7 @@ function waitForDeploymentStatusImpl(
   // context.app is ensured by the middleware
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   cliContainer.getDeployment(context.app!, deploymentID).then(
-    result => {
+    (result) => {
       if (
         result.status === DeploymentStatus.Running ||
         result.status === DeploymentStatus.DeployFailed
@@ -247,7 +247,7 @@ function waitForDeploymentStatusImpl(
         waitForDeploymentStatusImpl(context, deploymentID, resolve, reject);
       }, 3000);
     },
-    err => {
+    (err) => {
       reject(err);
     }
   );
@@ -279,7 +279,7 @@ async function confirmIfItemsWillBeRemovedInNewDeployment(
     // itemName is found in existing deployment but not found in new deployment
     // or
     // itemName is found in both deployment but the types differ.
-    const newItem = deployments.find(a => a.name === existingItem.name);
+    const newItem = deployments.find((a) => a.name === existingItem.name);
     if (!newItem || existingItem.type !== newItem.type) {
       itemsWillBeRemoved.push(existingItem.name);
     }
@@ -362,7 +362,7 @@ function downloadDeployLogImpl(
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     .downloadDeployLog(context.app!, deploymentID, onLogReceive)
     .then(resolve)
-    .catch(err => {
+    .catch((err) => {
       // retry when the log is not found, wait for the deployment start
       if (isHTTP404(err)) {
         if (context.debug) {
@@ -440,7 +440,7 @@ async function run(argv: Arguments) {
     if (artifactItems.length > 0) {
       const artifactResponses = await cliContainer.createArtifacts(
         appName,
-        artifactItems.map(a => a.artifact)
+        artifactItems.map((a) => a.artifact)
       );
       for (let i = 0; i < artifactItems.length; i++) {
         deploymentItemArtifacts.push({
@@ -458,7 +458,7 @@ async function run(argv: Arguments) {
     );
 
     console.log(chalk`Wait for deployment: {green ${deploymentID}}`);
-    await downloadDeployLog(argv.context, deploymentID, log => {
+    await downloadDeployLog(argv.context, deploymentID, (log) => {
       if (log.message) {
         console.log(log.message);
       }
@@ -484,7 +484,7 @@ async function run(argv: Arguments) {
 }
 
 export default createCommand({
-  builder: yargs => {
+  builder: (yargs) => {
     return yargs.middleware(requireUser).option("app", {
       desc: "App name",
       type: "string",

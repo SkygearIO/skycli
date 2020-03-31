@@ -26,7 +26,7 @@ async function collectTemplatePaths(
   const stats = await fs.lstat(filePath);
   if (stats.isDirectory()) {
     const basenames = await fs.readdir(filePath);
-    const filePaths = basenames.map(basename => join(filePath, basename));
+    const filePaths = basenames.map((basename) => join(filePath, basename));
     for (const p of filePaths) {
       await collectTemplatePaths(p, output, depth - 1);
     }
@@ -181,7 +181,7 @@ async function run(argv: Arguments) {
 }
 
 export default createCommand({
-  builder: yargs => {
+  builder: (yargs) => {
     return yargs
       .middleware(requireClusterConfig)
       .middleware(requireUser)

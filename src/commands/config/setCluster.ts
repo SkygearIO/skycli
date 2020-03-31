@@ -56,7 +56,7 @@ const apiKeyPrompt: inquirer.Question = {
   message: "Cluster API key:",
   name: "apiKey",
   type: "input",
-  validate: input => {
+  validate: (input) => {
     if (input.trim() === "") {
       return "Cluster API key is required.";
     }
@@ -68,7 +68,7 @@ const urlPrompt: inquirer.Question = {
   message: "Cluster endpoint:",
   name: "endpoint",
   type: "input",
-  validate: input => {
+  validate: (input) => {
     if (input.trim() === "") {
       return "Cluster API endpoint is required.";
     }
@@ -80,7 +80,7 @@ const namePrompt: inquirer.Question = {
   message: "Cluster Name:",
   name: "name",
   type: "input",
-  validate: input => {
+  validate: (input) => {
     if (!/^[a-zA-Z0-9-]{1,}$/.test(input)) {
       return "Cluster Name must contain only alphanumeric characters and dash.";
     }
@@ -92,8 +92,8 @@ async function selectCluster(argv: Arguments) {
   const answers = await inquirer.prompt([
     {
       choices: clusterOptions
-        .filter(o => !o.debug || argv.debug)
-        .map(t => ({ name: t.displayName, value: t.cluster })),
+        .filter((o) => !o.debug || argv.debug)
+        .map((t) => ({ name: t.displayName, value: t.cluster })),
       message: "Select a cluster you want to connect to:",
       name: "cluster",
       type: "list",
@@ -118,13 +118,13 @@ async function askClusterServer(argv: Arguments) {
         server.name = selected.name;
       }
     } else {
-      selected = clusterOptions.find(c => c.cluster?.name === server.name)
+      selected = clusterOptions.find((c) => c.cluster?.name === server.name)
         ?.cluster;
       if (!selected) {
         const choices = clusterOptions
-          .filter(o => !o.debug || argv.debug)
-          .map(o => o.cluster?.name)
-          .filter(n => n);
+          .filter((o) => !o.debug || argv.debug)
+          .map((o) => o.cluster?.name)
+          .filter((n) => n);
         throw new Error(
           `Cluster not found. Valid choices are: ${choices.join(", ")}`
         );
@@ -163,7 +163,7 @@ async function askClusterServer(argv: Arguments) {
     return Promise.resolve(server);
   }
 
-  return inquirer.prompt(prompts).then(answers => {
+  return inquirer.prompt(prompts).then((answers) => {
     return {
       ...server,
       ...answers,
@@ -185,14 +185,16 @@ async function run(argv: Arguments) {
   config.contexts = config.contexts ?? [];
 
   const clusterConfig: ClusterConfig = { env, endpoint, api_key: apiKey };
-  const cluster = config.clusters.find(c => c.name === clusterName);
+  const cluster = config.clusters.find((c) => c.name === clusterName);
   if (!cluster) {
     config.clusters.push({ name: clusterName, cluster: clusterConfig });
   } else {
     cluster.cluster = clusterConfig;
   }
 
-  const context = config.contexts.find(c => c.context.cluster === clusterName);
+  const context = config.contexts.find(
+    (c) => c.context.cluster === clusterName
+  );
   if (!context) {
     config.contexts.push({
       name: clusterName,
@@ -210,7 +212,7 @@ async function run(argv: Arguments) {
 }
 
 export default createCommand({
-  builder: yargs => {
+  builder: (yargs) => {
     return yargs
       .option("endpoint", {
         desc: "Cluster API endpoint.",
