@@ -33,8 +33,8 @@ const clusterOptions: ClusterOption[] = [
     debug: true,
     cluster: {
       name: "skygeario-staging",
-      apiKey: "nA1nZ2vemgjJFD99n36QoGNObG5myWXO",
-      endpoint: "https://controller.staging.skygear.dev",
+      apiKey: "auSYii4NDyopRcgmbwIq6dCcYjUmqO6H",
+      endpoint: "https://controller.lambdify.com",
     },
   },
   {
@@ -42,8 +42,8 @@ const clusterOptions: ClusterOption[] = [
     debug: true,
     cluster: {
       name: "skygeario-dev",
-      apiKey: "3ac91f63e599eafce8632420613754cb",
-      endpoint: "https://controller.dev.skygearapis.com",
+      apiKey: "eHkB1VzJN6AyEhtVvcTlRldLZ2pf5tK1",
+      endpoint: "https://controller.lamdify.com",
     },
   },
   {
