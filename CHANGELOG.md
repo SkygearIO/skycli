@@ -1,3 +1,16 @@
+
+## 2.3.0 (2020-04-02)
+
+### Features
+
+- New auth ui support
+- Support custom domain assignment
+
+### Other notes
+
+- Update staging and dev cluster to new cluster with auth ui support
+- Upgrade deps and fix npm audit
+
 ## 2.2.0 (2020-03-02)
 
 ### Features
