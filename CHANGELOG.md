@@ -1,3 +1,9 @@
+## 2.3.1 (2020-04-42)
+
+### Features
+
+- Support update templates with language tag
+
 
 ## 2.3.0 (2020-04-02)
 
