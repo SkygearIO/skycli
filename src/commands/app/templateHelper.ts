@@ -8,6 +8,10 @@ export function templateItemToLocalTemplatePath(
 ): string {
   const parts = [];
 
+  if (templateItem.language_tag) {
+    parts.push(templateItem.language_tag);
+  }
+
   if (templateItem.key) {
     parts.push(templateItem.key);
   }

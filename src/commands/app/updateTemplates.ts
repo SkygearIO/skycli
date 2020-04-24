@@ -10,6 +10,7 @@ import {
   TemplateItem,
   LocalTemplateItem,
   RemoteTemplateItem,
+  TemplateSpec,
 } from "../../container/types";
 import { digestOfFilePath } from "../../digest";
 import { findEqualReference, printTemplateItems } from "./templateHelper";
@@ -37,22 +38,33 @@ async function collectTemplatePaths(
 
 async function localTemplatePathToLocalTemplateItem(
   templatePath: string,
-  templateDir: string
+  templateDir: string,
+  typeToSpec: { [type: string]: TemplateSpec }
 ): Promise<LocalTemplateItem> {
-  // TODO(template): we do not support language tag nor key validation now.
-  let type = "";
+  const p = relative(templateDir, templatePath);
+  const parts = p.split(sep);
+
+  if (parts.length <= 0) {
+    throw new Error("unexpected template: " + p);
+  }
+
+  const type = parts.pop()!;
+  const spec = typeToSpec[type];
+  if (!spec) {
+    throw new Error("unexpected template: " + p);
+  }
+
   let key;
-  const keyType = relative(templateDir, templatePath).split(sep);
-  switch (keyType.length) {
-    case 1:
-      type = keyType[0];
-      break;
-    case 2:
-      key = keyType[0];
-      type = keyType[1];
-      break;
-    default:
-      throw new Error("unexpected template: " + keyType);
+  let language_tag;
+  if (spec.is_keyed && parts.length > 0) {
+    key = parts.pop();
+  }
+  if (parts.length > 0) {
+    language_tag = parts.pop();
+  }
+
+  if (parts.length !== 0) {
+    throw new Error("unexpected template: " + p);
   }
 
   const digest = await digestOfFilePath(templatePath);
@@ -60,6 +72,7 @@ async function localTemplatePathToLocalTemplateItem(
   return {
     type,
     key,
+    language_tag,
     digest,
     filePath: templatePath,
   };
@@ -132,7 +145,14 @@ async function reuseAndUploadTemplateItems(
 
 async function run(argv: Arguments) {
   const appName = argv.context.app || "";
-  const { items } = await cliContainer.getTemplates(appName);
+  const { specs: gearSpecs, items } = await cliContainer.getTemplates(appName);
+  const typeToSpec: { [type: string]: TemplateSpec } = {};
+  for (const specs of Object.values(gearSpecs)) {
+    for (const spec of specs) {
+      typeToSpec[spec.type] = spec;
+    }
+  }
+
   const templateDir = argv.dir as string;
   const localTemplatePaths: string[] = [];
   await collectTemplatePaths(templateDir, localTemplatePaths, 2);
@@ -140,7 +160,11 @@ async function run(argv: Arguments) {
   const localTemplateItems: LocalTemplateItem[] = [];
   for (const templatePath of localTemplatePaths) {
     localTemplateItems.push(
-      await localTemplatePathToLocalTemplateItem(templatePath, templateDir)
+      await localTemplatePathToLocalTemplateItem(
+        templatePath,
+        templateDir,
+        typeToSpec
+      )
     );
   }
 
