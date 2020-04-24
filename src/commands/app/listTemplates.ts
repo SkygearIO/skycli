@@ -6,16 +6,16 @@ async function run(argv: Arguments) {
   const { specs: gearSpecs, items } = await cliContainer.getTemplates(
     argv.context.app || ""
   );
-  const table = createTable({ head: ["TYPE", "KEY", "URL"] });
+  const table = createTable({ head: ["TYPE", "KEY", "LANG", "URL"] });
 
   for (const item of items) {
-    table.push([item.type, item.key, item.signed_uri]);
+    table.push([item.type, item.key, item.language_tag, item.signed_uri]);
   }
 
   for (const specs of Object.values(gearSpecs)) {
     for (const spec of specs) {
       if (!items.some((item) => item.type === spec.type)) {
-        table.push([spec.type, "", "<not provided>"]);
+        table.push([spec.type, "", "", "<not provided>"]);
       }
     }
   }
