@@ -202,6 +202,8 @@ async function run(argv: Arguments) {
     unchanged
   );
   await cliContainer.putTemplates(appName, templateItemsToPut);
+
+  console.log("Templates updated");
 }
 
 export default createCommand({
