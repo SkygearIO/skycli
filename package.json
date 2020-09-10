@@ -46,7 +46,7 @@
     "js-yaml": "3.13.1",
     "mime": "2.4.4",
     "moment": "2.24.0",
-    "node-fetch": "2.6.0",
+    "node-fetch": "2.6.1",
     "punycode": "2.1.1",
     "tar-fs": "^2.0.1",
     "tmp-promise": "2.0.2",
